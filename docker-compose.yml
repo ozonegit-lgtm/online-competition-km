@@ -1,0 +1,78 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: competition_km_app
+    working_dir: /var/www/html
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - competition_km_network
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: competition_km_nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - competition_km_network
+
+  db:
+    image: mariadb:10.4
+    container_name: competition_km_db
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MARIADB_DATABASE: online_competition_km
+      MARIADB_USER: competition_user
+      MARIADB_PASSWORD: competition_password
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - competition_km_db_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "healthcheck.sh",
+          "--connect",
+          "--innodb_initialized"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - competition_km_network
+
+  node:
+    image: node:22-alpine
+    container_name: competition_km_node
+    working_dir: /var/www/html
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/var/www/html
+      - competition_km_node_modules:/var/www/html/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    networks:
+      - competition_km_network
+
+networks:
+  competition_km_network:
+    driver: bridge
+
+volumes:
+  competition_km_db_data:
+  competition_km_node_modules:
