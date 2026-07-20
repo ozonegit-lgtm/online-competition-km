@@ -28,7 +28,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'role_id',
-        // 'username',
+        'username',
         'email',
         'password',
         'status',
@@ -46,15 +46,15 @@ class User extends Authenticatable
      * Type Casting
      */
     protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'status' => 'boolean',
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
-        ];
-    }
+        {
+            return [
+                'password' => 'hashed',
+                'is_active' => 'boolean',
+                'last_login_at' => 'datetime',
+                'created_at' => 'datetime',
+                'updated_at' => 'datetime',
+            ];
+        }
 
     /**
      * User เป็นของ Role หนึ่ง Role
