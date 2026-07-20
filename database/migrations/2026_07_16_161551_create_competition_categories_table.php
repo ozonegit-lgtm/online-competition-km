@@ -12,8 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('competition_categories', function (Blueprint $table) {
+
             $table->id();
+
+            $table->string('category_name',100)->unique();
+            $table->string('category_slug',120)->unique();
+
+            $table->text('description')->nullable();
+
+            $table->boolean('is_active')
+                ->default(true)
+                ->comment('เปิด/ปิดการใช้งานหมวดหมู่');
+
             $table->timestamps();
+
+            $table->index('is_active');
         });
     }
 

@@ -12,8 +12,32 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('submission_members', function (Blueprint $table) {
+
             $table->id();
+
+            $table->foreignId('submission_id')
+                ->constrained('submissions')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
+            $table->string('fullname',150);
+
+            $table->string('email',150)->nullable();
+
+            $table->string('phone',20)->nullable();
+
+            $table->string('organization',255)->nullable();
+
+            $table->string('position',150)->nullable();
+
+            $table->boolean('is_team_leader')
+                ->default(false);
+
             $table->timestamps();
+
+            $table->index('submission_id');
+            $table->index('is_team_leader');
+
         });
     }
 

@@ -2,44 +2,89 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    /**
+     * ตารางที่ใช้งาน
+     */
+    protected $table = 'users';
+
+    /**
+     * Primary Key
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * Mass Assignment
+     */
     protected $fillable = [
         'role_id',
+        // 'username',
         'email',
         'password',
         'status',
-        'last_login_at',
     ];
 
+    /**
+     * ซ่อนข้อมูล
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    /**
+     * Type Casting
+     */
     protected function casts(): array
     {
         return [
+            'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'last_login_at' => 'datetime',
+            'status' => 'boolean',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 
+    /**
+     * User เป็นของ Role หนึ่ง Role
+     */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
 
+    /**
+     * User มีข้อมูล Profile เพียงหนึ่งรายการ
+     */
     public function adminProfile(): HasOne
     {
         return $this->hasOne(AdminProfile::class);
+    }
+
+    /**
+     * User สร้างการแข่งขันได้หลายรายการ
+     */
+    public function competitions(): HasMany
+    {
+        return $this->hasMany(Competition::class, 'created_by');
+    }
+
+    /**
+     * User มี Activity Logs ได้หลายรายการ
+     */
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 }

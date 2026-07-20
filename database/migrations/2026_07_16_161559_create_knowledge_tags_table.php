@@ -12,8 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('knowledge_tags', function (Blueprint $table) {
+
             $table->id();
+
+            $table->string('tag_name',100)->unique();
+
+            $table->string('slug',100)->unique();
+
+            $table->string('color',20)->nullable();
+
+            $table->boolean('is_active')
+                ->default(true);
+
             $table->timestamps();
+
+            $table->index('is_active');
+
         });
     }
 

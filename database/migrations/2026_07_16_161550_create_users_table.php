@@ -9,21 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+   public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('role_id')->constrained('roles')->restrictOnDelete();
-            $table->string('email', 150)->unique();
-            $table->string('password', 255);
-            $table->enum('status', [
-                'active',
-                'inactive',
-            ])->default('active');
-            $table->dateTime('last_login_at')->nullable();
+            $table->foreignId('role_id')->constrained('roles')->cascadeOnUpdate()->restrictOnDelete();
+            $table->string('username',50)->unique();
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
+            $table->timestamp('last_login_at')->nullable();
             $table->timestamps();
-            $table->index('status');
         });
     }
 

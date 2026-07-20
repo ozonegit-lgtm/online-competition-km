@@ -9,25 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+   public function up(): void
     {
         Schema::create('admin_profiles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
-            $table->string('first_name', 100)->nullable();
-            $table->string('last_name', 100)->nullable();
-            $table->string('phone', 20)->nullable();
-            $table->string('organization', 255)->nullable();
-            $table->string('profile_image', 255)->nullable();
-            $table->enum('approval_status', [
-                'pending',
-                'approved',
-                'rejected',
-            ])->default('pending');
-            $table->foreignId('approved_by_user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->dateTime('approved_at')->nullable();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('first_name',100);
+            $table->string('last_name',100);
+            $table->string('phone',20)->nullable();
+            $table->string('position',150)->nullable();
+            $table->string('avatar')->nullable();
+            $table->boolean('must_change_password')->default(true);
             $table->timestamps();
-            $table->index('approval_status');
         });
     }
     /**

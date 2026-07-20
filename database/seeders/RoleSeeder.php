@@ -14,16 +14,19 @@ class RoleSeeder extends Seeder
         Role::updateOrCreate([
             'role_name' => 'Super admin',
             'description' =>'ผู้ดูแลระบบสูงสุด',
+            'display_name' =>'Super-Admin',
         ]);
 
         Role::updateOrCreate([
             'role_name'   => 'Competition Admin',
             'description' => 'ผู้จัดการแข่งขัน',
+            'display_name' =>'Admin-competition',
         ]);
 
         Role::updateOrCreate([
             'role_name'   => 'Judge',
             'description' => 'กรรมการตัดสิน',
+            'display_name' =>'Judge-competition',
         ]);
     }
 }

@@ -12,8 +12,33 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('competition_judges', function (Blueprint $table) {
+
             $table->id();
+
+            $table->string('fullname',150);
+
+            $table->string('email',150)->unique();
+
+            $table->string('phone',20)->nullable();
+
+            $table->string('organization',255)->nullable();
+
+            $table->string('position',150)->nullable();
+
+            $table->string('password');
+
+            $table->rememberToken();
+
+            $table->timestamp('last_login_at')->nullable();
+
+            $table->enum('status',[
+                'active',
+                'inactive'
+            ])->default('active');
+
             $table->timestamps();
+
+            $table->index('status');
         });
     }
 

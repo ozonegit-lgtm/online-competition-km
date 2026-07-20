@@ -19,37 +19,36 @@ class SuperAdminSeeder extends Seeder
         $role = Role::where('role_name', 'Super Admin')->first();
 
         if (!$role) {
-            $this->command->error('Role Super Admin not found.');
+            $this->command->error('Role "Super Admin" not found.');
             return;
         }
 
-        // สร้าง Super Admin
+        // สร้างบัญชี Super Admin
         $user = User::updateOrCreate(
             [
                 'email' => 'admin@competitionkm.com',
             ],
             [
                 'role_id'       => $role->id,
+                'username'      => 'superadmin',
                 'password'      => Hash::make('12345678'),
-                'status'        => 'active',
+                'is_active'     => true,
                 'last_login_at' => null,
             ]
         );
 
-        // สร้าง Admin Profile
-        AdminProfile::updateOrCreate(
+        // สร้างข้อมูล Profile
+       AdminProfile::updateOrCreate(
             [
                 'user_id' => $user->id,
             ],
             [
-                'first_name'         => 'Super',
-                'last_name'          => 'Admin',
-                'phone'              => '0812345678',
-                'organization'       => 'Online Competition KM',
-                'profile_image'      => null,
-                'approval_status'    => 'approved',
-                'approved_by_user_id'=> $user->id,
-                'approved_at'        => now(),
+                'first_name'          => 'Super',
+                'last_name'           => 'Admin',
+                'phone'               => '0812345678',
+                'position'            => 'Super Administrator',
+                'avatar'              => null,
+                'must_change_password'=> false,
             ]
         );
     }

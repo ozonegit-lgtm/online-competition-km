@@ -55,6 +55,22 @@ services:
     networks:
       - competition_km_network
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: competition_km_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      - db
+    networks:
+      - competition_km_network
+
   node:
     image: node:22-alpine
     container_name: competition_km_node

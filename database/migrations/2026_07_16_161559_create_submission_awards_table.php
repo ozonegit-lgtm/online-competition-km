@@ -12,8 +12,34 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('submission_awards', function (Blueprint $table) {
+
             $table->id();
+
+            $table->foreignId('submission_id')
+                ->constrained('submissions')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
+            $table->foreignId('award_id')
+                ->constrained('awards')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+
+            $table->timestamp('awarded_at')
+                ->useCurrent();
+
+            $table->text('remark')->nullable();
+
             $table->timestamps();
+
+            $table->unique([
+                'submission_id',
+                'award_id'
+            ]);
+
+            $table->index('submission_id');
+            $table->index('award_id');
+
         });
     }
 
