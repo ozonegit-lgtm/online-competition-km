@@ -67,6 +67,13 @@ class AuthController extends Controller
         $passwordOk   = Hash::check($password, $passwordHash) && $user !== null;
 
         $isActive = $user && (bool) $user->is_active === true;
+        dd([
+            'email_input' => $email,
+            'user_found' => $user !== null,
+            'user_email' => $user?->email,
+            'password_ok' => $passwordOk,
+            'is_active' => $isActive,
+        ]);
 
         if (!$user || !$passwordOk || !$isActive) {
             RateLimiter::hit($throttleKey, self::LOCKOUT_SECONDS);
