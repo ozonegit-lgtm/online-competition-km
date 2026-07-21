@@ -32,11 +32,11 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function postlogin(Request $request): RedirectResponse
+    public function postLogin(Request $request): RedirectResponse
     {
         $request->validate([
             'email'    => ['required', 'email', 'max:150'],
-            'password' => ['required', 'string', 'min:6'],
+            'password' => ['required', 'string',],
         ]);
 
         $throttleKey = $this->throttleKey($request);
@@ -95,13 +95,13 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         // 5) อัปเดตข้อมูลการเข้าสู่ระบบล่าสุด
-        $user->forceFill([
+        $user->update([
             'last_login_at' => now(),
-        ])->save();
+        ]); 
 
         $this->logAttempt($request, $user, 'success');
 
-        return redirect()->intended('dashboard')->with('success', 'เข้าสู่ระบบสำเร็จ');
+        return redirect()->intended(route('dashboard'))->with('success', 'เข้าสู่ระบบสำเร็จ');
     }
 
     public function logout(Request $request): RedirectResponse
