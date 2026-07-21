@@ -12,7 +12,7 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         Role::updateOrCreate([
-            'role_name' => 'Super admin',
+            'role_name' => 'Super Admin',
             'description' =>'ผู้ดูแลระบบสูงสุด',
             'display_name' =>'Super-Admin',
         ]);
