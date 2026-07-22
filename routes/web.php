@@ -7,6 +7,12 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Guest
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware('guest')->group(function () {
 
     Route::get('/login', [AuthController::class, 'index'])
@@ -17,7 +23,13 @@ Route::middleware('guest')->group(function () {
 
 });
 
-Route::middleware('auth')->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Authenticated User
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -25,5 +37,41 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Super Admin
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:Super Admin'])->group(function () {
+
+    // Route ของ Super Admin
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Competition Admin
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:Competition Admin'])->group(function () {
+
+    // Route ของ Competition Admin
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Judge
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:Judge'])->group(function () {
+
+    // Route ของ Judge
 
 });

@@ -19,12 +19,12 @@
     <div class="min-h-screen flex">
 
         {{-- Sidebar --}}
-        @include('components.layout.sidebar')
+        @include('components.sidebar')
 
         <div class="flex flex-col flex-1 min-w-0">
 
             {{-- Navbar --}}
-            @include('components.layout.navbar')
+            @include('components.navbar')
 
             {{-- Main Content --}}
             <main class="flex-1 p-6">
@@ -73,7 +73,7 @@
             </main>
 
             {{-- Footer --}}
-            @include('components.layout.footer')
+            @include('components.footer')
 
         </div>
 
