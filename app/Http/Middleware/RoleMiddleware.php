@@ -38,6 +38,19 @@ class RoleMiddleware
         $user = Auth::user();
 
         /**
+         * บัญชีถูกระงับการใช้งาน (เผื่อกรณีถูกปิดระหว่างที่ session ยังไม่หมดอายุ)
+         */
+        if (!$user->is_active) {
+
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')->with('error', 'บัญชีนี้ถูกระงับการใช้งาน');
+
+        }
+
+        /**
          * ไม่มีข้อมูล Role
          */
         if (!$user->role) {

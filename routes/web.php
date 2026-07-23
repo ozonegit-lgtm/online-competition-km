@@ -15,11 +15,8 @@ Route::get('/', function () {
 
 Route::middleware('guest')->group(function () {
 
-    Route::get('/login', [AuthController::class, 'index'])
-        ->name('login');
-
-    Route::post('/login', [AuthController::class, 'postLogin'])
-        ->name('login.post');
+    Route::get('/login', [AuthController::class, 'index'])->name('login');
+    Route::post('/login', [AuthController::class, 'postLogin'])->name('login.post');
 
 });
 
@@ -31,12 +28,8 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->name('logout');
+    Route::get('/dashboard', function () {return view('dashboard');})->name('dashboard');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 });
 
