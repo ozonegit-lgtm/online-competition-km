@@ -3,72 +3,96 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>
         @yield('title', config('app.name'))
     </title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite([
+        'resources/css/app.css',
+        'resources/js/app.js'
+    ])
 
     @stack('styles')
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 text-slate-800">
 
-    <div class="min-h-screen flex">
+    <div class="min-h-screen lg:flex">
 
         {{-- Sidebar --}}
         @include('components.sidebar')
 
-        <div class="flex flex-col flex-1 min-w-0">
+        {{-- Mobile Overlay --}}
+        <div id="sidebar-overlay"class="fixed inset-0 z-40 hidden bg-slate-950/60backdrop-blur-sm lg:hidden"></div>
+
+        <div class="flex min-h-screen min-w-0 flex-1 flex-col">
 
             {{-- Navbar --}}
             @include('components.navbar')
 
             {{-- Main Content --}}
-            <main class="flex-1 p-6">
+            <main class="flex-1 p-4 sm:p-6">
 
-                {{-- Breadcrumb --}}
-                @hasSection('breadcrumb')
-                    <div class="mb-4">
-                        @yield('breadcrumb')
-                    </div>
-                @endif
+                <div class="mx-auto w-full max-w-7xl">
 
-                {{-- Page Header --}}
-                @hasSection('header')
-                    <div class="mb-6">
-                        @yield('header')
-                    </div>
-                @endif
+                    {{-- Breadcrumb --}}
+                    @hasSection('breadcrumb')
+                        <div class="mb-4">
+                            @yield('breadcrumb')
+                        </div>
+                    @endif
 
-                {{-- Flash Message --}}
-                @if (session('success'))
-                    <div class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700">
-                        {{ session('success') }}
-                    </div>
-                @endif
+                    {{-- Page Header --}}
+                    @hasSection('header')
+                        <div class="mb-6">
+                            @yield('header')
+                        </div>
+                    @endif
 
-                @if (session('error'))
-                    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-                        {{ session('error') }}
-                    </div>
-                @endif
+                    {{-- Success Message --}}
+                    @if (session('success'))
+                        <div
+                            class="mb-5 rounded-xl border border-green-200
+                                   bg-green-50 px-4 py-3 text-sm text-green-700"
+                        >
+                            {{ session('success') }}
+                        </div>
+                    @endif
 
-                {{-- Validation Errors --}}
-                @if ($errors->any())
-                    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                        <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+                    {{-- Error Message --}}
+                    @if (session('error'))
+                        <div
+                            class="mb-5 rounded-xl border border-red-200
+                                   bg-red-50 px-4 py-3 text-sm text-red-700"
+                        >
+                            {{ session('error') }}
+                        </div>
+                    @endif
 
-                {{-- Page Content --}}
-                @yield('content')
+                    {{-- Validation Errors --}}
+                    @if ($errors->any())
+                        <div
+                            class="mb-5 rounded-xl border border-red-200
+                                   bg-red-50 px-4 py-3"
+                        >
+                            <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- Page Content --}}
+                    @yield('content')
+
+                </div>
 
             </main>
 
@@ -80,7 +104,6 @@
     </div>
 
     @stack('scripts')
-
 </body>
 
 </html>

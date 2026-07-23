@@ -159,24 +159,13 @@ class AuthController extends Controller
                 $user,
                 $reason
             );
-
-            return redirect()
-                ->route('login')
-                ->withInput([
-                    'email' => $email,
-                ])
-                ->with(
-                    'error',
-                    'อีเมลหรือรหัสผ่านไม่ถูกต้อง'
-                );
+            return redirect()->route('login')->withInput(['email' => $email,])->with('error','อีเมลหรือรหัสผ่านไม่ถูกต้อง');
         }
-
         /*
         |--------------------------------------------------------------------------
         | Password ถูกต้อง แต่บัญชีถูกระงับ
         |--------------------------------------------------------------------------
         */
-
         if (!(bool) $user->is_active) {
             /*
              * รหัสผ่านถูกต้องแล้ว
@@ -200,12 +189,7 @@ class AuthController extends Controller
         */
 
         RateLimiter::clear($throttleKey);
-
-        Auth::login(
-            $user,
-            $request->boolean('remember')
-        );
-
+        Auth::login($user,$request->boolean('remember'));
         /*
          * ป้องกัน Session Fixation
          */

@@ -29,20 +29,5 @@
             {{ auth()->user()->role->display_name }}
         </p>
 
-        <form
-            action="{{ route('logout') }}"
-            method="POST"
-            class="mt-6"
-        >
-            @csrf
-
-            <button
-                type="submit"
-                class="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-            >
-                ออกจากระบบ
-            </button>
-        </form>
-
     </div>
 @endsection
