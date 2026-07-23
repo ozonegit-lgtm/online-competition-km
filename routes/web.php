@@ -1,7 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\DashboardController as DashboardRedirectController;
+
+use App\Http\Controllers\SuperAdmin\DashboardController
+    as SuperAdminDashboardController;
+
+use App\Http\Controllers\CompetitionAdmin\DashboardController
+    as CompetitionAdminDashboardController;
+
+use App\Http\Controllers\Judge\DashboardController
+    as JudgeDashboardController;
+
+/*
+|--------------------------------------------------------------------------
+| หน้าแรก
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -15,8 +32,11 @@ Route::get('/', function () {
 
 Route::middleware('guest')->group(function () {
 
-    Route::get('/login', [AuthController::class, 'index'])->name('login');
-    Route::post('/login', [AuthController::class, 'postLogin'])->name('login.post');
+    Route::get('/login', [AuthController::class, 'index'])
+        ->name('login');
+
+    Route::post('/login', [AuthController::class, 'postLogin'])
+        ->name('login.post');
 
 });
 
@@ -26,10 +46,17 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
 
-    Route::get('/dashboard', function () {return view('dashboard');})->name('dashboard');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    /*
+     * รับผู้ใช้หลัง Login แล้วส่งไป Dashboard ตาม Role
+     */
+    Route::get('/dashboard', DashboardRedirectController::class)
+        ->middleware('role:Super Admin,Competition Admin,Judge')
+        ->name('dashboard');
+
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->name('logout');
 
 });
 
@@ -39,11 +66,17 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:Super Admin'])->group(function () {
+Route::prefix('superadmin')
+    ->name('superadmin.')
+    ->middleware(['auth', 'role:Super Admin'])
+    ->group(function () {
 
-    // Route ของ Super Admin
+        Route::get('/dashboard', [
+            SuperAdminDashboardController::class,
+            'index',
+        ])->name('dashboard');
 
-});
+    });
 
 /*
 |--------------------------------------------------------------------------
@@ -51,11 +84,17 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:Competition Admin'])->group(function () {
+Route::prefix('competition-admin')
+    ->name('competition-admin.')
+    ->middleware(['auth', 'role:Competition Admin'])
+    ->group(function () {
 
-    // Route ของ Competition Admin
+        Route::get('/dashboard', [
+            CompetitionAdminDashboardController::class,
+            'index',
+        ])->name('dashboard');
 
-});
+    });
 
 /*
 |--------------------------------------------------------------------------
@@ -63,8 +102,14 @@ Route::middleware(['auth', 'role:Competition Admin'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:Judge'])->group(function () {
+Route::prefix('judge')
+    ->name('judge.')
+    ->middleware(['auth', 'role:Judge'])
+    ->group(function () {
 
-    // Route ของ Judge
+        Route::get('/dashboard', [
+            JudgeDashboardController::class,
+            'index',
+        ])->name('dashboard');
 
-});
+    });
