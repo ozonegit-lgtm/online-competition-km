@@ -8,6 +8,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./:/var/www/html
+      - competition_km_vendor:/var/www/html/vendor
     depends_on:
       db:
         condition: service_healthy
@@ -81,7 +82,7 @@ services:
     volumes:
       - ./:/var/www/html
       - competition_km_node_modules:/var/www/html/node_modules
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    command: npm run dev -- --host 0.0.0.0
     networks:
       - competition_km_network
 
@@ -92,3 +93,4 @@ networks:
 volumes:
   competition_km_db_data:
   competition_km_node_modules:
+  competition_km_vendor:

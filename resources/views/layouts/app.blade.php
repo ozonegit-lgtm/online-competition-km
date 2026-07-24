@@ -29,7 +29,10 @@
         @include('components.sidebar')
 
         {{-- Mobile Overlay --}}
-        <div id="sidebar-overlay"class="fixed inset-0 z-40 hidden bg-slate-950/60backdrop-blur-sm lg:hidden"></div>
+        <div
+            id="sidebar-overlay"
+            class="fixed inset-0 z-40 hidden bg-slate-950/60 backdrop-blur-sm lg:hidden"
+        ></div>
 
         <div class="flex min-h-screen min-w-0 flex-1 flex-col">
 
