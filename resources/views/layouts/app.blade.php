@@ -21,7 +21,7 @@
     @stack('styles')
 </head>
 
-<body class="bg-slate-100 text-slate-800">
+<body class="bg-slate-100 font-sans text-slate-800">
 
     <div class="min-h-screen lg:flex">
 

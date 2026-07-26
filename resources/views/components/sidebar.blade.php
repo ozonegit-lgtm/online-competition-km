@@ -105,7 +105,12 @@
             @if ($roleName === 'Super Admin')
                 <div class="space-y-1">
                     <div class="flex items-center justify-between rounded-xl px-3 py-3 text-sm text-slate-500">
-                        <span>จัดการผู้ใช้งาน</span>
+                        <a href="{{ route('superadmin.createUser') }}"class="flex items-center justify-between rounded-xl px-3 py-3 text-sm
+                                    {{ request()->routeIs('superadmin.createuser')
+                                        ? 'bg-blue-50 text-blue-700'
+                                        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900' }}">
+                                        จัดการผู้ใช้งาน
+                        </a>
                         <span class="text-xs">เร็ว ๆ นี้</span>
                     </div>
 
@@ -117,10 +122,14 @@
             @elseif ($roleName === 'Competition Admin')
                 <div class="space-y-1">
                     <div class="flex items-center justify-between rounded-xl px-3 py-3 text-sm text-slate-500">
-                        <span>การแข่งขัน</span>
+                        <a href="{{ route('competition-admin.createCompitetion') }}"class="flex items-center justify-between rounded-xl px-3 py-3 text-sm
+                                    {{ request()->routeIs('competition-admin.createCompitetion')
+                                        ? 'bg-blue-50 text-blue-700'
+                                        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900' }}">
+                                        จัดการผู้ใช้งาน
+                        </a>
                         <span class="text-xs">เร็ว ๆ นี้</span>
                     </div>
-
                     <div class="flex items-center justify-between rounded-xl px-3 py-3 text-sm text-slate-500">
                         <span>ผลงานที่ส่ง</span>
                         <span class="text-xs">เร็ว ๆ นี้</span>

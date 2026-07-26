@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Competition;
+use App\Models\role;
+use App\Models\user;
 use Illuminate\Http\Request;
 
 class CompetitionController extends Controller
@@ -20,7 +22,9 @@ class CompetitionController extends Controller
      */
     public function create()
     {
-        //
+        $users = User::all();
+        $roles = Role::orderBy('id')->get();
+        return view('competition-admin.createCompitetion', compact('roles','users'));
     }
 
     /**
