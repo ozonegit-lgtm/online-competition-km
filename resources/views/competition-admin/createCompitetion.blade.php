@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'แดชบอร์ดผู้จัดการแข่งขัน')
+@section('title', 'สร้างการแข่งขัน')
 
 @section('header')
     <div>
         <h1 class="text-2xl font-bold text-slate-800">
-            แดชบอร์ดผู้จัดการแข่งขัน
+            สร้างการแข่งขัน
         </h1>
 
         <p class="mt-1 text-sm text-slate-500">

@@ -12,6 +12,8 @@ use App\Http\Controllers\Judge\DashboardController
 as JudgeDashboardController;
 use App\Http\Controllers\SuperAdmin\UserManagementController;
 use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\SuperAdmin\CompetitionTemplateController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +66,7 @@ Route::prefix('superadmin')->name('superadmin.')->middleware(['auth', 'role:Supe
         Route::get('/edit/{id}', [UserManagementController::class,'edit',])->name('editeUser');
         Route::put('/update/{id}', [UserManagementController::class,'update',])->name('updateUser');
         Route::delete('/destroy/{id}', [UserManagementController::class,'destroy',])->name('deleteUser');
+        Route::resource('templates', CompetitionTemplateController::class);
     });
 
 /*

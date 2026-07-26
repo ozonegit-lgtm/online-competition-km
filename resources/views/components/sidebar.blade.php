@@ -94,7 +94,6 @@
 
             <span>แดชบอร์ด</span>
         </a>
-
         {{-- เมนูตาม Role --}}
         <div class="mt-8">
 
@@ -103,50 +102,80 @@
             </p>
 
             @if ($roleName === 'Super Admin')
-                <div class="space-y-1">
-                    <div class="flex items-center justify-between rounded-xl px-3 py-3 text-sm text-slate-500">
-                        <a href="{{ route('superadmin.createUser') }}"class="flex items-center justify-between rounded-xl px-3 py-3 text-sm
-                                    {{ request()->routeIs('superadmin.createuser')
-                                        ? 'bg-blue-50 text-blue-700'
-                                        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900' }}">
-                                        จัดการผู้ใช้งาน
-                        </a>
-                        <span class="text-xs">เร็ว ๆ นี้</span>
-                    </div>
 
-                    <div class="flex items-center justify-between rounded-xl px-3 py-3 text-sm text-slate-500">
-                        <span>ประวัติการใช้งาน</span>
-                        <span class="text-xs">เร็ว ๆ นี้</span>
-                    </div>
+                <div class="space-y-1">
+
+                    <a
+                        href="{{ route('superadmin.createUser') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
+                        {{ request()->routeIs('superadmin.createUser')
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
+                        <span>จัดการผู้ใช้งาน</span>
+                    </a>
+
+                    <a
+                        href="{{ route('superadmin.templates.index') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
+                        {{ request()->routeIs('superadmin.template.index')
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
+                        <span>จัดการข้อมูลแบบform</span>
+                    </a>
+
                 </div>
+
             @elseif ($roleName === 'Competition Admin')
-                <div class="space-y-1">
-                    <div class="flex items-center justify-between rounded-xl px-3 py-3 text-sm text-slate-500">
-                        <a href="{{ route('competition-admin.createCompitetion') }}"class="flex items-center justify-between rounded-xl px-3 py-3 text-sm
-                                    {{ request()->routeIs('competition-admin.createCompitetion')
-                                        ? 'bg-blue-50 text-blue-700'
-                                        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900' }}">
-                                        จัดการผู้ใช้งาน
-                        </a>
-                        <span class="text-xs">เร็ว ๆ นี้</span>
-                    </div>
-                    <div class="flex items-center justify-between rounded-xl px-3 py-3 text-sm text-slate-500">
-                        <span>ผลงานที่ส่ง</span>
-                        <span class="text-xs">เร็ว ๆ นี้</span>
-                    </div>
-                </div>
-            @elseif ($roleName === 'Judge')
-                <div class="space-y-1">
-                    <div class="flex items-center justify-between rounded-xl px-3 py-3 text-sm text-slate-500">
-                        <span>งานที่ได้รับมอบหมาย</span>
-                        <span class="text-xs">เร็ว ๆ นี้</span>
-                    </div>
 
-                    <div class="flex items-center justify-between rounded-xl px-3 py-3 text-sm text-slate-500">
-                        <span>ประวัติการให้คะแนน</span>
-                        <span class="text-xs">เร็ว ๆ นี้</span>
-                    </div>
+                <div class="space-y-1">
+
+                    <a
+                        href="{{ route('competition-admin.createCompitetion') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
+                        {{ request()->routeIs('competition-admin.createCompitetion')
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
+                        <span>สร้างการแข่งขัน</span>
+                    </a>
+
+                    <a
+                        href="#"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium
+                            text-slate-500 cursor-not-allowed"
+                    >
+                        <span>ผลงานที่ส่ง</span>
+                        <span class="ml-auto text-xs">เร็ว ๆ นี้</span>
+                    </a>
+
                 </div>
+
+            @elseif ($roleName === 'Judge')
+
+                <div class="space-y-1">
+
+                    <a
+                        href="#"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium
+                            text-slate-500 cursor-not-allowed"
+                    >
+                        <span>งานที่ได้รับมอบหมาย</span>
+                        <span class="ml-auto text-xs">เร็ว ๆ นี้</span>
+                    </a>
+
+                    <a
+                        href="#"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium
+                            text-slate-500 cursor-not-allowed"
+                    >
+                        <span>ประวัติการให้คะแนน</span>
+                        <span class="ml-auto text-xs">เร็ว ๆ นี้</span>
+                    </a>
+
+                </div>
+
             @endif
 
         </div>
