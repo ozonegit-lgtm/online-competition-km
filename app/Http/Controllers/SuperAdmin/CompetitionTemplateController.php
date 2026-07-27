@@ -5,6 +5,8 @@
     use Illuminate\Support\Str;
     use App\Models\CompetitionTemplate;
     use Illuminate\Http\Request;
+    use Illuminate\Validation\Rule;
+    use Illuminate\Support\Facades\Storage;
 
     class CompetitionTemplateController extends Controller
     {
@@ -31,7 +33,7 @@
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validate = $request->validate([
             'template_name' => ['required', 'string', 'max:255'],
             'template_slug' => ['nullable', 'string', 'max:255', 'unique:competition_templates,template_slug'],
             'default_description' => ['nullable', 'string'],
@@ -39,15 +41,15 @@
             'is_active' => ['required', 'boolean'],
         ]);
 
-        $validated['template_slug'] = Str::slug(
-            $validated['template_slug'] ?: $validated['template_name']
+        $validate['template_slug'] = Str::slug(
+            $validate['template_slug'] ?: $validate['template_name']
         );
 
         if ($request->hasFile('cover_image')) {
-            $validated['cover_image'] = $request->file('cover_image')->store('competition-templates', 'public');
+            $validate['cover_image'] = $request->file('cover_image')->store('competition-templates', 'public');
         }
         
-        CompetitionTemplate::create($validated);
+        CompetitionTemplate::create($validate);
         return redirect()->route('superadmin.templates.index')->with('success', 'สร้าง Template สำเร็จ');
     }
 
@@ -64,24 +66,59 @@
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(CompetitionTemplate $competitionTemplate)
-    {
-        //
-    }
+    public function edit(CompetitionTemplate $template)
+        {
+            return view('superadmin.templates.edit', compact('template'));
+        }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, CompetitionTemplate $competitionTemplate)
-    {
-        //
-    }
+        {
+            $validate = $request->validate([
+                'template_name' => ['required', 'string', 'max:255'],
+                'template_slug' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                    Rule::unique('competition_templates', 'template_slug')
+                        ->ignore($competitionTemplate->id),
+                ],
+                'default_description' => ['nullable', 'string'],
+                'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                'is_active' => ['nullable'],
+            ]);
+
+            if ($request->hasFile('cover_image')) {
+                if ($competitionTemplate->cover_image) {
+                    Storage::disk('public')->delete($competitionTemplate->cover_image);
+                }
+
+                $validate['cover_image'] = $request->file('cover_image')
+                    ->store('competition-templates', 'public');
+            }
+
+            $validate['is_active'] = $request->has('is_active');
+
+            $competitionTemplate->update($validate);
+
+            return redirect()
+                ->route('superadmin.templates.edit', [
+                    'template' => $competitionTemplate->id
+                ])
+                ->with('success', 'แก้ไขข้อมูลสำเร็จ');
+        }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(CompetitionTemplate $competitionTemplate)
     {
-        //
+        $competitionTemplate->delete();
+
+        return redirect()
+            ->route('superadmin.templates.index')
+            ->with('success', 'ลบ Template สำเร็จ');
     }
 }

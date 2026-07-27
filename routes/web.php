@@ -58,16 +58,16 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('superadmin')->name('superadmin.')->middleware(['auth', 'role:Super Admin'])->group(function () {
-        Route::get('/dashboard', [SuperAdminDashboardController::class,'index',])->name('dashboard');
-        Route::get('/create-user', [UserManagementController::class,'create',])->name('createUser');
-        Route::post('/store', [UserManagementController::class,'store',])->name('storeUser');
-        Route::get('/show/{id}', [UserManagementController::class,'show',])->name('showUser');
-        Route::get('/edit/{id}', [UserManagementController::class,'edit',])->name('editeUser');
-        Route::put('/update/{id}', [UserManagementController::class,'update',])->name('updateUser');
-        Route::delete('/destroy/{id}', [UserManagementController::class,'destroy',])->name('deleteUser');
-        Route::resource('templates', CompetitionTemplateController::class);
-    });
+    Route::prefix('superadmin')->name('superadmin.')->middleware(['auth', 'role:Super Admin'])->group(function () {
+            Route::get('/dashboard', [SuperAdminDashboardController::class,'index',])->name('dashboard');
+            Route::get('/create-user', [UserManagementController::class,'create',])->name('createUser');
+            Route::post('/store', [UserManagementController::class,'store',])->name('storeUser');
+            Route::get('/show/{id}', [UserManagementController::class,'show',])->name('showUser');
+            Route::get('/edit/{id}', [UserManagementController::class,'edit',])->name('editeUser');
+            Route::put('/update/{id}', [UserManagementController::class,'update',])->name('updateUser');
+            Route::delete('/destroy/{id}', [UserManagementController::class,'destroy',])->name('deleteUser');
+            Route::resource('templates', CompetitionTemplateController::class);
+        });
 
 /*
 |--------------------------------------------------------------------------
