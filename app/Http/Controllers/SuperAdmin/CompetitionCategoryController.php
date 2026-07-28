@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SuperAdmin;
 
+use App\Http\Controllers\Controller;
 use App\Models\CompetitionCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CompetitionCategoryController extends Controller
 {
@@ -12,7 +14,7 @@ class CompetitionCategoryController extends Controller
      */
     public function index()
     {
-        //
+         return redirect()->route('superadmin.categories.create');
     }
 
     /**
@@ -20,7 +22,8 @@ class CompetitionCategoryController extends Controller
      */
     public function create()
     {
-        //
+        $categories = CompetitionCategory::latest()->paginate(6);
+        return view('superadmin.categories.create',compact('categories'));
     }
 
     /**
@@ -28,7 +31,19 @@ class CompetitionCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'category_name' => ['required','string','max:255','unique:competition_categories,category_name'],
+            'category_slug' => ['nullable', 'string', 'max:255', 'unique:competition_categories,category_slug'],
+            'description' => ['nullable', 'string'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+            $validate['category_slug'] = Str::slug(
+            $validate['category_slug'] ?: $validate['category_name']
+        );
+        CompetitionCategory::create($validate);
+        $categories = CompetitionCategory::latest()->paginate(6);
+        return view('superadmin.categories.create',compact('categories'));
+
     }
 
     /**

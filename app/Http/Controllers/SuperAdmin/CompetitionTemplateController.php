@@ -38,7 +38,7 @@
             'template_slug' => ['nullable', 'string', 'max:255', 'unique:competition_templates,template_slug'],
             'default_description' => ['nullable', 'string'],
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'is_active' => ['required', 'boolean'],
+            'is_active' => ['nullable', 'boolean'],
         ]);
 
         $validate['template_slug'] = Str::slug(
@@ -56,11 +56,9 @@
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show(CompetitionTemplate $template)
     {
-        $competitionTemplate = CompetitionTemplate::findOrFail($id);
-
-        return view('superadmin.templates.show', compact('competitionTemplate'));
+        return view('superadmin.templates.show', compact('template'));
     }
 
     /**
@@ -74,7 +72,7 @@
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CompetitionTemplate $competitionTemplate)
+    public function update(Request $request, CompetitionTemplate $template)
         {
             $validate = $request->validate([
                 'template_name' => ['required', 'string', 'max:255'],
@@ -82,17 +80,19 @@
                     'nullable',
                     'string',
                     'max:255',
-                    Rule::unique('competition_templates', 'template_slug')
-                        ->ignore($competitionTemplate->id),
+                    Rule::unique('competition_templates', 'template_slug')->ignore($template->id),
                 ],
                 'default_description' => ['nullable', 'string'],
                 'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
                 'is_active' => ['nullable'],
             ]);
+            if (!$request->filled('template_slug')) {
+                $validate['template_slug'] = $template->template_slug;
+            }
 
             if ($request->hasFile('cover_image')) {
-                if ($competitionTemplate->cover_image) {
-                    Storage::disk('public')->delete($competitionTemplate->cover_image);
+                if ($template->cover_image) {
+                    Storage::disk('public')->delete($template->cover_image);
                 }
 
                 $validate['cover_image'] = $request->file('cover_image')
@@ -101,24 +101,20 @@
 
             $validate['is_active'] = $request->has('is_active');
 
-            $competitionTemplate->update($validate);
+            $template->update($validate);
 
-            return redirect()
-                ->route('superadmin.templates.edit', [
-                    'template' => $competitionTemplate->id
-                ])
-                ->with('success', 'แก้ไขข้อมูลสำเร็จ');
+            return redirect()->route('superadmin.templates.index')->with('success', 'แก้ไขข้อมูลสำเร็จ');
         }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(CompetitionTemplate $competitionTemplate)
-    {
-        $competitionTemplate->delete();
-
-        return redirect()
-            ->route('superadmin.templates.index')
-            ->with('success', 'ลบ Template สำเร็จ');
-    }
+        public function destroy(CompetitionTemplate $template)
+        {
+            if ($template->cover_image) {
+                Storage::disk('public')->delete($template->cover_image);
+            }
+            $template->delete();
+            return redirect()->route('superadmin.templates.index')->with('success', 'ลบ Template สำเร็จ');
+        }
 }

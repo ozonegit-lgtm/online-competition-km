@@ -124,6 +124,15 @@
                     >
                         <span>จัดการข้อมูลแบบform</span>
                     </a>
+                                        <a
+                        href="{{ route('superadmin.categories.create') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
+                        {{ request()->routeIs('superadmin.template.index')
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
+                        <span>จัดการข้อประเภทการแข่งขัน</span>
+                    </a>
 
                 </div>
 

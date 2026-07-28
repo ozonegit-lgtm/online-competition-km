@@ -13,6 +13,8 @@ as JudgeDashboardController;
 use App\Http\Controllers\SuperAdmin\UserManagementController;
 use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\SuperAdmin\CompetitionTemplateController;
+use App\Http\Controllers\SuperAdmin\CompetitionCategoryController;
+
 
 
 /*
@@ -67,6 +69,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/update/{id}', [UserManagementController::class,'update',])->name('updateUser');
             Route::delete('/destroy/{id}', [UserManagementController::class,'destroy',])->name('deleteUser');
             Route::resource('templates', CompetitionTemplateController::class);
+            Route::resource('categories', CompetitionCategoryController::class);
         });
 
 /*

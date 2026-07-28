@@ -117,17 +117,37 @@
                 </label>
 
                 <div class="flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-slate-200 bg-slate-50">
-                    @if($template->cover_image)
-                        <img src="{{ asset('storage/'.$template->cover_image) }}"
-                             alt="{{ $template->template_name }}"
-                             class="h-full w-full object-cover">
-                    @else
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p class="mt-3 text-sm text-slate-400">ไม่มีรูปภาพ</p>
-                    @endif
+
+                {{-- รูปภาพเดิมหรือรูปภาพที่เพิ่งเลือก --}}
+                <img
+                    id="cover_image_preview"
+                    src="{{ $template->cover_image ? asset('storage/'.$template->cover_image) : '' }}"
+                    alt="ตัวอย่างภาพหน้าปก"
+                    class="{{ $template->cover_image ? '' : 'hidden' }} h-full w-full object-cover">
+
+                {{-- แสดงเมื่อยังไม่มีรูปภาพ --}}
+                <div
+                    id="cover_image_placeholder"
+                    class="{{ $template->cover_image ? 'hidden' : '' }} flex flex-col items-center">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-10 w-10 text-slate-300"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="1.5">
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
+                    </svg>
+
+                    <p class="mt-3 text-sm text-slate-400">
+                        ไม่มีรูปภาพ
+                    </p>
                 </div>
+            </div>
 
                 <label for="cover_image"
                        class="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-blue-300 hover:text-blue-700">
@@ -167,4 +187,41 @@
 
     </form>
 </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('cover_image');
+            const preview = document.getElementById('cover_image_preview');
+            const placeholder = document.getElementById('cover_image_placeholder');
+
+            input.addEventListener('change', function () {
+                const file = this.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+                if (!file.type.startsWith('image/')) {
+                    alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น');
+                    this.value = '';
+                    return;
+                }
+
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('รูปภาพต้องมีขนาดไม่เกิน 2MB');
+                    this.value = '';
+                    return;
+                }
+
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+
+                preview.onload = function () {
+                    URL.revokeObjectURL(preview.src);
+                };
+            });
+        });
+    </script>
+
 @endsection
+

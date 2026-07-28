@@ -15,7 +15,7 @@
 @endsection
 
 @section('content')
-{{-- {{dd($competitionTemplate->cover_image);}} --}}
+{{-- {{dd($template->cover_image);}} --}}
 <div class="mx-auto max-w-6xl">
 
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -33,7 +33,7 @@
 
                 <div>
                     <h2 class="text-xl font-semibold text-slate-800">
-                        {{ $competitionTemplate->template_name }}
+                        {{ $template->template_name }}
                     </h2>
                     <p class="mt-0.5 text-sm text-slate-500">
                         รายละเอียดทั้งหมดของ Template
@@ -41,7 +41,7 @@
                 </div>
             </div>
 
-            @if($competitionTemplate->is_active)
+            @if($template->is_active)
                 <span class="inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-200">
                     <span class="h-2 w-2 rounded-full bg-green-500"></span>
                     เปิดใช้งาน
@@ -73,7 +73,7 @@
                         </label>
 
                         <p class="mt-2 text-lg font-semibold text-slate-800">
-                            {{ $competitionTemplate->template_name }}
+                            {{ $template->template_name }}
                         </p>
                     </div>
 
@@ -87,7 +87,7 @@
                         </label>
 
                         <p class="mt-2 inline-flex rounded-lg bg-slate-100 px-3 py-1.5 font-mono text-sm text-slate-700">
-                            {{ $competitionTemplate->template_slug ?: '-' }}
+                            {{ $template->template_slug ?: '-' }}
                         </p>
                     </div>
 
@@ -103,7 +103,7 @@
                     </label>
 
                     <div class="mt-3 whitespace-pre-line rounded-xl border border-slate-100 bg-slate-50 p-5 leading-7 text-slate-700">
-                        {{ $competitionTemplate->default_description ?: '-' }}
+                        {{ $template->default_description ?: '-' }}
                     </div>
                 </div>
 
@@ -121,10 +121,10 @@
                 </label>
 
                 <div class="mt-3">
-                    @if($competitionTemplate->cover_image)
+                    @if($template->cover_image)
 
                         <img
-                            src="{{ asset('storage/'.$competitionTemplate->cover_image) }}"
+                            src="{{ asset('storage/'.$template->cover_image) }}"
                             class="w-full rounded-xl border border-slate-200 object-cover shadow-sm"
                             style="max-height: 320px;">
 
@@ -160,7 +160,7 @@
                 </a>
 
                 <a
-                    href="{{ route('superadmin.templates.edit', $competitionTemplate) }}"
+                    href="{{ route('superadmin.templates.edit', $template) }}"
                     class="inline-flex h-11 min-w-[140px] items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
