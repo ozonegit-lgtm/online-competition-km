@@ -165,12 +165,12 @@
         </div>
     </form>
 </div>
-    {{-- ข้อความสำเร็จ --}}
+    {{-- ข้อความสำเร็จ
     @if(session('success'))
         <div class="mt-6 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-green-700">
             {{ session('success') }}
         </div>
-    @endif
+    @endif --}}
 
     {{-- รายการประเภทการแข่งขัน --}}
     <div class="mt-10">

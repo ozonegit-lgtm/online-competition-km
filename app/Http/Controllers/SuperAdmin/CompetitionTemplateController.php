@@ -94,9 +94,7 @@
                 if ($template->cover_image) {
                     Storage::disk('public')->delete($template->cover_image);
                 }
-
-                $validate['cover_image'] = $request->file('cover_image')
-                    ->store('competition-templates', 'public');
+                $validate['cover_image'] = $request->file('cover_image')->store('competition-templates', 'public');
             }
 
             $validate['is_active'] = $request->has('is_active');

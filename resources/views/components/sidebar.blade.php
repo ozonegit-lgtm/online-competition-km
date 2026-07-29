@@ -141,7 +141,7 @@
                 <div class="space-y-1">
 
                     <a
-                        href="{{ route('competition-admin.createCompitetion') }}"
+                        href="{{ route('competition-admin.competitions.create') }}"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
                         {{ request()->routeIs('competition-admin.createCompitetion')
                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'

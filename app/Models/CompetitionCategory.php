@@ -46,4 +46,6 @@ class CompetitionCategory extends Model
     {
         return $this->hasMany(Competition::class, 'category_id');
     }
+    
+    
 }

@@ -11,7 +11,7 @@ use App\Http\Controllers\CompetitionAdmin\DashboardController
 use App\Http\Controllers\Judge\DashboardController
 as JudgeDashboardController;
 use App\Http\Controllers\SuperAdmin\UserManagementController;
-use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\CompetitionAdmin\CompetitionController;
 use App\Http\Controllers\SuperAdmin\CompetitionTemplateController;
 use App\Http\Controllers\SuperAdmin\CompetitionCategoryController;
 
@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
             Route::put('/update/{id}', [UserManagementController::class,'update',])->name('updateUser');
             Route::delete('/destroy/{id}', [UserManagementController::class,'destroy',])->name('deleteUser');
             Route::resource('templates', CompetitionTemplateController::class);
-            Route::resource('categories', CompetitionCategoryController::class);
+            Route::resource('categories', CompetitionCategoryController::class)->parameters(['categories' => 'competitionCategory',]);
         });
 
 /*
@@ -80,7 +80,7 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('competition-admin')->name('competition-admin.')->middleware(['auth', 'role:Competition Admin'])->group(function () {
         Route::get('/dashboard', [CompetitionAdminDashboardController::class,'index',])->name('dashboard');
-        Route::get('/create', [CompetitionController::class,'create',])->name('createCompitetion');
+        Route::resource('competitions',CompetitionController::class);
     });
 
 /*
