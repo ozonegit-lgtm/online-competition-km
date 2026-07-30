@@ -108,7 +108,115 @@
                 </div>
 
             </div>
+            {{-- Form Fields --}}
+            <div>
 
+                <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/>
+                </svg>
+
+                    ฟิลด์ของ Template
+                </label>
+
+                <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-5 space-y-5">
+
+                    @forelse($template->formFields as $field)
+
+                    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+
+                        <div class="mb-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-medium text-slate-800">
+                                    {{ $field->field_label }}
+                                </h4>
+
+                                @if($field->is_required)
+                                    <span class="text-red-500">*</span>
+                                @endif
+                            </div>
+
+                            <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                                {{ ucfirst($field->field_type) }}
+                            </span>
+                        </div>
+
+                        @switch($field->field_type)
+
+                            @case('text')
+                                <input type="text" disabled placeholder="{{ $field->placeholder ?: 'กรอกข้อมูล...' }}"
+                                    class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3">
+                            @break
+
+                            @case('textarea')
+                                <textarea rows="3" disabled placeholder="{{ $field->placeholder ?: 'กรอกรายละเอียด...' }}"
+                                    class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3"></textarea>
+                            @break
+
+                            @case('email')
+                                <input type="email" disabled placeholder="example@email.com"
+                                    class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3">
+                            @break
+
+                            @case('number')
+                                <input type="number" disabled placeholder="0"
+                                    class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3">
+                            @break
+
+                            @case('date')
+                                <input type="date" disabled
+                                    class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3">
+                            @break
+
+                            @case('file')
+                                <div class="rounded-lg border-2 border-dashed border-slate-300 py-8 text-center text-slate-400">
+                                    เลือกไฟล์...
+                                </div>
+                            @break
+
+                            @case('select')
+                                <select disabled class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3">
+                                    <option>เลือกข้อมูล</option>
+                                </select>
+                            @break
+
+                            @case('radio')
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-2"><input type="radio" disabled> ตัวเลือก 1</label>
+                                    <label class="flex items-center gap-2"><input type="radio" disabled> ตัวเลือก 2</label>
+                                </div>
+                            @break
+
+                            @case('checkbox')
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-2"><input type="checkbox" disabled> ตัวเลือก 1</label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" disabled> ตัวเลือก 2</label>
+                                </div>
+                            @break
+
+                        @endswitch
+
+                    </div>
+
+                    @empty
+
+                    <div class="rounded-xl border border-dashed border-slate-300 bg-white py-10 text-center text-slate-400">
+                        ยังไม่มีฟิลด์ใน Template นี้
+                    </div>
+
+                    @endforelse
+
+                </div>
+
+            </div>
             {{-- Right: Cover Image --}}
             <div>
 

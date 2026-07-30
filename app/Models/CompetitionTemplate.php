@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
+
 class CompetitionTemplate extends Model
 {
     use HasFactory;
@@ -46,5 +48,9 @@ class CompetitionTemplate extends Model
     public function competitions(): HasMany
     {
         return $this->hasMany(Competition::class, 'template_id');
+    }
+    public function formFields(): HasMany
+    {
+        return $this->hasMany(CompetitionTemplateFormField::class,'template_id')->orderBy('sort_order');
     }
 }

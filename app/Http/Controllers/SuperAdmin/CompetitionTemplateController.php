@@ -13,11 +13,13 @@
     /**
      * Display a listing of the resource.
      */
+
     public function index()
     {
-        $competitionTemplates = CompetitionTemplate::paginate(10);
-        return view('superadmin.templates.index',compact('competitionTemplates'));
-    }
+            $competitionTemplates = CompetitionTemplate::withCount('formFields')->latest()->paginate(9);
+            return view('superadmin.templates.index', compact('competitionTemplates'));
+        }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -49,8 +51,8 @@
             $validate['cover_image'] = $request->file('cover_image')->store('competition-templates', 'public');
         }
         
-        CompetitionTemplate::create($validate);
-        return redirect()->route('superadmin.templates.index')->with('success', 'สร้าง Template สำเร็จ');
+        $template = CompetitionTemplate::create($validate);
+        return redirect()->route('superadmin.templates.form-fields.create', ['template' => $template->id])->with('success','สร้าง Template สำเร็จ กรุณาสร้างช่องกรอกข้อมูลต่อ');
     }
 
     /**
@@ -58,6 +60,7 @@
      */
     public function show(CompetitionTemplate $template)
     {
+        $template->load(['formFields' => function ($query) {$query->orderBy('sort_order');}]);
         return view('superadmin.templates.show', compact('template'));
     }
 

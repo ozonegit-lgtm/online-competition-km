@@ -73,8 +73,7 @@ class CompetitionCategoryController extends Controller
             'description' =>['nullable','string',],
             'is_active' => ['nullable'],
         ]);
-            $validate['is_active'] = $request->has('is_active');
-
+            $validate['is_active'] = $request->boolean('is_active');
             $competitionCategory->update($validate);
             return redirect()->route('superadmin.categories.create')->with('success', 'แก้ไขประเภทการแข่งขันสำเร็จ');
             // return redirect()->route('superadmin.categories.edit')->with('success', 'แก้ไขข้อมูลสำเร็จ');

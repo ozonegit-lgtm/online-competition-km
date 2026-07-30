@@ -1,4 +1,5 @@
 import './bootstrap';
+import './form-builder';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('app-sidebar');
