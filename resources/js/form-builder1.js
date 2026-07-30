@@ -77,12 +77,15 @@
         );
         const required = document.getElementById('field_required').checked;
         const active = document.getElementById('field_active').checked;
+
         const acceptedFileTypes = type === 'file'
             ? fileTypesSelect.value
             : '';
+
         const maxFileSize = type === 'file'
             ? Number(maxFileSizeSelect.value)
             : null;
+
         const allowMultiple = type === 'file'
             ? allowMultipleInput.checked
             : false;
@@ -131,7 +134,7 @@
 
     function renderPreview() {
         previewContainer.innerHTML = '';
-
+        
         if (fields.length === 0) {
             emptyPreview.style.display = '';
             previewContainer.appendChild(emptyPreview);
@@ -215,38 +218,33 @@
         let element;
 
         if (field.type === 'file') {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'space-y-2';
+                const wrapper = document.createElement('div');
+                wrapper.className = 'space-y-2';
 
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = field.accepted_file_types || '';
-            input.multiple = Boolean(field.allow_multiple);
-            input.disabled = !field.active;
-            input.className = inputClasses();
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = field.accepted_file_types || '';
+                input.multiple = Boolean(field.allow_multiple);
+                input.disabled = !field.active;
+                input.className = inputClasses();
 
-            const fileInfo = document.createElement('p');
-            fileInfo.className = 'text-xs text-slate-500';
+                const fileInfo = document.createElement('p');
+                fileInfo.className = 'text-xs text-slate-500';
 
-            const maxSizeMb = field.max_file_size
-                ? field.max_file_size / 1024
-                : 10;
+                const maxSizeMb = field.max_file_size
+                    ? field.max_file_size / 1024
+                    : 10;
 
-            fileInfo.textContent =
-                `ขนาดสูงสุด ${maxSizeMb} MB` +
-                (field.allow_multiple
-                    ? ' • อัปโหลดได้หลายไฟล์'
-                    : '');
+                fileInfo.textContent =
+                    `ขนาดสูงสุด ${maxSizeMb} MB` +
+                    (field.allow_multiple
+                        ? ' • อัปโหลดได้หลายไฟล์'
+                        : '');
 
-            wrapper.append(input, fileInfo);
+                wrapper.append(input, fileInfo);
 
-            return wrapper;
-        } else if (field.type === 'textarea') {
-            element = document.createElement('textarea');
-            element.rows = 3;
-            element.placeholder = field.placeholder;
-            element.className = inputClasses();
-        } else if (field.type === 'select') {
+                return wrapper;
+            } else if (field.type === 'textarea') {
             element = document.createElement('select');
             element.className = inputClasses();
 

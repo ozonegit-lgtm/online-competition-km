@@ -124,6 +124,12 @@
                         </label>
                         <select
                             id="field_type"
+                                onchange="
+                                    document
+                                        .getElementById('fileSettingsBox')
+                                        .classList
+                                        .toggle('hidden', this.value !== 'file')
+                                "
                             class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
                                 focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
                             <option value="text">ข้อความสั้น (Text)</option>
@@ -177,6 +183,61 @@
                             ใช้สำหรับ Dropdown, Radio และ Checkbox
                         </p>
                     </div>
+                    {{-- ตั้งค่าไฟล์ --}}
+                    <div id="fileSettingsBox" class="hidden space-y-5">
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700">
+                                ประเภทไฟล์ที่อนุญาต
+                            </label>
+
+                            <select
+                                id="field_file_types"
+                                class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
+                                    focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+
+                                <option value="">ไฟล์ทุกประเภท</option>
+                                <option value="image/*">รูปภาพ</option>
+                                <option value=".pdf">PDF</option>
+                                <option value=".doc,.docx">Microsoft Word</option>
+                                <option value=".xls,.xlsx">Microsoft Excel</option>
+                                <option value=".ppt,.pptx">PowerPoint</option>
+                                <option value="video/*">วิดีโอ</option>
+                                <option value="audio/*">ไฟล์เสียง</option>
+                                <option value=".zip,.rar,.7z">ZIP / RAR / 7Z</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700">
+                                ขนาดไฟล์สูงสุด
+                            </label>
+
+                            <select
+                                id="field_max_file_size"
+                                class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
+                                    focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+
+                                <option value="2048">2 MB</option>
+                                <option value="5120">5 MB</option>
+                                <option value="10240" selected>10 MB</option>
+                                <option value="20480">20 MB</option>
+                                <option value="51200">50 MB</option>
+                            </select>
+                        </div>
+
+                        <label class="flex items-center gap-3">
+                            <input
+                                type="checkbox"
+                                id="field_allow_multiple"
+                                class="h-5 w-5 accent-blue-600">
+
+                            <span class="text-sm text-slate-700">
+                                อนุญาตให้อัปโหลดหลายไฟล์
+                            </span>
+                        </label>
+
+                    </div>
                     {{-- ตั้งค่า --}}
                     <div class="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-5">
                         <label class="flex items-center gap-3">
@@ -222,9 +283,9 @@
                 </p>
             </div>
             {{-- Preview --}}
-            <div id="previewContainer"class="space-y-5 p-6">
+            <div id="previewContainer" class="space-y-5 p-6">
                 {{-- Empty State --}}
-                <div id="emptyPreview"class="rounded-xl border-2 border-dashed border-slate-300 py-16 text-center">
+                <div id="emptyPreview" class="rounded-xl border-2 border-dashed border-slate-300 py-16 text-center">
                     <div class="text-5xl">
                         📝
                     </div>

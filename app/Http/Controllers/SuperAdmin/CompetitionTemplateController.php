@@ -69,42 +69,98 @@
      */
     public function edit(CompetitionTemplate $template)
         {
+            $template->load('formFields');
             return view('superadmin.templates.edit', compact('template'));
         }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CompetitionTemplate $template)
+        public function update(Request $request, CompetitionTemplate $template)
         {
-            $validate = $request->validate([
+            $validated = $request->validate([
                 'template_name' => ['required', 'string', 'max:255'],
                 'template_slug' => [
                     'nullable',
                     'string',
                     'max:255',
-                    Rule::unique('competition_templates', 'template_slug')->ignore($template->id),
+                    Rule::unique('competition_templates', 'template_slug')
+                        ->ignore($template->id),
                 ],
                 'default_description' => ['nullable', 'string'],
-                'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-                'is_active' => ['nullable'],
+                'cover_image' => [
+                    'nullable',
+                    'image',
+                    'mimes:jpg,jpeg,png,webp',
+                    'max:2048'
+                ],
+                'is_active' => ['nullable', 'boolean'],
+
+                'form_fields' => ['nullable', 'array'],
+                'form_fields.*.id' => ['required', 'integer'],
+                'form_fields.*.label' => ['required', 'string', 'max:255'],
+                'form_fields.*.field_type' => [
+                    'required',
+                    'in:text,textarea,number,email,phone,date,file,select,radio,checkbox'
+                ],
+                'form_fields.*.placeholder' => ['nullable', 'string'],
+                'form_fields.*.help_text' => ['nullable', 'string'],
+                'form_fields.*.options' => ['nullable', 'string'],
+                'form_fields.*.is_required' => ['required', 'boolean'],
+                'form_fields.*.is_active' => ['required', 'boolean'],
             ]);
+
+            // แยกข้อมูล Form Fields ออกจากข้อมูล Template
+            $formFields = $validated['form_fields'] ?? [];
+            unset($validated['form_fields']);
+
             if (!$request->filled('template_slug')) {
-                $validate['template_slug'] = $template->template_slug;
+                $validated['template_slug'] = $template->template_slug;
             }
+
+            $validated['is_active'] = $request->boolean('is_active');
 
             if ($request->hasFile('cover_image')) {
                 if ($template->cover_image) {
                     Storage::disk('public')->delete($template->cover_image);
                 }
-                $validate['cover_image'] = $request->file('cover_image')->store('competition-templates', 'public');
+
+                $validated['cover_image'] = $request
+                    ->file('cover_image')
+                    ->store('competition-templates', 'public');
             }
 
-            $validate['is_active'] = $request->has('is_active');
+            // อัปเดตตาราง competition_templates
+            $template->update($validated);
 
-            $template->update($validate);
+            // อัปเดตตาราง competition_template_form_fields
+            foreach ($formFields as $fieldId => $fieldData) {
+                $field = $template->formFields()->findOrFail($fieldId);
 
-            return redirect()->route('superadmin.templates.index')->with('success', 'แก้ไขข้อมูลสำเร็จ');
+                $options = preg_split(
+                    '/\r\n|\r|\n|,/',
+                    $fieldData['options'] ?? ''
+                );
+
+                $options = array_values(array_filter(
+                    array_map('trim', $options)
+                ));
+
+                $field->update([
+                    'label' => $fieldData['label'],
+                    'field_name' => Str::snake($fieldData['label']),
+                    'field_type' => $fieldData['field_type'],
+                    'placeholder' => $fieldData['placeholder'] ?? null,
+                    'help_text' => $fieldData['help_text'] ?? null,
+                    'options' => $options,
+                    'is_required' => (bool) $fieldData['is_required'],
+                    'is_active' => (bool) $fieldData['is_active'],
+                ]);
+            }
+
+            return redirect()
+                ->route('superadmin.templates.index')
+                ->with('success', 'แก้ไขข้อมูลสำเร็จ');
         }
 
     /**

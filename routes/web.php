@@ -69,12 +69,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/edit/{id}', [UserManagementController::class,'edit',])->name('editeUser');
             Route::put('/update/{id}', [UserManagementController::class,'update',])->name('updateUser');
             Route::delete('/destroy/{id}', [UserManagementController::class,'destroy',])->name('deleteUser');
-            Route::get('/templates/{template}/form-fields',[CompetitionTemplateFormFieldController::class, 'index'])->name('templates.form-fields.create');
-            Route::post('/templates/{template}/form-fields',[CompetitionTemplateFormFieldController::class, 'store'])->name('templates.form-fields.store');
             Route::resource('templates', CompetitionTemplateController::class);
             Route::resource('categories', CompetitionCategoryController::class)->parameters(['categories' => 'competitionCategory',]);
             Route::get('/templates/{template}/form-fields/create',[CompetitionTemplateFormFieldController::class, 'index'])->name('templates.form-fields.create');
             Route::post('/templates/{template}/form-fields',[CompetitionTemplateFormFieldController::class, 'store'])->name('templates.form-fields.store');
+
         });
 
 /*
