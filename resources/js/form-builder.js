@@ -70,6 +70,7 @@
 
         const label = document.getElementById('field_label').value.trim();
         const type = document.getElementById('field_type').value;
+        const systemField = document.getElementById('field_system').value;
         const placeholder = document.getElementById('field_placeholder').value.trim();
         const help = document.getElementById('field_help').value.trim();
         const options = parseOptions(
@@ -103,6 +104,7 @@
             id: Date.now(),
             label,
             type,
+            system_field: systemField,
             placeholder,
             help,
             options,
@@ -123,6 +125,7 @@
         document.getElementById('field_help').value = '';
         document.getElementById('field_options').value = '';
         document.getElementById('field_type').value = 'text';
+        document.getElementById('field_system').value = '';
         document.getElementById('field_required').checked = false;
         document.getElementById('field_active').checked = true;
         toggleOptionsBox();
@@ -172,7 +175,12 @@
 
             const meta = document.createElement('p');
             meta.className = 'mt-1 text-xs text-slate-400';
-            meta.textContent = `ชนิด: ${getTypeLabel(field.type)}${field.active ? '' : ' • ปิดใช้งาน'}`;
+            meta.textContent =
+                `ชนิด: ${getTypeLabel(field.type)}`
+                + (field.system_field
+                    ? ` • System: ${field.system_field}`
+                    : '')
+                + (field.active ? '' : ' • ปิดใช้งาน');
 
             titleArea.append(title, meta);
 

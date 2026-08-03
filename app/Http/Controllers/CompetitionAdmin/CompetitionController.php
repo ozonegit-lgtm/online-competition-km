@@ -13,6 +13,7 @@ use App\Models\CompetitionFormField;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Submission;
 
 class CompetitionController extends Controller
 {
@@ -102,6 +103,7 @@ class CompetitionController extends Controller
                             'competition_id' => $competition->id,
                             'label' => $templateField->label,
                             'field_name' => $templateField->field_name,
+                            'system_field' => $templateField->system_field,
                             'field_type' => $templateField->field_type,
                             'placeholder' => $templateField->placeholder,
                             'help_text' => $templateField->help_text,
@@ -211,6 +213,14 @@ class CompetitionController extends Controller
                 }
 
                 return redirect()->route('competition-admin.competitions.show', $competition)->with('success', 'แก้ไขข้อมูลการแข่งขันสำเร็จ');
+    }
+    public function submissions()
+    {
+        $submissions = Submission::with(['competition.category','files',])->whereHas('competition', function ($query) {$query->where('created_by', auth()->id()); })
+        ->latest('submitted_at')
+        ->paginate(12);
+
+        return view('competition-admin.submissions.index',compact('submissions'));
     }
 
     public function destroy(Competition $competition)

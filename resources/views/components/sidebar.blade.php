@@ -157,15 +157,24 @@
                     >
                         <span>สร้างการแข่งขัน</span>
                     </a>
-
+                    
                     <a
+                        href="{{ route('competition-admin.submissions.index') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
+                        {{ request()->routeIs('competition-admin.submissions.*')
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                        <span>ผลงานที่ส่ง</span>
+                    </a>
+
+                    <!-- <a
                         href="#"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium
                             text-slate-500 cursor-not-allowed"
                     >
                         <span>ผลงานที่ส่ง</span>
                         <span class="ml-auto text-xs">เร็ว ๆ นี้</span>
-                    </a>
+                    </a> -->
 
                 </div>
 

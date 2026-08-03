@@ -3,7 +3,6 @@ FROM php:8.2-fpm
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 
-# ติดตั้ง Package ที่ Laravel และ PHP Extension ต้องใช้
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -31,12 +30,13 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# ติดตั้ง Composer จาก Official Composer Image
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# <<< เพิ่มตรงนี้ >>>
+COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 WORKDIR /var/www/html
 
-# กำหนดสิทธิ์โฟลเดอร์ Laravel
 RUN chown -R www-data:www-data /var/www/html
 
 EXPOSE 9000

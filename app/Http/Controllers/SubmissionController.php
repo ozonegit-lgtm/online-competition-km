@@ -101,7 +101,7 @@ class SubmissionController extends Controller
             $submission = Submission::create([
                 'competition_id' => $competition->id,
                 'submission_code' => $this->generateSubmissionCode(),
-                'project_title' => $answersByName['project_title'],
+                'project_title' => $answersByName['project_title'] ?? 'ไม่มีชื่อผลงาน',
                 'project_description' => $answersByName['project_description'] ?? null,
                 'team_name' => $competition->competition_type === 'team'
                     ? $validated['team_name']
@@ -232,11 +232,10 @@ class SubmissionController extends Controller
             'contact_name',
             'contact_email',
             'contact_phone',
-            'project_title',
         ]);
 
         $missingFields = $requiredFields->diff(
-            $fields->pluck('field_name')
+            $fields->pluck('system_field')
         );
 
         abort_if(
@@ -314,7 +313,7 @@ class SubmissionController extends Controller
                 default => [
                     $requiredRule,
                     'string',
-                    'max:' . match ($field->field_name) {
+                    'max:' . match ($field->system_field) {
                         'contact_name' => 150,
                         'project_title' => 255,
                         default => 1000,
@@ -347,10 +346,12 @@ class SubmissionController extends Controller
                 continue;
             }
 
-            $answers[$field->field_name] = data_get(
-                $validated,
-                "fields.{$field->id}"
-            );
+            if ($field->system_field) {
+                $answers[$field->system_field] = data_get(
+                    $validated,
+                    "fields.{$field->id}"
+                );
+            }
         }
 
         return $answers;

@@ -14,6 +14,7 @@ class CompetitionTemplateFormField extends Model
         'template_id',
         'label',
         'field_name',
+        'system_field',
         'field_type',
         'placeholder',
         'help_text',

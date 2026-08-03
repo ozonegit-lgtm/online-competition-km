@@ -33,6 +33,11 @@ class CompetitionTemplateFormFieldController extends Controller
                     'fields' => ['required', 'array', 'min:1'],
                     'fields.*.label' => ['required','string','max:255',],
                     'fields.*.type' => ['required','in:text,textarea,number,email,phone,date,file,select,radio,checkbox',],
+                    'fields.*.system_field' => [
+                        'nullable',
+                        'string',
+                        'in:contact_name,contact_email,contact_phone,project_title,project_description,project_file',
+                    ],
                     'fields.*.placeholder' => ['nullable','string','max:255',],
                     'fields.*.help' => ['nullable','string',],
                     'fields.*.options' => ['nullable','array',],
@@ -46,10 +51,11 @@ class CompetitionTemplateFormFieldController extends Controller
             foreach ($fields as $index => $field) {
                 $fieldName = Str::snake($field['label']);
 
-                // ป้องกัน field_name ว่างหรือชื่อซ้ำ
                 if ($fieldName === '') {
                     $fieldName = 'field_' . ($index + 1);
                 }
+
+                $fieldName .= '_' . Str::lower(Str::random(6));
 
                 $fieldName .= '_' . ($index + 1);
 
@@ -57,6 +63,7 @@ class CompetitionTemplateFormFieldController extends Controller
                     'template_id' => $template->id,
                     'label' => $field['label'],
                     'field_name' => $fieldName,
+                    'system_field' => $field['system_field'] ?: null,
                     'field_type' => $field['type'],
                     'placeholder' => $field['placeholder'] ?: null,
                     'help_text' => $field['help'] ?: null,

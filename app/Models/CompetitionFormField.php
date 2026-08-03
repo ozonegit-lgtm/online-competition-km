@@ -28,6 +28,7 @@ class CompetitionFormField extends Model
         'competition_id',
         'label',
         'field_name',
+        'system_field',
         'field_type',
         'placeholder',
         'help_text',

@@ -144,6 +144,26 @@
                             <option value="checkbox">Checkbox</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700">
+                            ฟิลด์ระบบ
+                        </label>
+                        <select
+                            id="field_system"
+                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
+                                focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                            <option value="">-- ไม่มี --</option>
+                            <option value="contact_name">ชื่อผู้ติดต่อ</option>
+                            <option value="contact_email">อีเมล</option>
+                            <option value="contact_phone">เบอร์โทรศัพท์</option>
+                            <option value="project_title">ชื่อผลงาน</option>
+                            <option value="project_description">รายละเอียดผลงาน</option>
+                            <option value="project_file">ไฟล์ผลงาน</option>
+                        </select>
+                        <p class="mt-2 text-xs text-slate-500">
+                            ใช้สำหรับช่องที่ระบบต้องรู้จัก เช่น ชื่อผู้ติดต่อหรือชื่อผลงาน
+                        </p>
+                    </div>
                     {{-- Placeholder --}}
                     <div>
                         <label class="block text-sm font-semibold text-slate-700">

@@ -19,6 +19,7 @@ use App\Http\Controllers\SubmissionController;
 
 
 
+
 /*
 |--------------------------------------------------------------------------
 | หน้าแรก
@@ -95,6 +96,7 @@ Route::middleware('auth')->group(function () {
 Route::prefix('competition-admin')->name('competition-admin.')->middleware(['auth', 'role:Competition Admin'])->group(function () {
         Route::get('/dashboard', [CompetitionAdminDashboardController::class,'index',])->name('dashboard');
         Route::resource('competitions',CompetitionController::class);
+        Route::get('/submissions',[CompetitionController::class, 'submissions'])->name('submissions.index');
     });
 
 /*
