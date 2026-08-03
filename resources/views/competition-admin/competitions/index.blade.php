@@ -50,6 +50,7 @@
             @forelse ($competitions as $competition)
                 @php
                     $status = $competition->status ?? 'draft';
+
                     $statusLabels = [
                         'draft' => 'ฉบับร่าง',
                         'published' => 'เผยแพร่แล้ว',
@@ -58,6 +59,7 @@
                         'judging' => 'กำลังตัดสิน',
                         'completed' => 'เสร็จสิ้น',
                     ];
+
                     $statusClasses = [
                         'draft' => 'bg-slate-100 text-slate-600',
                         'published' => 'bg-blue-100 text-blue-700',
@@ -65,6 +67,16 @@
                         'closed' => 'bg-amber-100 text-amber-700',
                         'judging' => 'bg-violet-100 text-violet-700',
                         'completed' => 'bg-green-100 text-green-700',
+                    ];
+
+                    $modeLabels = [
+                        'public' => ' Public',
+                        'private' => ' Private',
+                    ];
+
+                    $modeClasses = [
+                        'public' => 'bg-sky-100 text-sky-700',
+                        'private' => 'bg-rose-100 text-rose-700',
                     ];
                 @endphp
 
@@ -82,10 +94,24 @@
                             </div>
                         @endif
 
-                        <span
-                            class="absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-semibold shadow-sm {{ $statusClasses[$status] ?? 'bg-slate-100 text-slate-600' }}">
-                            {{ $statusLabels[$status] ?? $status }}
-                        </span>
+                        <div class="absolute top-3 right-3 flex items-center gap-2">
+                            <span
+                                class="rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white shadow">
+                                {{ $statusLabels[$status] ?? $status }}
+                            </span>
+                            @if($competition->visibility === 'public')
+                                <span
+                                    class="rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white shadow">
+                                    🌐 Public
+                                </span>
+                            @else
+                                <span
+                                    class="rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow">
+                                    🔒 Private
+                                </span>
+                            @endif
+                        </div>
+
                     </div>
 
                     <div class="flex flex-1 flex-col p-5">
