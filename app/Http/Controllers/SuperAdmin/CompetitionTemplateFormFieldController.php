@@ -25,54 +25,21 @@ class CompetitionTemplateFormFieldController extends Controller
 
         $fields = json_decode($request->fields, true);
 
-        Validator::make(
+        Validator::make (
+            
             ['fields' => $fields],
-            [
-                'fields' => ['required', 'array', 'min:1'],
 
-                'fields.*.label' => [
-                    'required',
-                    'string',
-                    'max:255',
-                ],
-
-                'fields.*.type' => [
-                    'required',
-                    'in:text,textarea,number,email,phone,date,file,select,radio,checkbox',
-                ],
-
-                'fields.*.placeholder' => [
-                    'nullable',
-                    'string',
-                    'max:255',
-                ],
-
-                'fields.*.help' => [
-                    'nullable',
-                    'string',
-                ],
-
-                'fields.*.options' => [
-                    'nullable',
-                    'array',
-                ],
-
-                'fields.*.options.*' => [
-                    'nullable',
-                    'string',
-                    'max:255',
-                ],
-
-                'fields.*.required' => [
-                    'required',
-                    'boolean',
-                ],
-
-                'fields.*.active' => [
-                    'required',
-                    'boolean',
-                ],
-            ]
+                [
+                    'fields' => ['required', 'array', 'min:1'],
+                    'fields.*.label' => ['required','string','max:255',],
+                    'fields.*.type' => ['required','in:text,textarea,number,email,phone,date,file,select,radio,checkbox',],
+                    'fields.*.placeholder' => ['nullable','string','max:255',],
+                    'fields.*.help' => ['nullable','string',],
+                    'fields.*.options' => ['nullable','array',],
+                    'fields.*.options.*' => ['nullable','string','max:255',],
+                    'fields.*.required' => ['required','boolean',],
+                    'fields.*.active' => ['required','boolean',],
+                ]
         )->validate();
 
         DB::transaction(function () use ($template, $fields) {

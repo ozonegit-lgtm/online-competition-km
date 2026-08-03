@@ -15,6 +15,7 @@ use App\Http\Controllers\CompetitionAdmin\CompetitionController;
 use App\Http\Controllers\SuperAdmin\CompetitionTemplateController;
 use App\Http\Controllers\SuperAdmin\CompetitionCategoryController;
 use App\Http\Controllers\SuperAdmin\CompetitionTemplateFormFieldController;
+use App\Http\Controllers\SubmissionController;
 
 
 
@@ -26,6 +27,15 @@ use App\Http\Controllers\SuperAdmin\CompetitionTemplateFormFieldController;
 
 Route::get('/', function () {return redirect()->route('login');});
 
+/*
+|--------------------------------------------------------------------------
+| Public Submission
+|--------------------------------------------------------------------------
+| ผู้เข้าร่วมไม่ต้องเข้าสู่ระบบ
+*/
+
+Route::resource('competitions.submissions',SubmissionController::class)->only(['create','store',]);
+Route::get('/submissions/{submission:submission_code}/success',[SubmissionController::class, 'success'])->name('submissions.success');
 /*
 |--------------------------------------------------------------------------
 | Guest
