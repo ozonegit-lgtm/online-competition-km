@@ -1,5 +1,6 @@
 @php
     $navbarUser = auth()->user();
+    $navbarAvatar = $navbarUser?->adminProfile?->avatar;
 @endphp
 
 <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -41,6 +42,7 @@
 
         <div class="flex shrink-0 items-center gap-3">
 
+            {{-- ข้อมูลผู้ใช้งาน --}}
             <div class="hidden text-right md:block">
                 <p class="text-sm font-semibold text-slate-800">
                     {{ $navbarUser?->username }}
@@ -51,11 +53,30 @@
                 </p>
             </div>
 
-            <div class="flex h-10 w-10 items-center justify-center rounded-full
-                        bg-blue-100 font-semibold text-blue-700">
-                {{ strtoupper(substr($navbarUser?->username ?? 'U', 0, 1)) }}
-            </div>
+            {{-- รูปโปรไฟล์ --}}
+            <a
+                href="{{ route('profile.edit') }}"
+                class="flex h-10 w-10 shrink-0 items-center justify-center
+                       overflow-hidden rounded-full bg-blue-100
+                       font-semibold text-blue-700 ring-2 ring-transparent
+                       transition hover:ring-blue-300"
+                title="แก้ไขโปรไฟล์"
+                aria-label="แก้ไขโปรไฟล์"
+            >
+                @if ($navbarAvatar)
+                    <img
+                        src="{{ asset('storage/' . $navbarAvatar) }}"
+                        alt="รูปโปรไฟล์ของ {{ $navbarUser?->username }}"
+                        class="h-full w-full object-cover"
+                    >
+                @else
+                    <span>
+                        {{ strtoupper(substr($navbarUser?->username ?? 'U', 0, 1)) }}
+                    </span>
+                @endif
+            </a>
 
+            {{-- ปุ่มออกจากระบบ --}}
             <form
                 action="{{ route('logout') }}"
                 method="POST"
@@ -64,11 +85,13 @@
 
                 <button
                     type="submit"
-                    class="rounded-xl border border-red-200 px-3 py-2 text-sm
-                           font-medium text-red-600 transition
+                    class="rounded-xl border border-red-200 px-3 py-2
+                           text-sm font-medium text-red-600 transition
                            hover:bg-red-50 hover:text-red-700"
                 >
-                    <span class="hidden sm:inline">ออกจากระบบ</span>
+                    <span class="hidden sm:inline">
+                        ออกจากระบบ
+                    </span>
 
                     <svg
                         class="h-5 w-5 sm:hidden"

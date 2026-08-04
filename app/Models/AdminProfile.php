@@ -30,7 +30,8 @@ class AdminProfile extends Model
         'phone',
         'position',
         'organization',
-        'profile_image',
+        'avatar',
+        'must_change_password',
     ];
 
     /**

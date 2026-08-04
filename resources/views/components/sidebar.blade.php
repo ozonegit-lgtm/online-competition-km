@@ -149,6 +149,33 @@
                 <div class="space-y-1">
 
                     <a
+                        href="{{ route('profile.edit') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
+                        {{ request()->routeIs('profile.*')
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M20 21a8 8 0 0 0-16 0" />
+
+                            <circle
+                                cx="12"
+                                cy="7"
+                                r="4" />
+                        </svg>
+
+                        <span>โปรไฟล์ของฉัน</span>
+                    </a>
+                    <a
                         href="{{ route('competition-admin.competitions.index') }}"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
                         {{ request()->routeIs('competition-admin.createCompitetion')
@@ -166,15 +193,6 @@
                             : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                         <span>ผลงานที่ส่ง</span>
                     </a>
-
-                    <!-- <a
-                        href="#"
-                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium
-                            text-slate-500 cursor-not-allowed"
-                    >
-                        <span>ผลงานที่ส่ง</span>
-                        <span class="ml-auto text-xs">เร็ว ๆ นี้</span>
-                    </a> -->
 
                 </div>
 

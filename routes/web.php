@@ -16,6 +16,7 @@ use App\Http\Controllers\SuperAdmin\CompetitionTemplateController;
 use App\Http\Controllers\SuperAdmin\CompetitionCategoryController;
 use App\Http\Controllers\SuperAdmin\CompetitionTemplateFormFieldController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\ProfileController;
 
 
 
@@ -62,6 +63,10 @@ Route::middleware('auth')->group(function () {
      * รับผู้ใช้หลัง Login แล้วส่งไป Dashboard ตาม Role
      */
     Route::get('/dashboard', DashboardRedirectController::class)->middleware('role:Super Admin,Competition Admin,Judge')->name('dashboard');
+
+    Route::get('/profile',[ProfileController::class, 'edit'])->middleware('role:Competition Admin,Judge')->name('profile.edit');
+    Route::put('/profile',[ProfileController::class, 'update'])->middleware('role:Competition Admin,Judge')->name('profile.update');
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 });
