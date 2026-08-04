@@ -10,13 +10,13 @@
 @endsection
 
 @section('content')
-    <div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto w-full max-w-7xl px-4 pt-0 pb-8 sm:px-6 lg:px-8">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <h2 class="text-2xl font-bold text-slate-800">การแข่งขันของฉัน</h2>
+                <!-- <h2 class="text-2xl font-bold text-slate-800">การแข่งขันของฉัน</h2>
                 <p class="mt-1 text-sm text-slate-500">
                     จัดการการแข่งขัน ดูรายละเอียด หรือสร้างการแข่งขันรายการใหม่
-                </p>
+                </p> -->
             </div>
 
             <a href="{{ route('competition-admin.competitions.create') }}"

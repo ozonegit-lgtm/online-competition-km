@@ -229,7 +229,7 @@
                                 <p
                                     id="file-info"
                                     class="mt-1 text-sm text-slate-500">
-                                    รองรับ JPG, JPEG, PNG และ WEBP ขนาดไม่เกิน 2 MB
+                                    รองรับ JPG, JPEG, PNG และ WEBP ขนาดไม่เกิน 10 MB
                                 </p>
                             </div>
                         </div>

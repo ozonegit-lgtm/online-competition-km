@@ -118,13 +118,37 @@ class CompetitionController extends Controller
             return redirect()->route('competition-admin.competitions.index')->with('success', 'สร้างการแข่งขันและฟอร์มรับผลงานสำเร็จ');
         }
 
-    public function show(Competition $competition)
-        {
-            abort_unless((int) $competition->created_by === (int) Auth::id(),403);
-            $competition->load(['category','template.formFields','creator','formFields' => fn ($query) => $query->orderBy('sort_order'),]);
-            $competition->loadCount(['formFields','rubrics','judgeAssignments','submissions','awards',]);
-            return view('competition-admin.competitions.show',compact('competition'));
-        }
+   public function show(Competition $competition)
+    {
+        abort_unless(
+            (int) $competition->created_by === (int) auth()->id(),
+            403
+        );
+
+        $competition->load([
+            'category',
+            'template.formFields',
+            'creator',
+
+            'formFields' => fn ($query) => $query
+                ->orderBy('sort_order')
+                ->orderBy('id'),
+
+            'rubrics' => fn ($query) => $query
+                ->orderBy('sort_order')
+                ->orderBy('id'),
+        ]);
+
+        $competition->loadCount([
+            'formFields',
+            'rubrics',
+            'judgeAssignments',
+            'submissions',
+            'awards',
+        ]);
+
+        return view('competition-admin.competitions.show',compact('competition'));
+    }
 
     public function edit(Competition $competition)
         {

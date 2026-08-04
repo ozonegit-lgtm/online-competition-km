@@ -269,6 +269,36 @@
                             </div>
 
                             <div>
+                                <label for="field_system_field_{{ $field->id }}" class="mb-2 block text-sm font-medium text-slate-700">
+                                    ฟิลด์ระบบ
+                                    <span class="text-xs font-normal text-slate-400">(ใช้จับคู่ข้อมูลผู้ติดต่อ/ผลงาน)</span>
+                                </label>
+                                <select
+                                    id="field_system_field_{{ $field->id }}"
+                                    name="form_fields[{{ $field->id }}][system_field]"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                                    <option value="">-- ไม่ใช่ฟิลด์ระบบ --</option>
+                                    @foreach([
+                                        'contact_name' => 'contact_name (ชื่อผู้ติดต่อ) *จำเป็น',
+                                        'contact_email' => 'contact_email (อีเมล) *จำเป็น',
+                                        'contact_phone' => 'contact_phone (เบอร์โทร) *จำเป็น',
+                                        'project_title' => 'project_title (ชื่อผลงาน)',
+                                        'project_description' => 'project_description (รายละเอียดผลงาน)',
+                                        'project_file' => 'project_file (ไฟล์ผลงาน)',
+                                    ] as $sysValue => $sysLabel)
+                                        <option
+                                            value="{{ $sysValue }}"
+                                            {{ old("form_fields.{$field->id}.system_field", $field->system_field) === $sysValue ? 'selected' : '' }}>
+                                            {{ $sysLabel }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error("form_fields.{$field->id}.system_field")
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
                                 <label for="field_placeholder_{{ $field->id }}" class="mb-2 block text-sm font-medium text-slate-700">
                                     Placeholder
                                 </label>
@@ -354,7 +384,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
-                บันทึกข้อมูล
+                บันทึกข้อมูล                                            
             </button>
         </div>
 
@@ -397,4 +427,3 @@
     </script>
 
 @endsection
-

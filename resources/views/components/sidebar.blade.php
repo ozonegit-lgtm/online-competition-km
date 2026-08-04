@@ -167,6 +167,15 @@
                         <span>ผลงานที่ส่ง</span>
                     </a>
 
+                    <a
+                        href="{{ route('competition-admin.competitions.index') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
+                        {{ request()->routeIs('competition-admin.competitions.rubrics.*')
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+
+                        <span>เกณฑ์การตัดสิน</span>
+                    </a>
                     <!-- <a
                         href="#"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium

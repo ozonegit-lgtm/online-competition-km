@@ -25,8 +25,19 @@ class CompetitionTemplateFormFieldController extends Controller
 
         $fields = json_decode($request->fields, true);
 
-        Validator::make (
-            
+        /**
+         * ฟิลด์ระบบที่จำเป็นต้องมีอยู่ในทุก Template
+         * เพื่อให้ Competition ที่สร้างจาก Template นี้
+         * เปิดฟอร์มส่งผลงานได้จริง (ดู SubmissionController::ensureRequiredSystemFieldsExist)
+         */
+        $requiredSystemFields = [
+            'contact_name',
+            'contact_email',
+            'contact_phone',
+        ];
+
+        Validator::make(
+
             ['fields' => $fields],
 
                 [
@@ -45,7 +56,56 @@ class CompetitionTemplateFormFieldController extends Controller
                     'fields.*.required' => ['required','boolean',],
                     'fields.*.active' => ['required','boolean',],
                 ]
-        )->validate();
+        )->after(function ($validator) use ($fields, $requiredSystemFields, $template) {
+
+            /**
+             * รวม system_field ของฟิลด์ที่มีอยู่แล้วในฐานข้อมูล (จากการ Submit
+             * รอบก่อนหน้า) เข้ากับฟิลด์ชุดใหม่ที่กำลังจะบันทึก เพราะแอดมิน
+             * สามารถทยอยเพิ่มฟิลด์เป็นหลายรอบได้ ไม่ใช่ต้องส่งครบในครั้งเดียว
+             */
+            $existingSystemFields = $template->formFields()
+                ->whereNotNull('system_field')
+                ->pluck('system_field');
+
+            $systemFieldsUsed = collect($fields)
+                ->pluck('system_field')
+                ->filter(fn ($value) => filled($value))
+                ->merge($existingSystemFields)
+                ->values();
+
+            /**
+             * ต้องมีฟิลด์ระบบที่จำเป็นครบทั้ง 3 ตัว
+             * มิฉะนั้น Competition ที่ใช้ Template นี้
+             * จะเปิดฟอร์มส่งผลงานไม่ได้ (Error 422)
+             */
+            $missingFields = collect($requiredSystemFields)->diff($systemFieldsUsed);
+
+            if ($missingFields->isNotEmpty()) {
+                $validator->errors()->add(
+                    'fields',
+                    'กรุณากำหนดฟิลด์ระบบให้ครบ: '
+                        . $missingFields->implode(', ')
+                        . ' มิฉะนั้นผู้เข้าร่วมจะไม่สามารถเปิดฟอร์มส่งผลงานได้'
+                );
+            }
+
+            /**
+             * ห้ามกำหนด system_field ซ้ำกันมากกว่า 1 ช่อง
+             * เพราะระบบจะไม่รู้ว่าควรใช้คำตอบจากช่องใด
+             */
+            $duplicatedFields = $systemFieldsUsed
+                ->duplicates()
+                ->unique()
+                ->values();
+
+            if ($duplicatedFields->isNotEmpty()) {
+                $validator->errors()->add(
+                    'fields',
+                    'พบฟิลด์ระบบที่ถูกกำหนดซ้ำกันมากกว่า 1 ช่อง: '
+                        . $duplicatedFields->implode(', ')
+                );
+            }
+        })->validate();
 
         DB::transaction(function () use ($template, $fields) {
             foreach ($fields as $index => $field) {
@@ -63,17 +123,16 @@ class CompetitionTemplateFormFieldController extends Controller
                     'template_id' => $template->id,
                     'label' => $field['label'],
                     'field_name' => $fieldName,
-                    'system_field' => $field['system_field'] ?: null,
+                    'system_field' => $field['system_field'] ?? null,
                     'field_type' => $field['type'],
-                    'placeholder' => $field['placeholder'] ?: null,
-                    'help_text' => $field['help'] ?: null,
+                    'placeholder' => $field['placeholder'] ?? null,
+                    'help_text' => $field['help'] ?? null,
 
-                    // ใช้กรณี options ในฐานข้อมูลเป็น TEXT หรือ JSON
+                    // ส่ง array ตรง ๆ ให้ Model cast 'options' => 'array' เป็นผู้ json_encode
+                    // ให้เอง (ห้าม json_encode ซ้ำตรงนี้ มิฉะนั้นค่าที่บันทึกจะถูก
+                    // encode ซ้อนกัน 2 ชั้น แล้วตอนอ่านกลับมาจะได้ string แทน array)
                     'options' => !empty($field['options'])
-                        ? json_encode(
-                            $field['options'],
-                            JSON_UNESCAPED_UNICODE
-                        )
+                        ? array_values($field['options'])
                         : null,
 
                     'is_required' => (bool) $field['required'],

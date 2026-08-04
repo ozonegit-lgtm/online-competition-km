@@ -16,6 +16,7 @@ use App\Http\Controllers\SuperAdmin\CompetitionTemplateController;
 use App\Http\Controllers\SuperAdmin\CompetitionCategoryController;
 use App\Http\Controllers\SuperAdmin\CompetitionTemplateFormFieldController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\CompetitionAdmin\RubricController;
 
 
 
@@ -97,6 +98,7 @@ Route::prefix('competition-admin')->name('competition-admin.')->middleware(['aut
         Route::get('/dashboard', [CompetitionAdminDashboardController::class,'index',])->name('dashboard');
         Route::resource('competitions',CompetitionController::class);
         Route::get('/submissions',[CompetitionController::class, 'submissions'])->name('submissions.index');
+        Route::resource('competitions.rubrics',RubricController::class)->only(['index','store','update','destroy']);
     });
 
 /*
