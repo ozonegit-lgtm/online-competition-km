@@ -17,7 +17,7 @@ class CompetitionTemplateFormFieldController extends Controller
         return view('superadmin.templates.form-fields.create', compact('template'));
     }
 
-    public function store(Request $request, CompetitionTemplate $template)
+     public function store(Request $request, CompetitionTemplate $template)
     {
         $request->validate([
             'fields' => ['required', 'json'],
@@ -25,30 +25,33 @@ class CompetitionTemplateFormFieldController extends Controller
 
         $fields = json_decode($request->fields, true);
 
-        Validator::make (
-            
+        Validator::make(
             ['fields' => $fields],
-
-                [
-                    'fields' => ['required', 'array', 'min:1'],
-                    'fields.*.label' => ['required','string','max:255',],
-                    'fields.*.type' => ['required','in:text,textarea,number,email,phone,date,file,select,radio,checkbox',],
-                    'fields.*.system_field' => [
-                        'nullable',
-                        'string',
-                        'in:contact_name,contact_email,contact_phone,project_title,project_description,project_file',
-                    ],
-                    'fields.*.placeholder' => ['nullable','string','max:255',],
-                    'fields.*.help' => ['nullable','string',],
-                    'fields.*.options' => ['nullable','array',],
-                    'fields.*.options.*' => ['nullable','string','max:255',],
-                    'fields.*.required' => ['required','boolean',],
-                    'fields.*.active' => ['required','boolean',],
-                ]
+            [
+                'fields' => ['required', 'array', 'min:1'],
+                'fields.*.label' => ['required', 'string', 'max:255'],
+                'fields.*.type' => [
+                    'required',
+                    'in:text,textarea,number,email,phone,date,file,select,radio,checkbox',
+                ],
+                'fields.*.system_field' => [
+                    'nullable',
+                    'string',
+                    'in:contact_name,contact_email,contact_phone,project_title,project_description,project_file',
+                ],
+                'fields.*.placeholder' => ['nullable', 'string', 'max:255'],
+                'fields.*.help' => ['nullable', 'string'],
+                'fields.*.options' => ['nullable', 'array'],
+                'fields.*.options.*' => ['nullable', 'string', 'max:255'],
+                'fields.*.required' => ['required', 'boolean'],
+                'fields.*.active' => ['required', 'boolean'],
+            ]
         )->validate();
 
         DB::transaction(function () use ($template, $fields) {
+
             foreach ($fields as $index => $field) {
+
                 $fieldName = Str::snake($field['label']);
 
                 if ($fieldName === '') {
@@ -56,29 +59,25 @@ class CompetitionTemplateFormFieldController extends Controller
                 }
 
                 $fieldName .= '_' . Str::lower(Str::random(6));
-
                 $fieldName .= '_' . ($index + 1);
 
-                CompetitionTemplateFormField::create([
-                    'template_id' => $template->id,
-                    'label' => $field['label'],
-                    'field_name' => $fieldName,
-                    'system_field' => $field['system_field'] ?: null,
-                    'field_type' => $field['type'],
-                    'placeholder' => $field['placeholder'] ?: null,
-                    'help_text' => $field['help'] ?: null,
-
-                    // ใช้กรณี options ในฐานข้อมูลเป็น TEXT หรือ JSON
-                    'options' => !empty($field['options'])
-                        ? json_encode(
-                            $field['options'],
-                            JSON_UNESCAPED_UNICODE
-                        )
+                $data = [
+                    'template_id'   => $template->id,
+                    'label'         => $field['label'],
+                    'field_name'    => $fieldName,
+                    'system_field'  => $field['system_field'] ?? null,
+                    'field_type'    => $field['type'],
+                    'placeholder'   => $field['placeholder'] ?: null,
+                    'help_text'     => $field['help'] ?: null,
+                    'options'       => !empty($field['options'])
+                        ? json_encode($field['options'], JSON_UNESCAPED_UNICODE)
                         : null,
+                    'is_required'   => (bool) $field['required'],
+                    'sort_order'    => $index + 1,
+                    'is_active'     => (bool) $field['active'],
+                ];
 
-                    'is_required' => (bool) $field['required'],
-                    'is_active' => (bool) $field['active'],
-                ]);
+                CompetitionTemplateFormField::create($data);
             }
         });
 
