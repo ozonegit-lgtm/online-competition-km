@@ -100,6 +100,15 @@
             return;
         }
 
+        if (systemField !== '') {
+            const duplicate = fields.find(field => field.system_field === systemField);
+            if (duplicate) {
+                alert('ฟิลด์ระบบนี้ถูกเลือกแล้ว กรุณาเลือกฟิลด์ระบบอื่น');
+                document.getElementById('field_system').focus();
+                return;
+            }
+        }
+
         fields.push({
             id: Date.now(),
             label,

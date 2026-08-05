@@ -152,16 +152,27 @@
                             id="field_system"
                             class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
                                 focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                            <option value="">-- ไม่มี --</option>
-                            <option value="contact_name">ชื่อผู้ติดต่อ</option>
-                            <option value="contact_email">อีเมล</option>
-                            <option value="contact_phone">เบอร์โทรศัพท์</option>
-                            <option value="project_title">ชื่อผลงาน</option>
-                            <option value="project_description">รายละเอียดผลงาน</option>
-                            <option value="project_file">ไฟล์ผลงาน</option>
+
+                            <option value="">ไม่ใช่ฟิลด์ระบบ</option>
+
+                            <optgroup label="ข้อมูลผู้ส่ง">
+                                <option value="contact_name">ชื่อผู้ส่ง</option>
+                                <option value="contact_email">อีเมล</option>
+                                <option value="contact_phone">เบอร์โทรศัพท์</option>
+                            </optgroup>
+
+                            <optgroup label="ข้อมูลผลงาน">
+                                <option value="project_title">ชื่อผลงาน</option>
+                                <option value="project_description">รายละเอียดผลงาน</option>
+                                <option value="project_file">ไฟล์ผลงาน</option>
+                            </optgroup>
+
                         </select>
-                        <p class="mt-2 text-xs text-slate-500">
-                            ใช้สำหรับช่องที่ระบบต้องรู้จัก เช่น ชื่อผู้ติดต่อหรือชื่อผลงาน
+                        <p class="mt-2 text-xs leading-5 text-slate-500">
+                            หากเลือกเป็นฟิลด์ระบบ ระบบจะใช้ข้อมูลนี้ในการบันทึกและแสดงผลการส่งผลงาน
+                            <span class="font-semibold text-amber-600">
+                                (แต่ละประเภทเลือกได้เพียง 1 ครั้ง)
+                            </span>
                         </p>
                     </div>
                     {{-- Placeholder --}}

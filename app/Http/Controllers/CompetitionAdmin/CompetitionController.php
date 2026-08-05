@@ -69,6 +69,38 @@ class CompetitionController extends Controller
                 if (!empty($validated['template_id'])) {
                     $template = CompetitionTemplate::with(['formFields' => function ($query) {$query->orderBy('sort_order');},])->where('is_active', true)->findOrFail($validated['template_id']);
                 }
+
+                if ($template) {
+
+                    $requiredSystemFields = [
+                        'contact_name',
+                        'contact_email',
+                        'contact_phone',
+                        'project_title',
+                        'project_file',
+                    ];
+
+                    $existingSystemFields = $template->formFields
+                        ->pluck('system_field')
+                        ->filter()
+                        ->values()
+                        ->all();
+
+                    $missing = array_diff(
+                        $requiredSystemFields,
+                        $existingSystemFields
+                    );
+
+                    if (!empty($missing)) {
+
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'template_id' => [
+                                'Template นี้ยังตั้งค่าฟิลด์ระบบไม่ครบ กรุณาตรวจสอบ Template ก่อนสร้างการแข่งขัน'
+                            ]
+                        ]);
+                    }
+                }
+
                 $competition = Competition::create([
                     'category_id' => $validated['category_id'],
                     'template_id' => $template?->id,

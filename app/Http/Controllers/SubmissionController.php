@@ -227,23 +227,30 @@ class SubmissionController extends Controller
     }
 
     private function ensureRequiredSystemFieldsExist(Collection $fields): void
-    {
-        $requiredFields = collect([
-            'contact_name',
-            'contact_email',
-            'contact_phone',
-        ]);
+        {
+            $requiredFields = collect([
+                'contact_name',
+                'contact_email',
+                'contact_phone',
+                'project_title',
+                'project_file',
+            ]);
 
-        $missingFields = $requiredFields->diff(
-            $fields->pluck('system_field')
-        );
+            $missingFields = $requiredFields->diff(
+                $fields
+                    ->pluck('system_field')
+                    ->filter()
+            );
 
-        abort_if(
-            $missingFields->isNotEmpty(),
-            422,
-            'แบบฟอร์มการแข่งขันยังตั้งค่าไม่ครบ กรุณาติดต่อผู้ดูแลการแข่งขัน'
-        );
-    }
+            if ($missingFields->isNotEmpty()) {
+
+                throw ValidationException::withMessages([
+                    'form' => [
+                        'แบบฟอร์มการแข่งขันยังตั้งค่าไม่ครบ กรุณาติดต่อผู้ดูแลการแข่งขัน'
+                    ],
+                ]);
+            }
+        }
 
     private function attachResolvedOptions(Collection $fields): void
     {
