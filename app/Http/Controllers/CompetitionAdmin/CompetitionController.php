@@ -175,7 +175,7 @@ class CompetitionController extends Controller
                 'template_id' => ['required','integer','exists:competition_templates,id',],
                 'title' => ['required','string','max:255',],
                 'description' => ['nullable', 'string',],
-                'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2028',],
+                'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240',],
                 'competition_type' => ['required', 'in:individual,team',],
                 'visibility' => ['required', 'in:public,private',],
                 'access_code' => ['nullable', 'string', 'max:255',],
