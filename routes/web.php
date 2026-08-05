@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\AuthController;
@@ -18,6 +17,7 @@ use App\Http\Controllers\SuperAdmin\CompetitionTemplateFormFieldController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\CompetitionAdmin\RubricController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CompetitionJudgeController;
 
 
 
@@ -90,6 +90,10 @@ Route::middleware('auth')->group(function () {
             Route::resource('categories', CompetitionCategoryController::class)->parameters(['categories' => 'competitionCategory',]);
             Route::get('/templates/{template}/form-fields/create',[CompetitionTemplateFormFieldController::class, 'index'])->name('templates.form-fields.create');
             Route::post('/templates/{template}/form-fields',[CompetitionTemplateFormFieldController::class, 'store'])->name('templates.form-fields.store');
+            Route::get('/competitions-judges',[CompetitionJudgeController::class, 'competitions'])->name('competitions.judges.list');
+            Route::get('/competitions/{competition}/judges',[CompetitionJudgeController::class, 'index'])->name('competitions.judges.index');
+            Route::put('/competitions/{competition}/judges',[CompetitionJudgeController::class, 'sync'])->name('competitions.judges.sync');
+            Route::delete('/competitions/{competition}/judges/{judge}',[CompetitionJudgeController::class, 'destroy'])->name('competitions.judges.destroy');
 
         });
 

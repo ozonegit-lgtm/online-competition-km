@@ -59,7 +59,7 @@ class JudgeAssignment extends Model
      */
     public function judge(): BelongsTo
     {
-        return $this->belongsTo(CompetitionJudge::class, 'judge_id');
+        return $this->belongsTo(User::class, 'judge_id');
     }
 
     /**

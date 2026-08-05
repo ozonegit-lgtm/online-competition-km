@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Competition extends Model
 {
@@ -106,6 +108,24 @@ class Competition extends Model
     {
         return $this->hasMany(JudgeAssignment::class);
     }
+     public function judges(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'judge_assignments',
+            'competition_id',
+            'judge_id'
+        )
+            ->withPivot([
+                'id',
+                'assigned_at',
+                'assignment_status',
+                'accepted_at',
+                'declined_at',
+                'submitted_at',
+            ])
+            ->withTimestamps();
+    }
 
     /**
      * ผลงานที่ส่งเข้าประกวด
@@ -121,5 +141,9 @@ class Competition extends Model
     public function awards(): HasMany
     {
         return $this->hasMany(Award::class);
+    }
+    public function judgingSession(): HasOne
+    {
+        return $this->hasOne(JudgingSession::class);
     }
 }

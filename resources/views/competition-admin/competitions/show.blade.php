@@ -3,66 +3,176 @@
 @section('title', 'รายละเอียดการแข่งขัน')
 
 @section('header')
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-800">รายละเอียดการแข่งขัน</h1>
-            <p class="mt-1 text-sm text-slate-500">
-                ตรวจสอบข้อมูลและแบบฟอร์มรับผลงานของการแข่งขัน
-            </p>
+       {{-- แถบเครื่องมือจัดการการแข่งขัน --}}
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+
+            <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+
+                {{-- ชื่อเครื่องมือ --}}
+                <div class="flex min-w-0 items-center gap-3">
+
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center
+                                rounded-xl bg-blue-100 text-blue-700">
+                        <svg
+                            class="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M10 13a5 5 0 007.5.5l2-2a5 5 0 00-7-7l-1 1"/>
+                            <path d="M14 11a5 5 0 00-7.5-.5l-2 2a5 5 0 007 7l1-1"/>
+                        </svg>
+                    </div>
+
+                    <div class="min-w-0">
+                        <h2 class="font-bold text-slate-800">
+                            เครื่องมือจัดการการแข่งขัน
+                        </h2>
+
+                        <p class="truncate text-sm text-slate-500">
+                            {{ $competition->title }}
+                        </p>
+                    </div>
+                </div>
+
+                {{-- ปุ่มเครื่องมือ --}}
+                <div class="flex flex-wrap items-center gap-2">
+
+                    {{-- กลับหน้ารายการ --}}
+                    <a
+                        href="{{ route('competition-admin.competitions.index') }}"
+                        class="inline-flex items-center justify-center gap-2
+                            rounded-lg border border-slate-300 bg-white
+                            px-3.5 py-2.5 text-sm font-semibold text-slate-700
+                            shadow-sm transition hover:bg-slate-100
+                            focus:outline-none focus:ring-4 focus:ring-slate-200"
+                    >
+                        <svg
+                            class="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+
+                        กลับหน้ารายการ
+                    </a>
+
+                    {{-- ดูหน้าส่งผลงาน --}}
+                    <a
+                        href="{{ route('competitions.submissions.create', $competition) }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center justify-center gap-2
+                            rounded-lg border border-blue-200 bg-blue-50
+                            px-3.5 py-2.5 text-sm font-semibold text-blue-700
+                            shadow-sm transition hover:bg-blue-100
+                            focus:outline-none focus:ring-4 focus:ring-blue-100"
+                    >
+                        <svg
+                            class="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M14 3h7v7"/>
+                            <path d="M10 14L21 3"/>
+                            <path d="M21 14v5a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h5"/>
+                        </svg>
+
+                        ดูหน้าส่งผลงาน
+                    </a>
+
+                    {{-- คัดลอกลิงก์ --}}
+                    <button
+                        type="button"
+                        id="copySubmissionLink"
+                        data-copy-url="{{ route(
+                            'competitions.submissions.create',
+                            $competition
+                        ) }}"
+                        class="inline-flex items-center justify-center gap-2
+                            rounded-lg border border-emerald-200 bg-emerald-50
+                            px-3.5 py-2.5 text-sm font-semibold text-emerald-700
+                            shadow-sm transition hover:bg-emerald-100
+                            focus:outline-none focus:ring-4 focus:ring-emerald-100"
+                    >
+                        <svg
+                            class="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect x="9" y="9" width="11" height="11" rx="2"/>
+                            <path d="M15 9V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7a2 2 0 002 2h3"/>
+                        </svg>
+
+                        <span id="copySubmissionLinkText">
+                            คัดลอกลิงก์ฟอร์ม
+                        </span>
+                    </button>
+
+                    {{-- แก้ไขการแข่งขัน --}}
+                    <a
+                        href="{{ route(
+                            'competition-admin.competitions.edit',
+                            $competition
+                        ) }}"
+                        class="inline-flex items-center justify-center gap-2
+                            rounded-lg border border-blue-600 bg-blue-600
+                            px-3.5 py-2.5 text-sm font-semibold text-white
+                            shadow-sm transition hover:border-blue-700
+                            hover:bg-blue-700 focus:outline-none
+                            focus:ring-4 focus:ring-blue-200"
+                    >
+                        <svg
+                            class="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M12 20h9"/>
+                            <path d="M16.5 3.5a2.1 2.1 0 013 3L8 18l-4 1 1-4z"/>
+                        </svg>
+
+                        แก้ไขการแข่งขัน
+                    </a>
+
+                    {{-- จัดการเกณฑ์คะแนน --}}
+                    <a
+                        href="{{ route(
+                            'competition-admin.competitions.rubrics.index',
+                            $competition
+                        ) }}"
+                        class="inline-flex items-center justify-center gap-2
+                            rounded-lg border border-amber-500 bg-amber-500
+                            px-3.5 py-2.5 text-sm font-semibold text-white
+                            shadow-sm transition hover:border-amber-600
+                            hover:bg-amber-600 focus:outline-none
+                            focus:ring-4 focus:ring-amber-200"
+                    >
+                        <svg
+                            class="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M9 11l3 3L22 4"/>
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                        </svg>
+
+                        จัดการเกณฑ์คะแนน
+                    </a>
+                </div>
+            </div>
         </div>
-
-        <div class="flex flex-wrap gap-2">
-            <a href="{{ route('competition-admin.competitions.index') }}"
-                class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200">
-                กลับหน้ารายการ
-            </a>
-            <a href="{{ route('competitions.submissions.create', $competition) }}"target="_blank"
-                class="inline-flex items-center justify-center rounded-xl border border-blue-200
-                    bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 focus:outline-none focus:ring-4 focus:ring-blue-100">
-                ดูหน้าส่งผลงาน
-            </a>
-            <button
-                type="button"
-                id="copySubmissionLink"
-                data-copy-url="{{ route(
-                    'competitions.submissions.create',
-                    $competition
-                ) }}"
-                class="inline-flex items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-2.5 text-sm font-semibold text-green-700 transition hover:bg-green-100 focus:outline-none focus:ring-4 focus:ring-green-100">
-
-                <svg
-                    class="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true">
-
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M8 12h8m-8 4h5m-6 5h10a2 2 0 0 0 2-2V7l-5-5H7a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2Z" />
-                </svg>
-
-                <span id="copySubmissionLinkText">
-                    คัดลอกลิงก์ฟอร์ม
-                </span>
-            </button>
-            <a href="{{ route('competition-admin.competitions.edit', $competition) }}"
-                class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200">
-                แก้ไขการแข่งขัน
-            </a>
-            <a
-                href="{{ route(
-                    'competition-admin.competitions.rubrics.index',
-                    $competition
-                ) }}"
-                class="inline-flex items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-600">
-
-                จัดการเกณฑ์การให้คะแนน
-            </a>
-        </div>
-    </div>
 @endsection
 
 @section('content')
