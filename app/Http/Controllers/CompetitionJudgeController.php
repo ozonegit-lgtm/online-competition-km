@@ -25,15 +25,7 @@ class CompetitionJudgeController extends Controller
             (string) $request->query('q', '')
         );
 
-        $competitions = Competition::query()
-            ->with([
-                'category',
-                'creator.adminProfile',
-            ])
-            ->withCount([
-                'judgeAssignments',
-            ])
-            ->when(
+        $competitions = Competition::query() ->with([ 'category', 'creator.adminProfile',])->withCount(['judgeAssignments',])->when(
                 $search !== '',
                 function ($query) use ($search) {
                     $query->where(
@@ -58,29 +50,17 @@ class CompetitionJudgeController extends Controller
     /**
      * แสดงหน้าแต่งตั้งกรรมการของการแข่งขัน
      */
-    public function index(
-        Competition $competition
-    ): View {
-        Gate::authorize(
-            'assignJudges',
-            $competition
-        );
+    public function index(Competition $competition): View 
+    {
+        Gate::authorize('assignJudges',$competition);
 
         $competition->load([
             'judgeAssignments.judge.adminProfile',
         ]);
 
-        $judges = User::query()
-            ->where('is_active', true)
-            ->whereHas('role', function ($query) {
+        $judges = User::query()->where('is_active', true)->whereHas('role', function ($query) {
                 $query->where('role_name', 'Judge');
-            })
-            ->with([
-                'role',
-                'adminProfile',
-            ])
-            ->orderBy('username')
-            ->get();
+            })->with(['role','adminProfile',])->orderBy('username')->get();
 
         $assignedJudgeIds = $competition
             ->judgeAssignments
@@ -88,13 +68,8 @@ class CompetitionJudgeController extends Controller
             ->map(fn ($id) => (int) $id)
             ->all();
 
-        return view(
-            'superadmin.competition-judges.index',
-            compact(
-                'competition',
-                'judges',
-                'assignedJudgeIds'
-            )
+        return view('superadmin.competition-judges.index',
+            compact('competition', 'judges','assignedJudgeIds')
         );
     }
     /**

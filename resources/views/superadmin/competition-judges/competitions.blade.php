@@ -8,7 +8,7 @@
 
         <div>
             <h1 class="text-2xl font-bold text-slate-900">
-                จัดการกรรมการ
+                จัดการกรรมการ ผู้ลงคะแนน
             </h1>
 
             <p class="mt-1 text-sm text-slate-500">
@@ -320,9 +320,9 @@
                                 ) }}"
                                 class="mt-5 inline-flex w-full items-center
                                        justify-center gap-2 rounded-xl
-                                       bg-blue-600 px-4 py-3
+                                       bg-green-600 px-4 py-3
                                        text-sm font-semibold text-white
-                                       transition hover:bg-blue-700
+                                       transition hover:bg-green-700
                                        focus:outline-none focus:ring-4
                                        focus:ring-blue-200"
                             >
@@ -339,7 +339,7 @@
                                     <path d="M22 11h-6"/>
                                 </svg>
 
-                                จัดการกรรมการ
+                                จัดการกรรมการ 
                             </a>
                         </div>
                     </article>

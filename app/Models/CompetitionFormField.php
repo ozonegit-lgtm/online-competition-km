@@ -28,11 +28,12 @@ class CompetitionFormField extends Model
         'competition_id',
         'label',
         'field_name',
-        'system_field',
         'field_type',
         'placeholder',
         'help_text',
         'options',
+        'accepted_file_types',
+        'max_file_size',
         'is_required',
         'sort_order',
         'is_active',
@@ -41,13 +42,15 @@ class CompetitionFormField extends Model
     /**
      * Type Casting
      */
-    protected $casts = [
-        'options' => 'array',
-        'is_required' => 'boolean',
-        'is_active' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'options' => 'array',
+            'is_required' => 'boolean',
+            'is_active' => 'boolean',
+            'max_file_size' => 'integer',
+        ];
+    }
 
     /**
      * การแข่งขัน

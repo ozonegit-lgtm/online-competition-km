@@ -9,143 +9,251 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class CompetitionTemplateFormFieldController extends Controller
 {
-    public function index(CompetitionTemplate $template){
-        $template->load('formFields');
-        return view('superadmin.templates.form-fields.create', compact('template'));
+    /**
+     * แสดงหน้า Form Builder
+     */
+    public function create(CompetitionTemplate $template)
+    {
+        $template->load([
+            'formFields' => fn ($query) => $query
+                ->orderBy('sort_order')
+                ->orderBy('id'),
+        ]);
+
+        return view(
+            'superadmin.templates.form-fields.create',
+            compact('template')
+        );
     }
 
-    public function store(Request $request, CompetitionTemplate $template)
-    {
+    /**
+     * บันทึกคำถามทั้งหมดของ Template
+     */
+    public function store(
+        Request $request,
+        CompetitionTemplate $template
+    ) {
         $request->validate([
             'fields' => ['required', 'json'],
         ]);
 
-        $fields = json_decode($request->fields, true);
+        $fields = json_decode(
+            $request->input('fields'),
+            true
+        );
 
-        /**
-         * ฟิลด์ระบบที่จำเป็นต้องมีอยู่ในทุก Template
-         * เพื่อให้ Competition ที่สร้างจาก Template นี้
-         * เปิดฟอร์มส่งผลงานได้จริง (ดู SubmissionController::ensureRequiredSystemFieldsExist)
-         */
-        $requiredSystemFields = [
-            'contact_name',
-            'contact_email',
-            'contact_phone',
-        ];
-
-        Validator::make(
-
+        $validator = Validator::make(
             ['fields' => $fields],
+            [
+                'fields' => [
+                    'required',
+                    'array',
+                    'min:1',
+                ],
 
-                [
-                    'fields' => ['required', 'array', 'min:1'],
-                    'fields.*.label' => ['required','string','max:255',],
-                    'fields.*.type' => ['required','in:text,textarea,number,email,phone,date,file,select,radio,checkbox',],
-                    'fields.*.system_field' => [
-                        'nullable',
-                        'string',
-                        'in:contact_name,contact_email,contact_phone,project_title,project_description,project_file',
-                    ],
-                    'fields.*.placeholder' => ['nullable','string','max:255',],
-                    'fields.*.help' => ['nullable','string',],
-                    'fields.*.options' => ['nullable','array',],
-                    'fields.*.options.*' => ['nullable','string','max:255',],
-                    'fields.*.required' => ['required','boolean',],
-                    'fields.*.active' => ['required','boolean',],
-                ]
-        )->after(function ($validator) use ($fields, $requiredSystemFields, $template) {
+                'fields.*.label' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
 
-            /**
-             * รวม system_field ของฟิลด์ที่มีอยู่แล้วในฐานข้อมูล (จากการ Submit
-             * รอบก่อนหน้า) เข้ากับฟิลด์ชุดใหม่ที่กำลังจะบันทึก เพราะแอดมิน
-             * สามารถทยอยเพิ่มฟิลด์เป็นหลายรอบได้ ไม่ใช่ต้องส่งครบในครั้งเดียว
-             */
-            $existingSystemFields = $template->formFields()
-                ->whereNotNull('system_field')
-                ->pluck('system_field');
+                'fields.*.type' => [
+                    'required',
+                    Rule::in([
+                        'text',
+                        'textarea',
+                        'number',
+                        'email',
+                        'phone',
+                        'date',
+                        'file',
+                        'select',
+                        'radio',
+                        'checkbox',
+                    ]),
+                ],
 
-            $systemFieldsUsed = collect($fields)
-                ->pluck('system_field')
-                ->filter(fn ($value) => filled($value))
-                ->merge($existingSystemFields)
-                ->values();
+                'fields.*.placeholder' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                ],
 
-            /**
-             * ต้องมีฟิลด์ระบบที่จำเป็นครบทั้ง 3 ตัว
-             * มิฉะนั้น Competition ที่ใช้ Template นี้
-             * จะเปิดฟอร์มส่งผลงานไม่ได้ (Error 422)
-             */
-            $missingFields = collect($requiredSystemFields)->diff($systemFieldsUsed);
+                'fields.*.help' => [
+                    'nullable',
+                    'string',
+                    'max:1000',
+                ],
 
-            if ($missingFields->isNotEmpty()) {
-                $validator->errors()->add(
-                    'fields',
-                    'กรุณากำหนดฟิลด์ระบบให้ครบ: '
-                        . $missingFields->implode(', ')
-                        . ' มิฉะนั้นผู้เข้าร่วมจะไม่สามารถเปิดฟอร์มส่งผลงานได้'
-                );
+                'fields.*.options' => [
+                    'nullable',
+                    'array',
+                ],
+
+                'fields.*.options.*' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                ],
+
+                'fields.*.accepted_file_types' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                ],
+
+                'fields.*.max_file_size' => [
+                    'nullable',
+                    'integer',
+                    'min:1',
+                    'max:100',
+                ],
+
+                'fields.*.required' => [
+                    'required',
+                    'boolean',
+                ],
+
+                'fields.*.active' => [
+                    'required',
+                    'boolean',
+                ],
+            ],
+            [
+                'fields.required' =>
+                    'กรุณาเพิ่มคำถามอย่างน้อย 1 ข้อ',
+
+                'fields.min' =>
+                    'กรุณาเพิ่มคำถามอย่างน้อย 1 ข้อ',
+
+                'fields.*.label.required' =>
+                    'กรุณาระบุชื่อคำถามให้ครบ',
+
+                'fields.*.type.required' =>
+                    'กรุณาเลือกประเภทคำตอบ',
+
+                'fields.*.type.in' =>
+                    'พบประเภทคำตอบที่ระบบไม่รองรับ',
+            ]
+        );
+
+        /*
+         * ตรวจคำถามประเภทตัวเลือก
+         */
+        $validator->after(function ($validator) use ($fields) {
+            foreach ($fields as $index => $field) {
+                $type = $field['type'] ?? null;
+
+                $options = collect($field['options'] ?? [])
+                    ->map(fn ($option) => trim((string) $option))
+                    ->filter()
+                    ->values()
+                    ->all();
+
+                if (
+                    in_array(
+                        $type,
+                        ['select', 'radio', 'checkbox'],
+                        true
+                    )
+                    && empty($options)
+                ) {
+                    $validator->errors()->add(
+                        "fields.{$index}.options",
+                        'คำถามแบบตัวเลือกต้องมีอย่างน้อย 1 ตัวเลือก'
+                    );
+                }
             }
+        });
 
-            /**
-             * ห้ามกำหนด system_field ซ้ำกันมากกว่า 1 ช่อง
-             * เพราะระบบจะไม่รู้ว่าควรใช้คำตอบจากช่องใด
-             */
-            $duplicatedFields = $systemFieldsUsed
-                ->duplicates()
-                ->unique()
-                ->values();
-
-            if ($duplicatedFields->isNotEmpty()) {
-                $validator->errors()->add(
-                    'fields',
-                    'พบฟิลด์ระบบที่ถูกกำหนดซ้ำกันมากกว่า 1 ช่อง: '
-                        . $duplicatedFields->implode(', ')
-                );
-            }
-        })->validate();
+        $validator->validate();
 
         DB::transaction(function () use ($template, $fields) {
-            foreach ($fields as $index => $field) {
-                $fieldName = Str::snake($field['label']);
+            /*
+             * หน้า Form Builder ส่งคำถามมาทั้งหมด
+             * จึงลบชุดเดิมแล้วสร้างใหม่ตามลำดับล่าสุด
+             */
+            $template->formFields()->delete();
 
-                if ($fieldName === '') {
-                    $fieldName = 'field_' . ($index + 1);
+            foreach ($fields as $index => $field) {
+                $baseName = Str::snake(
+                    trim($field['label'])
+                );
+
+                if ($baseName === '') {
+                    $baseName = 'field';
                 }
 
-                $fieldName .= '_' . Str::lower(Str::random(6));
+                $fieldName = $baseName
+                    . '_'
+                    . Str::lower(Str::random(6));
 
-                $fieldName .= '_' . ($index + 1);
+                $optionTypes = [
+                    'select',
+                    'radio',
+                    'checkbox',
+                ];
+
+                $options = in_array(
+                    $field['type'],
+                    $optionTypes,
+                    true
+                )
+                    ? collect($field['options'] ?? [])
+                        ->map(fn ($option) =>
+                            trim((string) $option)
+                        )
+                        ->filter()
+                        ->values()
+                        ->all()
+                    : null;
+
+                $isFile = $field['type'] === 'file';
 
                 CompetitionTemplateFormField::create([
                     'template_id' => $template->id,
-                    'label' => $field['label'],
+                    'label' => trim($field['label']),
                     'field_name' => $fieldName,
-                    'system_field' => $field['system_field'] ?? null,
                     'field_type' => $field['type'],
-                    'placeholder' => $field['placeholder'] ?? null,
-                    'help_text' => $field['help'] ?? null,
 
-                    // ส่ง array ตรง ๆ ให้ Model cast 'options' => 'array' เป็นผู้ json_encode
-                    // ให้เอง (ห้าม json_encode ซ้ำตรงนี้ มิฉะนั้นค่าที่บันทึกจะถูก
-                    // encode ซ้อนกัน 2 ชั้น แล้วตอนอ่านกลับมาจะได้ string แทน array)
-                    'options' => !empty($field['options'])
-                        ? array_values($field['options'])
+                    'placeholder' =>
+                        $field['placeholder'] ?? null,
+
+                    'help_text' =>
+                        $field['help'] ?? null,
+
+                    'options' => $options,
+
+                    'accepted_file_types' => $isFile
+                        ? ($field['accepted_file_types'] ?? null)
                         : null,
 
-                    'is_required' => (bool) $field['required'],
-                    'is_active' => (bool) $field['active'],
+                    'max_file_size' => $isFile
+                        ? ($field['max_file_size'] ?? null)
+                        : null,
+
+                    'is_required' =>
+                        (bool) $field['required'],
+
+                    'is_active' =>
+                        (bool) $field['active'],
+
+                    'sort_order' => $index + 1,
                 ]);
             }
         });
 
         return redirect()
             ->route(
-                'superadmin.templates.form-fields.create',
-                ['template' => $template->id]
+                'superadmin.templates.index'
             )
-            ->with('success', 'เพิ่มช่องกรอกข้อมูลสำเร็จ');
+            ->with(
+                'success',
+                'บันทึกแบบฟอร์ม Template สำเร็จ'
+            );
     }
 }

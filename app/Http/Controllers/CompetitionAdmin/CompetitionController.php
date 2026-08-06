@@ -42,7 +42,7 @@ class CompetitionController extends Controller
             $validated = $request->validate([
                 'title' => ['required','string','max:255',],
                 'category_id' => ['required', Rule::exists('competition_categories', 'id')->where('is_active', true),],
-                'template_id' => ['nullable', Rule::exists('competition_templates', 'id')->where('is_active', true),],
+                'template_id' => ['required', Rule::exists('competition_templates', 'id')->where('is_active', true),],
                 'description' => ['nullable','string',],
                 'competition_type' => ['required','in:individual,team',],
                 'visibility' => ['required','in:public,private',],
@@ -51,6 +51,12 @@ class CompetitionController extends Controller
                 'judging_start' => ['required','date','after_or_equal:registration_end',],
                 'judging_end' => ['required','date','after:judging_start',],
                 'result_announcement' => ['required','date','after_or_equal:judging_end',],
+                'access_code' => [
+                    'nullable',
+                    'required_if:visibility,private',
+                    'string',
+                    'max:100',
+                ],
             ], [
                 'registration_start.required' => 'กรุณาเลือกวันและเวลาเริ่มรับผลงาน',
                 'registration_end.required' => 'กรุณาเลือกวันและเวลาปิดรับผลงาน',
@@ -70,33 +76,16 @@ class CompetitionController extends Controller
                     $template = CompetitionTemplate::with(['formFields' => function ($query) {$query->orderBy('sort_order');},])->where('is_active', true)->findOrFail($validated['template_id']);
                 }
 
-                if ($template) {
+               if ($template) {
+                    $hasActiveFields = $template->formFields
+                        ->where('is_active', true)
+                        ->isNotEmpty();
 
-                    $requiredSystemFields = [
-                        'contact_name',
-                        'contact_email',
-                        'contact_phone',
-                        'project_title',
-                        'project_file',
-                    ];
-
-                    $existingSystemFields = $template->formFields
-                        ->pluck('system_field')
-                        ->filter()
-                        ->values()
-                        ->all();
-
-                    $missing = array_diff(
-                        $requiredSystemFields,
-                        $existingSystemFields
-                    );
-
-                    if (!empty($missing)) {
-
+                    if (!$hasActiveFields) {
                         throw \Illuminate\Validation\ValidationException::withMessages([
                             'template_id' => [
-                                'Template นี้ยังตั้งค่าฟิลด์ระบบไม่ครบ กรุณาตรวจสอบ Template ก่อนสร้างการแข่งขัน'
-                            ]
+                                'Template นี้ยังไม่มีคำถามที่เปิดใช้งาน กรุณาสร้างแบบฟอร์มก่อนสร้างการแข่งขัน',
+                            ],
                         ]);
                     }
                 }
@@ -117,32 +106,27 @@ class CompetitionController extends Controller
                     'judging_end' => $validated['judging_end'],
                     'result_announcement' => $validated['result_announcement'],
                     'status' => 'draft',
+                    'access_code' => $validated['visibility'] === 'private'
+                        ? $validated['access_code']
+                        : null,
                 ]);
 
                 if ($template) {
-                    foreach ($template->formFields as $templateField) {
-                        $options = $templateField->options;
-
-                        if (is_string($options)) {
-                            $options = json_decode($options, true);
-                        }
-
-                        if (!is_array($options)) {
-                            $options = null;
-                        }
+                    foreach ($template->formFields->where('is_active', true) as $templateField) {
 
                         CompetitionFormField::create([
                             'competition_id' => $competition->id,
                             'label' => $templateField->label,
                             'field_name' => $templateField->field_name,
-                            'system_field' => $templateField->system_field,
                             'field_type' => $templateField->field_type,
                             'placeholder' => $templateField->placeholder,
                             'help_text' => $templateField->help_text,
-                            'options' => $options,
+                            'options' => $templateField->options,
+                            'accepted_file_types' => $templateField->accepted_file_types,
+                            'max_file_size' => $templateField->max_file_size,
                             'is_required' => $templateField->is_required,
                             'sort_order' => $templateField->sort_order,
-                            'is_active' => $templateField->is_active,
+                            'is_active' => true,
                         ]);
                     }
                 }
@@ -199,25 +183,32 @@ class CompetitionController extends Controller
     {
         abort_unless(
             (int) $competition->created_by === (int) Auth::id(),
-            403,'เอาเลข 1กับ0มาเลียงเป็นรูปภาพ'
+            403, 'คุณไม่มีสิทธิ์แก้ไขการแข่งขันนี้'
         );
 
         $validated = $request->validate([
                 'category_id' => ['required','integer','exists:competition_categories,id',],
-                'template_id' => ['required','integer','exists:competition_templates,id',],
+                'template_id' => 
+
+                [
+                    'required','integer',
+                    Rule::exists('competition_templates', 'id'),
+                    Rule::in([$competition->template_id]),
+                ],
+
                 'title' => ['required','string','max:255',],
                 'description' => ['nullable', 'string',],
                 'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240',],
                 'competition_type' => ['required', 'in:individual,team',],
                 'visibility' => ['required', 'in:public,private',],
-                'access_code' => ['nullable', 'string', 'max:255',],
+                'access_code' => ['nullable','required_if:visibility,private','string', 'max:100',],
                 'registration_start' => [ 'required','date',],
                 'registration_end' => ['required','date','after_or_equal:registration_start',],
                 'judging_start' => ['required','date','after_or_equal:registration_end',], 
                 'judging_end' => ['required','date','after_or_equal:judging_start',],
                 'result_announcement' => ['required','date','after_or_equal:judging_end',],
-                'publish_scores' => ['required','boolean',],
-                'publish_km' => ['required','boolean',],
+                'publish_scores' => ['nullable', 'boolean'],
+                'publish_km' => ['nullable', 'boolean'],
                 'status' => ['required','in:draft,published,open,closed,judging,completed,archived',],
             ], [
                 'category_id.required' => 'กรุณาเลือกหมวดหมู่การแข่งขัน',
@@ -227,7 +218,7 @@ class CompetitionController extends Controller
                 'title.max' => 'ชื่อการแข่งขันต้องไม่เกิน 255 ตัวอักษร',
                 'cover_image.image' => 'ไฟล์ภาพปกต้องเป็นรูปภาพเท่านั้น',
                 'cover_image.mimes' => 'ภาพปกต้องเป็นไฟล์ JPG, JPEG, PNG หรือ WEBP',
-                'cover_image.max' => 'ภาพปกต้องมีขนาดไม่เกิน 2 MB',
+                'cover_image.max' => 'ภาพปกต้องมีขนาดไม่เกิน 10 MB',
                 'competition_type.required' => 'กรุณาเลือกรูปแบบการแข่งขัน',
                 'competition_type.in' => 'รูปแบบการแข่งขันไม่ถูกต้อง',
                 'visibility.required' => 'กรุณาเลือกการเข้าถึงการแข่งขัน',

@@ -15,433 +15,460 @@
 @endsection
 
 @section('content')
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+<div class="mx-auto max-w-5xl">
 
-    {{-- แจ้งบันทึกสำเร็จ --}}
-    @if(session('success'))
-        <div class="mb-6 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-700">
-            {{ session('success') }}
-        </div>
-    @endif
+    <form
+        id="templateForm"
+        action="{{ route('superadmin.templates.form-fields.store', $template) }}"
+        method="POST"
+    >
+        @csrf
 
-    {{-- แจ้งข้อผิดพลาด --}}
-    @if($errors->any())
-        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
-            <p class="font-semibold text-red-700">
-                กรุณาตรวจสอบข้อมูลอีกครั้ง
-            </p>
+        {{-- ส่งคำถามทั้งหมดเป็น JSON --}}
+        <input type="hidden" name="fields" id="fieldsInput">
 
-            <ul class="mt-2 list-inside list-disc text-sm text-red-600">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+        {{-- หัวแบบฟอร์ม --}}
+        <div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="h-3 bg-violet-600"></div>
 
-    {{-- ขั้นตอนการสร้าง Template --}}
-    <div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="grid sm:grid-cols-2">
+            <div class="p-6">
+                <h2 class="text-xl font-bold text-slate-800">
+                    {{ $template->template_name }}
+                </h2>
 
-            {{-- ขั้นตอนที่ 1 สำเร็จแล้ว --}}
-            <div class="flex items-center gap-4 border-b border-slate-200 px-6 py-5 sm:border-b-0 sm:border-r">
-                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-600 font-bold text-white">
-                    ✓
-                </span>
-
-                <div>
-                    <p class="font-semibold text-green-700">
-                        ข้อมูล Template
+                @if ($template->description)
+                    <p class="mt-2 text-sm text-slate-500">
+                        {{ $template->description }}
                     </p>
+                @endif
 
-                    <p class="mt-1 text-xs text-slate-500">
-                        บันทึกข้อมูลเรียบร้อยแล้ว
-                    </p>
-                </div>
-            </div>
-
-            {{-- ขั้นตอนที่ 2 --}}
-            <div class="flex items-center gap-4 bg-blue-50 px-6 py-5">
-                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 font-bold text-white">
-                    2
-                </span>
-
-                <div>
-                    <p class="font-semibold text-blue-700">
-                        สร้างแบบฟอร์ม
-                    </p>
-
-                    <p class="mt-1 text-xs text-slate-500">
-                        กำลังเพิ่มช่องกรอกข้อมูล
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-<form
-    id="templateForm"
-    method="POST"
-    action="{{ route('superadmin.templates.form-fields.store', $template) }}">
-
-    @csrf
-
-    <input
-        type="hidden"
-        name="fields"
-        id="fieldsInput">
-    {{-- Form Builder --}}
-        <div class="grid gap-6 md:grid-cols-2">
-
-            {{-- ซ้าย --}}
-            <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
-                {{-- Header --}}
-                <div class="border-b border-slate-200 px-6 py-5">
-                    <h2 class="text-xl font-bold text-slate-800">
-                        Form Builder
-                    </h2>
-                    <p class="mt-1 text-sm text-slate-500">
-                        เพิ่มช่องกรอกข้อมูลสำหรับ Template
-                    </p>
-                </div>
-                {{-- Body --}}
-                <div class="space-y-6 p-6">
-                    {{-- ชื่อช่องกรอก --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700">
-                            ชื่อช่องกรอก <span class="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="field_label"
-                            placeholder="เช่น ชื่อผลงาน"
-                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
-                                focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                    </div>
-                    {{-- ประเภทข้อมูล --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700">
-                            ประเภทข้อมูล <span class="text-red-500">*</span>
-                        </label>
-                        <select
-                            id="field_type"
-                                onchange="
-                                    document
-                                        .getElementById('fileSettingsBox')
-                                        .classList
-                                        .toggle('hidden', this.value !== 'file')
-                                "
-                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
-                                focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                            <option value="text">ข้อความสั้น (Text)</option>
-                            <option value="textarea">ข้อความยาว (Textarea)</option>
-                            <option value="number">ตัวเลข</option>
-                            <option value="email">อีเมล</option>
-                            <option value="phone">เบอร์โทรศัพท์</option>
-                            <option value="date">วันที่</option>
-                            <option value="file">อัปโหลดไฟล์</option>
-                            <option value="select">Dropdown</option>
-                            <option value="radio">Radio</option>
-                            <option value="checkbox">Checkbox</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700">
-                            ฟิลด์ระบบ
-                        </label>
-                        <select
-                            id="field_system"
-                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
-                                focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-
-                            <option value="">ไม่ใช่ฟิลด์ระบบ</option>
-
-                            <optgroup label="ข้อมูลผู้ส่ง">
-                                <option value="contact_name">ชื่อผู้ส่ง</option>
-                                <option value="contact_email">อีเมล</option>
-                                <option value="contact_phone">เบอร์โทรศัพท์</option>
-                            </optgroup>
-
-                            <optgroup label="ข้อมูลผลงาน">
-                                <option value="project_title">ชื่อผลงาน</option>
-                                <option value="project_description">รายละเอียดผลงาน</option>
-                                <option value="project_file">ไฟล์ผลงาน</option>
-                            </optgroup>
-
-                        </select>
-                        <p class="mt-2 text-xs leading-5 text-slate-500">
-                            หากเลือกเป็นฟิลด์ระบบ ระบบจะใช้ข้อมูลนี้ในการบันทึกและแสดงผลการส่งผลงาน
-                            <span class="font-semibold text-amber-600">
-                                (แต่ละประเภทเลือกได้เพียง 1 ครั้ง)
-                            </span>
-                        </p>
-                    </div>
-                    {{-- Placeholder --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700">
-                            Placeholder
-                        </label>
-                        <input
-                            type="text"
-                            id="field_placeholder"
-                            placeholder="ข้อความตัวอย่าง"
-                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
-                                focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-                    </div>
-                    {{-- คำอธิบาย --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700">
-                            คำอธิบาย
-                        </label>
-                        <textarea
-                            id="field_help"
-                            rows="3"
-                            placeholder="ข้อความแนะนำผู้ใช้งาน"
-                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
-                                focus:border-blue-500 focus:ring-4 focus:ring-blue-100"></textarea>
-                    </div>
-                    {{-- ตัวเลือก --}}
-                    <div id="optionsBox" class="hidden">
-                        <label class="block text-sm font-semibold text-slate-700">
-                            ตัวเลือก
-                        </label>
-                        <textarea
-                            id="field_options"
-                            rows="5"
-                            placeholder="กรอก 1 ตัวเลือกต่อ 1 บรรทัด"
-                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
-                                focus:border-blue-500 focus:ring-4 focus:ring-blue-100"></textarea>
-                        <p class="mt-2 text-xs text-slate-500">
-                            ใช้สำหรับ Dropdown, Radio และ Checkbox
-                        </p>
-                    </div>
-                    {{-- ตั้งค่าไฟล์ --}}
-                    <div id="fileSettingsBox" class="hidden space-y-5">
-
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700">
-                                ประเภทไฟล์ที่อนุญาต
-                            </label>
-
-                            <select
-                                id="field_file_types"
-                                class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
-                                    focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-
-                                <option value="">ไฟล์ทุกประเภท</option>
-                                <option value="image/*">รูปภาพ</option>
-                                <option value=".pdf">PDF</option>
-                                <option value=".doc,.docx">Microsoft Word</option>
-                                <option value=".xls,.xlsx">Microsoft Excel</option>
-                                <option value=".ppt,.pptx">PowerPoint</option>
-                                <option value="video/*">วิดีโอ</option>
-                                <option value="audio/*">ไฟล์เสียง</option>
-                                <option value=".zip,.rar,.7z">ZIP / RAR / 7Z</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700">
-                                ขนาดไฟล์สูงสุด
-                            </label>
-
-                            <select
-                                id="field_max_file_size"
-                                class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3
-                                    focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
-
-                                <option value="2048">2 MB</option>
-                                <option value="5120">5 MB</option>
-                                <option value="10240" selected>10 MB</option>
-                                <option value="20480">20 MB</option>
-                                <option value="51200">50 MB</option>
-                            </select>
-                        </div>
-
-                        <label class="flex items-center gap-3">
-                            <input
-                                type="checkbox"
-                                id="field_allow_multiple"
-                                class="h-5 w-5 accent-blue-600">
-
-                            <span class="text-sm text-slate-700">
-                                อนุญาตให้อัปโหลดหลายไฟล์
-                            </span>
-                        </label>
-
-                    </div>
-                    {{-- ตั้งค่า --}}
-                    <div class="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-5">
-                        <label class="flex items-center gap-3">
-                            <input
-                                type="checkbox"
-                                id="field_required"
-                                class="h-5 w-5 accent-blue-600">
-                            <span class="text-sm text-slate-700">
-                                จำเป็นต้องกรอก
-                            </span>
-                        </label>
-                        <label class="flex items-center gap-3">
-                            <input
-                                type="checkbox"
-                                id="field_active"
-                                checked
-                                class="h-5 w-5 accent-green-600">
-                            <span class="text-sm text-slate-700">
-                                เปิดใช้งาน
-                            </span>
-                        </label>
-                    </div>
-                    {{-- ปุ่ม --}}
-                    <button
-                        type="button"
-                        id="addField"
-                        class="w-full rounded-xl bg-blue-600 px-6 py-3
-                            font-semibold text-white transition
-                            hover:bg-blue-700">
-                        + เพิ่มเข้า Preview
-                    </button>
-                </div>
-            </div>
-        {{-- ขวา --}}
-        <div class="rounded-2xl border border-slate-200 bg-white shadow-sm md:sticky md:top-24 md:self-start">
-            {{-- Header --}}
-            <div class="border-b border-slate-200 px-6 py-5">
-                <div class="flex items-start justify-between gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800">
-                            Live Preview
-                        </h2>
-                        <p class="mt-1 text-sm text-slate-500">
-                            ตัวอย่างช่องใหม่ที่กำลังเพิ่ม
-                        </p>
-                    </div>
-
-                    <span class="shrink-0 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
-                        มีแล้ว {{ $template->formFields->count() }} ช่อง
-                    </span>
-                </div>
-            </div>
-
-            {{-- New fields are always visible first --}}
-            <div class="border-b border-slate-200 px-6 py-4">
-                <h3 class="text-sm font-bold text-slate-800">ช่องใหม่ที่กำลังเพิ่ม</h3>
-                <p class="mt-1 text-xs text-slate-500">
-                    เมื่อกดเพิ่ม Preview จะแสดงตรงส่วนนี้ทันที
+                <p class="mt-4 text-xs text-slate-400">
+                    เพิ่มคำถามที่ต้องการให้ผู้ส่งผลงานกรอก
                 </p>
             </div>
+        </div>
 
-            <div id="previewContainer" class="space-y-5 p-6">
-                {{-- Empty State --}}
-                <div id="emptyPreview" class="rounded-xl border-2 border-dashed border-slate-300 px-6 py-12 text-center">
-                    <h3 class="text-base font-semibold text-slate-700">
-                        ยังไม่ได้เพิ่มช่องใหม่
-                    </h3>
-                    <p class="mt-2 text-sm text-slate-500">
-                        เพิ่มช่องจาก Form Builder ทางด้านซ้าย
-                    </p>
-                </div>
-            </div>
+        {{-- รายการคำถาม --}}
+        <div id="fieldsContainer" class="space-y-4"></div>
 
-            {{-- Existing fields are always visible below the new preview --}}
-            @if($template->formFields->isNotEmpty())
-                <section class="border-t border-slate-200 bg-slate-50/70">
-                    <div class="flex items-center justify-between gap-4 px-6 py-4">
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800">
-                                ช่องที่มีอยู่แล้ว {{ $template->formFields->count() }} ช่อง
-                            </h3>
-                            <p class="mt-1 text-xs text-slate-500">
-                                รายการช่องเดิมของ Template นี้
-                            </p>
-                        </div>
+        {{-- ปุ่มเพิ่มคำถาม --}}
+        <button
+            type="button"
+            id="addFieldButton"
+            class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl
+                   border-2 border-dashed border-violet-300 bg-violet-50
+                   px-5 py-4 font-semibold text-violet-700 transition
+                   hover:border-violet-400 hover:bg-violet-100"
+        >
+            <span class="text-xl">+</span>
+            เพิ่มคำถาม
+        </button>
 
-                        <a
-                            href="{{ route('superadmin.templates.edit', $template) }}"
-                            class="shrink-0 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-blue-700 ring-1 ring-slate-200 transition hover:bg-blue-50">
-                            แก้ไขช่องเดิม
-                        </a>
-                    </div>
+        {{-- Footer --}}
+        <div class="mt-8 flex items-center justify-between gap-4">
+            <a
+                href="{{ route('superadmin.templates.index') }}"
+                class="rounded-xl border border-slate-300 px-5 py-3
+                       font-semibold text-slate-600 transition
+                       hover:bg-slate-100"
+            >
+                ยกเลิก
+            </a>
 
-                    <div class="max-h-96 space-y-3 overflow-y-auto border-t border-slate-200 p-6">
-                        @foreach($template->formFields->sortBy('sort_order') as $existingField)
-                            @php
-                                $existingOptions = is_array($existingField->options)
-                                    ? $existingField->options
-                                    : (json_decode($existingField->options ?? '[]', true) ?: []);
-                            @endphp
+            <button
+                type="submit"
+                class="rounded-xl bg-green-600 px-6 py-3
+                       font-semibold text-white transition
+                       hover:bg-green-700">
+                บันทึกแบบฟอร์ม
+            </button>
+        </div>
+    </form>
+</div>
 
-                            <div class="rounded-xl border border-slate-200 bg-white p-4">
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="min-w-0">
-                                        <h4 class="break-words text-sm font-semibold text-slate-800">
-                                            {{ $existingField->label }}
-                                            @if($existingField->is_required)
-                                                <span class="text-red-500">*</span>
-                                            @endif
-                                        </h4>
-                                        <p class="mt-1 break-all text-xs text-slate-400">
-                                            {{ $existingField->field_name }}
-                                        </p>
-                                    </div>
+<template id="fieldTemplate">
+    <div
+        class="field-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+        data-field-id=""
+    >
+        <div class="mb-4 flex items-center justify-between gap-4">
+            <span class="field-number text-sm font-semibold text-slate-400"></span>
 
-                                    <div class="flex shrink-0 flex-wrap justify-end gap-2">
-                                        <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
-                                            {{ ucfirst($existingField->field_type) }}
-                                        </span>
-                                        <span class="rounded-full px-2.5 py-1 text-xs font-medium
-                                            {{ $existingField->is_active
-                                                ? 'bg-green-50 text-green-700'
-                                                : 'bg-slate-100 text-slate-500' }}">
-                                            {{ $existingField->is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน' }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                @if($existingField->placeholder)
-                                    <p class="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
-                                        Placeholder: {{ $existingField->placeholder }}
-                                    </p>
-                                @endif
-
-                                @if(
-                                    in_array($existingField->field_type, ['select', 'radio', 'checkbox'])
-                                    && !empty($existingOptions)
-                                )
-                                    <div class="mt-3 flex flex-wrap gap-2">
-                                        @foreach($existingOptions as $option)
-                                            <span class="rounded-lg bg-slate-100 px-2.5 py-1 text-xs text-slate-600">
-                                                {{ $option }}
-                                            </span>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                </section>
-            @endif
-
-            {{-- Footer --}}
-            <div class="grid gap-3 border-t border-slate-200 bg-slate-50 px-6 py-5 sm:grid-cols-2">
-                <a
-                    href="{{ route('superadmin.templates.show', $template) }}"
-                    class="flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3
-                        font-semibold text-slate-700 transition
-                        hover:bg-slate-100">
-                    ย้อนกลับไปหน้ารายละเอียด
-                </a>
+            <div class="flex items-center gap-2">
+                <button
+                    type="button"
+                    class="duplicate-field rounded-lg px-3 py-2 text-sm
+                           text-slate-500 hover:bg-slate-100"
+                >
+                    ทำสำเนา
+                </button>
 
                 <button
-                    type="submit"
-                    id="saveTemplate"
-                    class="w-full rounded-xl bg-green-600 px-6 py-3
-                        font-semibold text-white transition
-                        hover:bg-green-700">
-                    บันทึก Template ทั้งหมด
+                    type="button"
+                    class="delete-field rounded-lg px-3 py-2 text-sm
+                           text-red-500 hover:bg-red-50"
+                >
+                    ลบ
                 </button>
             </div>
         </div>
-    </div>
-</form>
 
+        <div class="grid gap-4 md:grid-cols-[1fr_220px]">
+            {{-- ชื่อคำถาม --}}
+            <div>
+                <label class="mb-1 block text-sm font-medium text-slate-700">
+                    คำถาม
+                </label>
+
+                <input
+                    type="text"
+                    class="field-label w-full rounded-xl border border-slate-300
+                           px-4 py-3 outline-none transition
+                           focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                    placeholder="ระบุคำถาม"
+                >
+            </div>
+
+            {{-- ประเภทคำตอบ --}}
+            <div>
+                <label class="mb-1 block text-sm font-medium text-slate-700">
+                    ประเภทคำตอบ
+                </label>
+
+                <select
+                    class="field-type w-full rounded-xl border border-slate-300
+                           px-4 py-3 outline-none focus:border-violet-500"
+                >
+                    <option value="text">ข้อความสั้น</option>
+                    <option value="textarea">ข้อความยาว</option>
+                    <option value="number">ตัวเลข</option>
+                    <option value="email">อีเมล</option>
+                    <option value="phone">เบอร์โทรศัพท์</option>
+                    <option value="date">วันที่</option>
+                    <option value="select">Dropdown</option>
+                    <option value="radio">ตัวเลือกเดียว</option>
+                    <option value="checkbox">หลายตัวเลือก</option>
+                    <option value="file">อัปโหลดไฟล์</option>
+                </select>
+            </div>
+        </div>
+
+        {{-- คำอธิบาย --}}
+        <div class="mt-4">
+            <label class="mb-1 block text-sm font-medium text-slate-700">
+                คำอธิบายเพิ่มเติม
+            </label>
+
+            <input
+                type="text"
+                class="field-help w-full rounded-xl border border-slate-300
+                       px-4 py-3 outline-none focus:border-violet-500"
+                placeholder="ข้อความช่วยอธิบายคำถาม (ไม่บังคับ)"
+            >
+        </div>
+
+        {{-- ตัวเลือก --}}
+        <div class="options-section mt-4 hidden">
+            <div class="mb-2 flex items-center justify-between">
+                <label class="text-sm font-medium text-slate-700">
+                    ตัวเลือก
+                </label>
+
+                <button
+                    type="button"
+                    class="add-option text-sm font-semibold text-violet-600"
+                >
+                    + เพิ่มตัวเลือก
+                </button>
+            </div>
+
+            <div class="options-container space-y-2"></div>
+        </div>
+
+        {{-- ตั้งค่าไฟล์ --}}
+        <div class="file-section mt-4 hidden">
+            <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700">
+                        ประเภทไฟล์ที่อนุญาต
+                    </label>
+
+                    <input
+                        type="text"
+                        class="accepted-file-types w-full rounded-xl
+                               border border-slate-300 px-4 py-3"
+                        placeholder=".pdf,.doc,.docx,.jpg,.png"
+                    >
+                </div>
+
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700">
+                        ขนาดสูงสุด (MB)
+                    </label>
+
+                    <input
+                        type="number"
+                        min="1"
+                        class="max-file-size w-full rounded-xl
+                               border border-slate-300 px-4 py-3"
+                        placeholder="10"
+                    >
+                </div>
+            </div>
+        </div>
+
+        {{-- Required --}}
+        <div class="mt-5 flex items-center justify-end border-t border-slate-100 pt-4">
+            <label class="flex cursor-pointer items-center gap-2">
+                <input
+                    type="checkbox"
+                    class="field-required h-4 w-4 rounded border-slate-300
+                           text-violet-600 focus:ring-violet-500"
+                >
+
+                <span class="text-sm font-medium text-slate-600">
+                    จำเป็นต้องตอบ
+                </span>
+            </label>
+        </div>
+    </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('templateForm');
+    const fieldsInput = document.getElementById('fieldsInput');
+    const fieldsContainer = document.getElementById('fieldsContainer');
+    const fieldTemplate = document.getElementById('fieldTemplate');
+    const addFieldButton = document.getElementById('addFieldButton');
+
+    let fields = [];
+
+    function createId() {
+        return window.crypto?.randomUUID
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random()}`;
+    }
+
+    function createEmptyField() {
+        return {
+            id: createId(),
+            label: '',
+            type: 'text',
+            help: '',
+            options: [],
+            required: false,
+            active: true,
+            accepted_file_types: '',
+            max_file_size: null
+        };
+    }
+
+    function escapeHtml(value) {
+        const element = document.createElement('div');
+        element.textContent = value ?? '';
+        return element.innerHTML;
+    }
+
+    function renderFields() {
+        fieldsContainer.innerHTML = '';
+
+        fields.forEach((field, index) => {
+            const fragment = fieldTemplate.content.cloneNode(true);
+            const card = fragment.querySelector('.field-card');
+
+            card.dataset.fieldId = field.id;
+            card.querySelector('.field-number').textContent = `คำถามที่ ${index + 1}`;
+            card.querySelector('.field-label').value = field.label;
+            card.querySelector('.field-type').value = field.type;
+            card.querySelector('.field-help').value = field.help;
+            card.querySelector('.field-required').checked = field.required;
+            card.querySelector('.accepted-file-types').value =
+                field.accepted_file_types ?? '';
+            card.querySelector('.max-file-size').value =
+                field.max_file_size ?? '';
+
+            updateConditionalSections(card, field);
+            bindCardEvents(card, field.id);
+
+            fieldsContainer.appendChild(fragment);
+        });
+    }
+
+    function updateConditionalSections(card, field) {
+        const optionTypes = ['select', 'radio', 'checkbox'];
+        const optionsSection = card.querySelector('.options-section');
+        const fileSection = card.querySelector('.file-section');
+
+        optionsSection.classList.toggle(
+            'hidden',
+            !optionTypes.includes(field.type)
+        );
+
+        fileSection.classList.toggle(
+            'hidden',
+            field.type !== 'file'
+        );
+
+        renderOptions(card, field);
+    }
+
+    function renderOptions(card, field) {
+        const container = card.querySelector('.options-container');
+        container.innerHTML = '';
+
+        field.options.forEach((option, optionIndex) => {
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-2';
+
+            row.innerHTML = `
+                <input
+                    type="text"
+                    value="${escapeHtml(option)}"
+                    data-option-index="${optionIndex}"
+                    class="option-input w-full rounded-xl border
+                           border-slate-300 px-4 py-2"
+                    placeholder="ตัวเลือกที่ ${optionIndex + 1}"
+                >
+
+                <button
+                    type="button"
+                    data-option-index="${optionIndex}"
+                    class="delete-option rounded-lg px-3 py-2
+                           text-red-500 hover:bg-red-50"
+                >
+                    ลบ
+                </button>
+            `;
+
+            container.appendChild(row);
+        });
+    }
+
+    function bindCardEvents(card, fieldId) {
+        const getField = () => fields.find(field => field.id === fieldId);
+
+        card.querySelector('.field-label').addEventListener('input', event => {
+            getField().label = event.target.value;
+        });
+
+        card.querySelector('.field-help').addEventListener('input', event => {
+            getField().help = event.target.value;
+        });
+
+        card.querySelector('.field-required').addEventListener('change', event => {
+            getField().required = event.target.checked;
+        });
+
+        card.querySelector('.field-type').addEventListener('change', event => {
+            const field = getField();
+            field.type = event.target.value;
+
+            if (!['select', 'radio', 'checkbox'].includes(field.type)) {
+                field.options = [];
+            } else if (field.options.length === 0) {
+                field.options = [''];
+            }
+
+            renderFields();
+        });
+
+        card.querySelector('.accepted-file-types').addEventListener('input', event => {
+            getField().accepted_file_types = event.target.value;
+        });
+
+        card.querySelector('.max-file-size').addEventListener('input', event => {
+            getField().max_file_size = event.target.value
+                ? Number(event.target.value)
+                : null;
+        });
+
+        card.querySelector('.add-option').addEventListener('click', () => {
+            getField().options.push('');
+            renderFields();
+        });
+
+        card.querySelector('.options-container').addEventListener('input', event => {
+            if (!event.target.classList.contains('option-input')) {
+                return;
+            }
+
+            getField().options[Number(event.target.dataset.optionIndex)] =
+                event.target.value;
+        });
+
+        card.querySelector('.options-container').addEventListener('click', event => {
+            const deleteButton = event.target.closest('.delete-option');
+
+            if (!deleteButton) {
+                return;
+            }
+
+            getField().options.splice(
+                Number(deleteButton.dataset.optionIndex),
+                1
+            );
+
+            renderFields();
+        });
+
+        card.querySelector('.duplicate-field').addEventListener('click', () => {
+            const index = fields.findIndex(field => field.id === fieldId);
+
+            fields.splice(index + 1, 0, {
+                ...structuredClone(getField()),
+                id: createId()
+            });
+
+            renderFields();
+        });
+
+        card.querySelector('.delete-field').addEventListener('click', () => {
+            fields = fields.filter(field => field.id !== fieldId);
+
+            if (fields.length === 0) {
+                fields.push(createEmptyField());
+            }
+
+            renderFields();
+        });
+    }
+
+    addFieldButton.addEventListener('click', function () {
+        fields.push(createEmptyField());
+        renderFields();
+    });
+
+    form.addEventListener('submit', function (event) {
+        const invalidField = fields.find(field => !field.label.trim());
+
+        if (invalidField) {
+            event.preventDefault();
+            alert('กรุณาระบุคำถามให้ครบทุกข้อ');
+            return;
+        }
+
+        fieldsInput.value = JSON.stringify(
+            fields.map((field, index) => ({
+                label: field.label.trim(),
+                type: field.type,
+                placeholder: '',
+                help: field.help.trim(),
+                options: field.options
+                    .map(option => option.trim())
+                    .filter(Boolean),
+                required: field.required,
+                active: field.active,
+                accepted_file_types: field.accepted_file_types,
+                max_file_size: field.max_file_size,
+                sort_order: index + 1
+            }))
+        );
+    });
+
+    // เริ่มต้นด้วยคำถามว่างหนึ่งข้อ
+    fields.push(createEmptyField());
+    renderFields();
+});
+</script>
 @endsection

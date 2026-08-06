@@ -73,14 +73,18 @@
                 </div>
 
                 <div>
-                    <label for="template_id" class="block text-sm font-semibold text-slate-700">
-                        แม่แบบฟอร์มรับผลงาน
-                    </label>
+                <label
+                    for="template_id"
+                    class="block text-sm font-semibold text-slate-700">
+                    แม่แบบฟอร์มรับผลงาน
+                    <span class="text-red-500">*</span>
+                </label>
                     <select
                         id="template_id"
                         name="template_id"
+                        required
                         class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100">
-                        <option value="">-- ไม่ใช้แม่แบบ --</option>
+                        <option value="">-- เลือกแม่แบบ --</option>
                         @forelse($templates as $template)
                             <option
                                 value="{{ $template->id }}"
@@ -128,6 +132,45 @@
                             <option value="private" {{ old('visibility') === 'private' ? 'selected' : '' }}>ใช้รหัสเข้าร่วม</option>
                         </select>
                     </div>
+                </div>
+                {{-- Access code --}}
+                <div
+                    id="accessCodeWrapper"
+                    class="{{ old('visibility', 'public') === 'private'
+                        ? ''
+                        : 'hidden' }}"
+                >
+                    <label
+                        for="access_code"
+                        class="block text-sm font-semibold text-slate-700"
+                    >
+                        รหัสเข้าร่วม
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    <input
+                        id="access_code"
+                        type="text"
+                        name="access_code"
+                        value="{{ old('access_code') }}"
+                        maxlength="100"
+                        autocomplete="off"
+                        placeholder="กำหนดรหัสสำหรับเข้าร่วมการแข่งขัน"
+                        class="mt-2 w-full rounded-xl border border-slate-300
+                            bg-slate-50 px-4 py-3 text-slate-800
+                            outline-none transition focus:border-blue-600
+                            focus:bg-white focus:ring-4 focus:ring-blue-100"
+                    >
+
+                    <p class="mt-2 text-xs text-slate-500">
+                        ผู้สมัครต้องกรอกรหัสนี้ก่อนส่งผลงาน
+                    </p>
+
+                    @error('access_code')
+                        <p class="mt-1 text-sm text-red-500">
+                            {{ $message }}
+                        </p>
+                    @enderror
                 </div>
 
                 {{-- Competition schedule --}}
@@ -363,9 +406,28 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const templateSelect = document.getElementById('template_id');
+    const visibilitySelect = document.getElementById('visibility');
+    const accessCodeWrapper = document.getElementById('accessCodeWrapper');
+    const accessCodeInput = document.getElementById('access_code');
+
     const emptyState = document.getElementById('templateEmptyState');
     const previews = document.querySelectorAll('[data-template-preview]');
     const dateTimeInputs = document.querySelectorAll('[data-datetime-input]');
+
+    function updateAccessCodeVisibility() {
+        const isPrivate = visibilitySelect.value === 'private';
+
+        accessCodeWrapper.classList.toggle(
+            'hidden',
+            !isPrivate
+        );
+
+        accessCodeInput.required = isPrivate;
+
+        if (!isPrivate) {
+            accessCodeInput.value = '';
+        }
+    }
 
     function formatThaiDateTime(value) {
         if (!value) {
@@ -418,6 +480,7 @@ document.addEventListener('DOMContentLoaded', function () {
         emptyState.classList.toggle('hidden', selectedId !== '');
     }
 
+    visibilitySelect.addEventListener( 'change', updateAccessCodeVisibility);
     templateSelect.addEventListener('change', showSelectedTemplate);
 
     dateTimeInputs.forEach(function (input) {
@@ -427,7 +490,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateDateTimeDisplay(input);
     });
-
+    
+    updateAccessCodeVisibility();
     showSelectedTemplate();
 });
 </script>

@@ -88,7 +88,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/destroy/{id}', [UserManagementController::class,'destroy',])->name('deleteUser');
             Route::resource('templates', CompetitionTemplateController::class);
             Route::resource('categories', CompetitionCategoryController::class)->parameters(['categories' => 'competitionCategory',]);
-            Route::get('/templates/{template}/form-fields/create',[CompetitionTemplateFormFieldController::class, 'index'])->name('templates.form-fields.create');
+            Route::get('/templates/{template}/form-fields/create',[CompetitionTemplateFormFieldController::class, 'create'])->name('templates.form-fields.create');
             Route::post('/templates/{template}/form-fields',[CompetitionTemplateFormFieldController::class, 'store'])->name('templates.form-fields.store');
             Route::get('/competitions-judges',[CompetitionJudgeController::class, 'competitions'])->name('competitions.judges.list');
             Route::get('/competitions/{competition}/judges',[CompetitionJudgeController::class, 'index'])->name('competitions.judges.index');

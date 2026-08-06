@@ -34,7 +34,12 @@ class SubmissionController extends Controller
 
         $fields = $competition->formFields->values();
 
-        $this->ensureRequiredSystemFieldsExist($fields);
+        if ($fields->isEmpty()) {
+            throw ValidationException::withMessages([
+                'form' => 'การแข่งขันนี้ยังไม่มีคำถามในแบบฟอร์ม',
+            ]);
+        }
+
         $this->attachResolvedOptions($fields);
         return view('submissions.create',compact('competition', 'fields'));
     }
@@ -52,7 +57,11 @@ class SubmissionController extends Controller
             ->orderBy('id')
             ->get();
 
-        $this->ensureRequiredSystemFieldsExist($fields);
+        if ($fields->isEmpty()) {
+            throw ValidationException::withMessages([
+                'form' => 'การแข่งขันนี้ยังไม่มีคำถามในแบบฟอร์ม',
+            ]);
+        }
 
         [$rules, $attributes] = $this->buildValidationRules(
             $competition,
@@ -88,27 +97,29 @@ class SubmissionController extends Controller
             ]);
         }
 
-        $answersByName = $this->collectAnswersByFieldName(
-            $validated,
-            $fields
-        );
 
         $storedPaths = [];
 
         DB::beginTransaction();
 
         try {
+            $submissionCode = $this->generateSubmissionCode();
+
             $submission = Submission::create([
                 'competition_id' => $competition->id,
-                'submission_code' => $this->generateSubmissionCode(),
-                'project_title' => $answersByName['project_title'] ?? 'ไม่มีชื่อผลงาน',
-                'project_description' => $answersByName['project_description'] ?? null,
+                'submission_code' => $submissionCode,
+                /*
+                * ระบบ Dynamic Form ไม่มีช่องชื่อผลงานแบบตายตัว
+                * จึงใช้รหัสการส่งเป็นชื่อรายการเริ่มต้น
+                */
+                'project_title' => "ผลงาน {$submissionCode}",
+                'project_description' => null,
                 'team_name' => $competition->competition_type === 'team'
-                    ? $validated['team_name']
+                    ? ($validated['team_name'] ?? null)
                     : null,
-                'contact_name' => $answersByName['contact_name'],
-                'contact_email' => $answersByName['contact_email'],
-                'contact_phone' => $answersByName['contact_phone'],
+                'contact_name' => null,
+                'contact_email' => null,
+                'contact_phone' => null,
                 'final_score' => 0,
                 'status' => 'submitted',
                 'submitted_at' => now(),
@@ -226,31 +237,6 @@ class SubmissionController extends Controller
         );
     }
 
-    private function ensureRequiredSystemFieldsExist(Collection $fields): void
-        {
-            $requiredFields = collect([
-                'contact_name',
-                'contact_email',
-                'contact_phone',
-                'project_title',
-                'project_file',
-            ]);
-
-            $missingFields = $requiredFields->diff(
-                $fields
-                    ->pluck('system_field')
-                    ->filter()
-            );
-
-            if ($missingFields->isNotEmpty()) {
-
-                throw ValidationException::withMessages([
-                    'form' => [
-                        'แบบฟอร์มการแข่งขันยังตั้งค่าไม่ครบ กรุณาติดต่อผู้ดูแลการแข่งขัน'
-                    ],
-                ]);
-            }
-        }
 
     private function attachResolvedOptions(Collection $fields): void
     {
@@ -305,7 +291,7 @@ class SubmissionController extends Controller
                     $requiredRule,
                     'file',
                     'mimes:jpg,jpeg,png,webp,pdf,doc,docx,ppt,pptx,zip',
-                    'max:10240',
+                    'max:' . (($field->max_file_size ?: 10) * 1024),
                 ],
                 'select', 'radio' => [
                     $requiredRule,
@@ -320,11 +306,7 @@ class SubmissionController extends Controller
                 default => [
                     $requiredRule,
                     'string',
-                    'max:' . match ($field->system_field) {
-                        'contact_name' => 150,
-                        'project_title' => 255,
-                        default => 1000,
-                    },
+                    'max:1000',
                 ],
             };
 
@@ -342,27 +324,7 @@ class SubmissionController extends Controller
         return [$rules, $attributes];
     }
 
-    private function collectAnswersByFieldName(
-        array $validated,
-        Collection $fields
-    ): array {
-        $answers = [];
 
-        foreach ($fields as $field) {
-            if ($field->field_type === 'file') {
-                continue;
-            }
-
-            if ($field->system_field) {
-                $answers[$field->system_field] = data_get(
-                    $validated,
-                    "fields.{$field->id}"
-                );
-            }
-        }
-
-        return $answers;
-    }
 
     private function resolveFieldOptions(
         CompetitionFormField $field
