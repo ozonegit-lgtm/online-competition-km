@@ -105,23 +105,41 @@
 
                 <div class="space-y-1">
 
-                    <a
-                        href="{{ route('superadmin.createUser') }}"
-                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
+                <a
+                    href="{{ route('superadmin.createUser') }}"
+                    class="flex w-full items-center gap-3 rounded-xl px-3 py-3
+                        text-sm font-medium transition
                         {{ request()->routeIs('superadmin.createUser')
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
-                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                        <span>จัดการผู้ใช้งาน</span>
-                    </a>
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5 shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15.75 6a3.75 3.75 0 11-7.5 0
+                            3.75 3.75 0 017.5 0zM4.5 20.12a7.5
+                            7.5 0 0115 0A17.93 17.93 0 0112
+                            21.75c-2.68 0-5.22-.59-7.5-1.63z"
+                        />
 
-                    <a
-                        href="{{ route('superadmin.templates.index') }}"
-                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
-                        {{ request()->routeIs('superadmin.templates.*')
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
-                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                        <span>จัดการ Form-Template</span>
-                    </a>
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M19.5 8.25v4.5M21.75 10.5h-4.5"
+                        />
+                    </svg>
+
+                    <span>จัดการผู้ใช้งาน</span>
+                </a>
                     <a
                         href="{{ route('superadmin.categories.create') }}"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3
@@ -143,6 +161,36 @@
                         </svg>
 
                         <span>จัดการประเภทการแข่งขัน</span>
+                    </a>
+                    <a
+                        href="{{ route('superadmin.templates.index') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3
+                            text-sm font-medium transition
+                            {{ request()->routeIs('superadmin.templates.*')
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 shrink-0"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 5.25H6.75A2.25 2.25 0 004.5 7.5v10.5a2.25
+                                2.25 0 002.25 2.25h10.5A2.25 2.25 0 0019.5
+                                18V7.5a2.25 2.25 0 00-2.25-2.25H15M9
+                                5.25a3 3 0 006 0M9 5.25a3 3 0 016 0M8.25
+                                11.25h7.5M8.25 15h5.25"
+                            />
+                        </svg>
+
+                        <span>จัดการ Form-Template</span>
                     </a>
                     <a
                         href="{{ route('superadmin.competitions.judges.list') }}"
