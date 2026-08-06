@@ -17,27 +17,6 @@
 @section('content')
     <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 
-        {{-- ข้อความบันทึกสำเร็จ --}}
-        @if (session('success'))
-            <div class="mb-6 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-700">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        {{-- ข้อผิดพลาด --}}
-        @if ($errors->any())
-            <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
-                <p class="font-semibold text-red-700">
-                    กรุณาตรวจสอบข้อมูล
-                </p>
-
-                <ul class="mt-2 list-inside list-disc text-sm text-red-600">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         {{-- สรุปคะแนน --}}
         <div class="mb-6 grid gap-4 sm:grid-cols-3">

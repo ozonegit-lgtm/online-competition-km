@@ -18,6 +18,7 @@
 <div>
     <form
         action="{{ route('superadmin.updateUser', ['id' => $user->id]) }}"
+        enctype="multipart/form-data"
         method="POST"
         autocomplete="off"
         class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

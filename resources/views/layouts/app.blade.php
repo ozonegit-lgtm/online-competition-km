@@ -58,39 +58,8 @@
                         </div>
                     @endif
 
-                    {{-- Success Message --}}
-                    @if (session('success'))
-                        <div
-                            class="mb-5 rounded-xl border border-green-200
-                                   bg-green-50 px-4 py-3 text-sm text-green-700"
-                        >
-                            {{ session('success') }}
-                        </div>
-                    @endif
-
-                    {{-- Error Message --}}
-                    @if (session('error'))
-                        <div
-                            class="mb-5 rounded-xl border border-red-200
-                                   bg-red-50 px-4 py-3 text-sm text-red-700"
-                        >
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
-                    {{-- Validation Errors --}}
-                    @if ($errors->any())
-                        <div
-                            class="mb-5 rounded-xl border border-red-200
-                                   bg-red-50 px-4 py-3"
-                        >
-                            <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                    {{-- Global Alert --}}
+                    <x-alert />
 
                     {{-- Page Content --}}
                     @yield('content')
