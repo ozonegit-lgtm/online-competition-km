@@ -280,14 +280,34 @@
             @elseif ($roleName === 'Judge')
 
                 <div class="space-y-1">
-
                     <a
-                        href="#"
-                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium
-                            text-slate-500 cursor-not-allowed"
+                        href="{{ route('judge.judging-rooms.index') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3
+                            text-sm font-medium transition
+                            {{ request()->routeIs('judge.judging-rooms.*')
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
                     >
-                        <span>งานที่ได้รับมอบหมาย</span>
-                        <span class="ml-auto text-xs">เร็ว ๆ นี้</span>
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 5a3 3 0 0 1 6 0v2H9V5Zm0 8 2 2 4-4"
+                            />
+                        </svg>
+
+                        <span>ห้องตัดสิน</span>
                     </a>
 
                     <a
