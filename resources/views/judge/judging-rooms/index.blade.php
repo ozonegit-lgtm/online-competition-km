@@ -56,14 +56,68 @@
                     </div>
                 </div>
 
+            {{-- Assignment actions --}}
+            @if ($assignment?->assignment_status === 'pending')
+                <div class="mt-5 grid grid-cols-2 gap-3">
+                    <form
+                        action="{{ route(
+                            'judge.assignments.accept',
+                            $assignment
+                        ) }}"
+                        method="POST"
+                    >
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="w-full rounded-xl bg-emerald-600 px-4 py-2.5
+                                text-sm font-semibold text-white transition
+                                hover:bg-emerald-700"
+                        >
+                            รับงาน
+                        </button>
+                    </form>
+
+                    <form
+                        action="{{ route(
+                            'judge.assignments.decline',
+                            $assignment
+                        ) }}"
+                        method="POST"
+                        onsubmit="return confirm('ยืนยันปฏิเสธงานตัดสินนี้หรือไม่?')"
+                    >
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="w-full rounded-xl border border-red-200 bg-white
+                                px-4 py-2.5 text-sm font-semibold text-red-600
+                                transition hover:bg-red-50"
+                        >
+                            ปฏิเสธ
+                        </button>
+                    </form>
+                </div>
+
+            @elseif ($assignment?->assignment_status === 'accepted')
                 <a
-                    href="{{ route('judge.judging-rooms.show', $room) }}"
+                    href="{{ route(
+                        'judge.judging-rooms.show',
+                        $room
+                    ) }}"
                     class="mt-5 flex w-full items-center justify-center rounded-xl
-                           bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white
-                           transition hover:bg-blue-700"
+                        bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white
+                        transition hover:bg-blue-700"
                 >
                     เข้าห้องตัดสิน
                 </a>
+
+            @elseif ($assignment?->assignment_status === 'declined')
+                <div class="mt-5 rounded-xl bg-slate-100 px-4 py-3
+                            text-center text-sm text-slate-500">
+                    คุณปฏิเสธงานตัดสินนี้แล้ว
+                </div>
+            @endif
             </article>
         @empty
             <div class="col-span-full rounded-2xl border-2 border-dashed border-slate-200 bg-white py-16 text-center">

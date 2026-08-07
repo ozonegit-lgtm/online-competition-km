@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\JudgeAssignment;
 use App\Models\JudgingSession;
 use App\Models\Score;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class JudgingRoomController extends Controller
 {
     /**
-     * รายการห้องตัดสินที่กรรมการได้รับมอบหมาย
+     * แสดงห้องที่กรรมการได้รับมอบหมาย
      */
     public function index(): View
     {
@@ -19,10 +21,7 @@ class JudgingRoomController extends Controller
             ->whereHas(
                 'competition.judgeAssignments',
                 function ($query) {
-                    $query->where(
-                        'judge_id',
-                        auth()->id()
-                    );
+                    $query->where('judge_id', Auth::id());
                 }
             )
             ->with([
@@ -35,7 +34,7 @@ class JudgingRoomController extends Controller
                 'competition.judgeAssignments' => function ($query) {
                     $query->where(
                         'judge_id',
-                        auth()->id()
+                        Auth::id()
                     );
                 },
             ])
@@ -48,14 +47,23 @@ class JudgingRoomController extends Controller
     }
 
     /**
-     * แสดงห้องตัดสิน
+     * แสดงรายละเอียดห้องและแบบให้คะแนน
      */
-    public function show(JudgingSession $session): View
-    {
-        $assignment = JudgeAssignment::query()
-            ->where('competition_id', $session->competition_id)
-            ->where('judge_id', auth()->id())
-            ->firstOrFail();
+    public function show(
+        JudgingSession $session
+    ): View {
+        $assignment = $this->getAssignment($session);
+        abort_unless(
+            $assignment->assignment_status === 'accepted',
+            403,
+            'คุณไม่มีสิทธิ์ติดตามสถานะห้องนี้'
+        );
+
+        abort_unless(
+            $assignment->assignment_status === 'accepted',
+            403,
+            'กรุณารับงานตัดสินก่อนเข้าห้อง'
+        );
 
         $session->load([
             'competition.rubrics' => function ($query) {
@@ -92,5 +100,54 @@ class JudgingRoomController extends Controller
             'rubrics' => $session->competition->rubrics,
             'scores' => $scores,
         ]);
+    }
+
+    /**
+     * ส่งสถานะห้องให้หน้า Judge polling
+     */
+    public function state(
+        JudgingSession $session
+    ): JsonResponse {
+        $this->getAssignment($session);
+
+        $session->refresh();
+
+        return response()->json([
+            'id' => $session->id,
+            'status' => $session->status,
+            'state_version' => $session->state_version,
+            'current_submission_id' =>
+                $session->current_submission_id,
+            'current_file_id' =>
+                $session->current_file_id,
+            'current_page' =>
+                $session->current_page,
+            'scroll_progress' =>
+                (float) $session->scroll_progress,
+            'zoom' =>
+                (float) $session->zoom,
+            'started_at' =>
+                $session->started_at?->toISOString(),
+            'ended_at' =>
+                $session->ended_at?->toISOString(),
+        ]);
+    }
+
+    /**
+     * ตรวจว่ากรรมการได้รับมอบหมายในห้องนี้
+     */
+    private function getAssignment(
+        JudgingSession $session
+    ): JudgeAssignment {
+        return JudgeAssignment::query()
+            ->where(
+                'competition_id',
+                $session->competition_id
+            )
+            ->where(
+                'judge_id',
+                Auth::id()
+            )
+            ->firstOrFail();
     }
 }

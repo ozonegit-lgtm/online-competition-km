@@ -19,6 +19,7 @@ use App\Http\Controllers\CompetitionAdmin\RubricController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompetitionJudgeController;
 use App\Http\Controllers\Judge\JudgingRoomController;
+use App\Http\Controllers\CompetitionAdmin\JudgingSessionController;
 
 
 
@@ -109,6 +110,14 @@ Route::prefix('competition-admin')->name('competition-admin.')->middleware(['aut
         Route::resource('competitions',CompetitionController::class);
         Route::get('/submissions',[CompetitionController::class, 'submissions'])->name('submissions.index');
         Route::resource('competitions.rubrics',RubricController::class)->only(['index','store','update','destroy']);
+        Route::get('/judging-rooms',[JudgingSessionController::class, 'index'])->name('judging-rooms.index');
+        Route::get('/competitions/{competition}/judging-room',[JudgingSessionController::class, 'show'])->name('competitions.judging-room.show');
+        Route::post('/competitions/{competition}/judging-room/start',[JudgingSessionController::class, 'start'])->name('competitions.judging-room.start');
+        Route::post('/competitions/{competition}/judging-room/pause',[JudgingSessionController::class, 'pause'])->name('competitions.judging-room.pause');
+        Route::post('/competitions/{competition}/judging-room/resume',[JudgingSessionController::class, 'resume'])->name('competitions.judging-room.resume');
+        Route::put('/competitions/{competition}/judging-room/submission',[JudgingSessionController::class, 'selectSubmission'])->name('competitions.judging-room.submission');
+        Route::post('/competitions/{competition}/judging-room/end',[JudgingSessionController::class, 'end'])->name('competitions.judging-room.end');
+        Route::post('/competitions/{competition}/judging-room/close',[JudgingSessionController::class, 'close'])->name('competitions.judging-room.close');
     });
 
 /*

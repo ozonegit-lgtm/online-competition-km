@@ -274,12 +274,72 @@
 
                         <span>เกณฑ์การตัดสิน</span>
                     </a>
+                    <a
+                        href="{{ route('competition-admin.judging-rooms.index') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3
+                            text-sm font-medium transition
+                            {{ request()->routeIs(
+                                    'competition-admin.judging-rooms.*',
+                                    'competition-admin.competitions.judging-room.*'
+                            )
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect
+                                x="3"
+                                y="5"
+                                width="18"
+                                height="14"
+                                rx="2"
+                            />
 
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M7 9h4m-4 4h7m3-4h.01m-.01 4h.01"
+                            />
+                        </svg>
+
+                        <span>ควบคุมห้องตัดสิน</span>
+                    </a>
                 </div>
 
             @elseif ($roleName === 'Judge')
 
                 <div class="space-y-1">
+                    <a
+                        href="{{ route('profile.edit') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3
+                            text-sm font-medium transition
+                            {{ request()->routeIs('profile.*')
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="12" cy="7" r="4" />
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M4 21a8 8 0 0 1 16 0"
+                            />
+                        </svg>
+
+                        <span>โปรไฟล์ของฉัน</span>
+                    </a>
                     <a
                         href="{{ route('judge.judging-rooms.index') }}"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3
