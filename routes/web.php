@@ -130,4 +130,7 @@ Route::prefix('judge')->name('judge.')->middleware(['auth', 'role:Judge'])->grou
         Route::get('/dashboard', [JudgeDashboardController::class,'index',])->name('dashboard');
         Route::get('/judging-rooms', [JudgingRoomController::class,'index',])->name('judging-rooms.index');
         Route::get('/judging-rooms/{session}', [JudgingRoomController::class,'show',])->name('judging-rooms.show');
+        Route::get('/judging-rooms/{session}/state', [JudgingRoomController::class,'state'])->name('judging-rooms.state');
+        Route::post('/judging-rooms/{session}/scores/draft', [JudgingRoomController::class, 'saveDraft'])->name('judging-rooms.scores.draft');
+        Route::post('/judging-rooms/{session}/scores/submit', [JudgingRoomController::class, 'submit'])->name('judging-rooms.scores.submit');
     });

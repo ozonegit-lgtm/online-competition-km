@@ -9,6 +9,7 @@ use App\Models\Score;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class JudgingRoomController extends Controller
 {
@@ -149,5 +150,20 @@ class JudgingRoomController extends Controller
                 Auth::id()
             )
             ->firstOrFail();
+    }
+
+    public function saveDarft(Request $request, JudgingSession $session): JsonRespone{
+        $this->getAssignment($session);
+        return respone()->json([
+            'success' => true,
+            'message' => 'Draft saved.',
+        ]);
+    }
+    public function submit(Request $request, JudgingSession $session): Jsonrespone{
+        $this->getAssignment($session);
+        return respone()->json([
+            'success' => true,
+            'message' => 'score submitted'
+        ]);
     }
 }
