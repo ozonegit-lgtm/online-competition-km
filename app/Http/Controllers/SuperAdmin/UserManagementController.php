@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Concerns\HandlesConstrainedDeletes;
 use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\User;
@@ -12,6 +13,8 @@ use Illuminate\Validation\Rule;
 
 class UserManagementController extends Controller
 {
+    use HandlesConstrainedDeletes;
+
     /**
      * Display a listing of the resource.
      */
@@ -57,9 +60,6 @@ class UserManagementController extends Controller
         ]);
         
 
-        // User::create($request->only(['username','email','password','role_id','is_active']));
-
-        // return redirect()->route('createUser')->with('success', 'User ceated!');
         User::create([
             'username' => $validated['username'],
             'email' => $validated['email'],
@@ -97,6 +97,13 @@ class UserManagementController extends Controller
     public function update(Request $request, string $id)
     {
         $user = User::findOrFail($id);
+
+        if ((int) $user->getKey() === (int) $request->user()->getAuthIdentifier()) {
+            return redirect()
+                ->route('superadmin.showUser', ['id' => $user->id])
+                ->with('error', 'ไม่สามารถแก้ไขบัญชีที่กำลังเข้าสู่ระบบอยู่ได้');
+        }
+
         $validated = $request->validate([
             'username' => ['required','string','max:255',Rule::unique('users','username')->ignore($user->id),],
             'email' => ['required','email','max:255', Rule::unique('users','email')->ignore($user->id),],
@@ -118,16 +125,6 @@ class UserManagementController extends Controller
         ]);
         
 
-        // User::create($request->only(['username','email','password','role_id','is_active']));
-
-        // return redirect()->route('createUser')->with('success', 'User ceated!');
-        // User::create([
-        //     'username' => $validated['username'],
-        //     'email' => $validated['email'],
-        //     'password' => Hash::make($validated['password']),
-        //     'role_id' => $validated['role_id'],
-        //     'is_active' => (bool) $validated['is_active'],
-        // ]);
         $validated['is_active'] = (bool) $validated['is_active'];
         if (!empty($validated['password'])) {
                 $validated['password'] = Hash::make($validated['password']);
@@ -136,7 +133,6 @@ class UserManagementController extends Controller
             }
             $user->update($validated);
 
-        // return redirect()->route('superadmin.createUser')->with('success', 'สร้างผู้ใช้งานสำเร็จ');
         return redirect()->route('superadmin.showUser', ['id' => $user->id])->with('success', 'แก้ไขข้อมูลผู้ใช้งานสำเร็จ');
             
     }
@@ -147,7 +143,19 @@ class UserManagementController extends Controller
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);
-        $user->delete();
-        return redirect()->route('superadmin.createUser')->with('success', 'User deleted successfully.');
+
+        if ((int) $user->getKey() === (int) request()->user()->getAuthIdentifier()) {
+            return redirect()
+                ->route('superadmin.showUser', ['id' => $user->id])
+                ->with('error', 'ไม่สามารถลบบัญชีที่กำลังเข้าสู่ระบบอยู่ได้');
+        }
+
+        if (! $this->deleteUnlessReferenced($user)) {
+            return redirect()
+                ->route('superadmin.showUser', ['id' => $user->id])
+                ->with('error', 'ไม่สามารถลบบัญชีนี้ได้ เนื่องจากมีข้อมูลการแข่งขันอ้างอิงอยู่');
+        }
+
+        return redirect()->route('superadmin.createUser')->with('success', 'ลบผู้ใช้งานสำเร็จ');
     }
 }
