@@ -20,6 +20,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompetitionJudgeController;
 use App\Http\Controllers\Judge\JudgingRoomController;
 use App\Http\Controllers\CompetitionAdmin\JudgingSessionController;
+use App\Http\Controllers\JudgeAssignmentController;
 
 
 
@@ -127,10 +128,12 @@ Route::prefix('competition-admin')->name('competition-admin.')->middleware(['aut
 */
 
 Route::prefix('judge')->name('judge.')->middleware(['auth', 'role:Judge'])->group(function () {
-        Route::get('/dashboard', [JudgeDashboardController::class,'index',])->name('dashboard');
-        Route::get('/judging-rooms', [JudgingRoomController::class,'index',])->name('judging-rooms.index');
-        Route::get('/judging-rooms/{session}', [JudgingRoomController::class,'show',])->name('judging-rooms.show');
-        Route::get('/judging-rooms/{session}/state', [JudgingRoomController::class,'state'])->name('judging-rooms.state');
-        Route::post('/judging-rooms/{session}/scores/draft', [JudgingRoomController::class, 'saveDraft'])->name('judging-rooms.scores.draft');
-        Route::post('/judging-rooms/{session}/scores/submit', [JudgingRoomController::class, 'submit'])->name('judging-rooms.scores.submit');
+        Route::get('/dashboard',[JudgeDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/assignments/{assignment}/accept',[JudgeAssignmentController::class, 'accept'])->name('assignments.accept');
+        Route::post('/assignments/{assignment}/decline',[JudgeAssignmentController::class, 'decline'])->name('assignments.decline');
+        Route::get('/judging-rooms',[JudgingRoomController::class, 'index'])->name('judging-rooms.index');
+        Route::get('/judging-rooms/{session}',[JudgingRoomController::class, 'show'])->name('judging-rooms.show');
+        Route::get('/judging-rooms/{session}/state',[JudgingRoomController::class, 'state'])->name('judging-rooms.state');
+        Route::post('/judging-rooms/{session}/scores/draft',[JudgingRoomController::class, 'saveDraft'])->name('judging-rooms.scores.draft');
+        Route::post('/judging-rooms/{session}/scores/submit',[JudgingRoomController::class, 'submit'])->name('judging-rooms.scores.submit');
     });

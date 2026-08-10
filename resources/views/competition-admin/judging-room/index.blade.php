@@ -42,6 +42,22 @@
                 @php
                     $session = $competition->judgingSession;
 
+                    $coverImage = $competition->cover_image
+                        ?: $competition->template?->cover_image;
+
+                    $coverUrl = $coverImage
+                        ? (\Illuminate\Support\Str::startsWith(
+                            $coverImage,
+                            ['http://', 'https://']
+                        )
+                            ? $coverImage
+                            : \Illuminate\Support\Facades\Storage::disk('public')
+                                ->url($coverImage))
+                        : null;
+
+                    $templateTitle = $competition->template?->template_name
+                        ?? 'ไม่ได้ระบุแบบฟอร์ม';
+
                     $status = $session?->status ?? 'not_created';
 
                     $statusConfig = match ($status) {
@@ -78,17 +94,51 @@
                     };
                 @endphp
 
-                <article class="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                    <div class="flex items-start justify-between gap-4">
-                        <div class="min-w-0">
-                            <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                                การแข่งขัน
-                            </p>
+                <article class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                    {{-- Competition header image --}}
+                    <div class="h-44 overflow-hidden bg-slate-100">
+                        @if ($coverUrl)
+                            <img
+                                src="{{ $coverUrl }}"
+                                alt="รูปภาพรายการ {{ $competition->title }}"
+                                class="h-full w-full object-cover"
+                                loading="lazy"
+                            >
+                        @else
+                            <div class="flex h-full flex-col items-center justify-center gap-2 text-slate-400">
+                                <svg
+                                    class="h-9 w-9"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    aria-hidden="true"
+                                >
+                                    <rect x="3" y="4" width="18" height="16" rx="2" />
+                                    <circle cx="8.5" cy="9" r="1.5" />
+                                    <path d="m4 17 5-5 4 4 2-2 5 4" />
+                                </svg>
 
-                            <h2 class="mt-1 line-clamp-2 text-lg font-bold text-slate-800">
-                                {{ $competition->title }}
-                            </h2>
-                        </div>
+                                <span class="text-sm">ไม่มีรูปภาพรายการ</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="flex flex-1 flex-col p-5">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                    การแข่งขัน
+                                </p>
+
+                                <h2 class="mt-1 line-clamp-2 text-lg font-bold text-slate-800">
+                                    {{ $competition->title }}
+                                </h2>
+
+                                <p class="mt-1 line-clamp-1 text-sm text-slate-500">
+                                    แบบฟอร์ม: {{ $templateTitle }}
+                                </p>
+                            </div>
 
                         <span
                             class="inline-flex shrink-0 items-center gap-2 rounded-full
@@ -181,7 +231,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-auto pt-5">
+                        <div class="mt-auto pt-5">
                         <a
                             href="{{ route(
                                 'competition-admin.competitions.judging-room.show',
@@ -214,7 +264,8 @@
                             {{ $session
                                 ? 'เปิดหน้าควบคุม'
                                 : 'เตรียมห้องตัดสิน' }}
-                        </a>
+                            </a>
+                        </div>
                     </div>
                 </article>
             @empty

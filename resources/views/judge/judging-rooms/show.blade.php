@@ -232,7 +232,6 @@
                             class="divide-y divide-slate-100"
                         >
                             @csrf
-                            @method('PUT')
 
                             @foreach ($rubrics as $rubric)
                                 @php
