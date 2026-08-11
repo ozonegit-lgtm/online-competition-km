@@ -220,26 +220,47 @@
             </div>
         </section>
 
-        <div class="grid gap-6 xl:grid-cols-3">
+        @php
+            $currentSubmission = isset($currentSubmission)
+                ? $currentSubmission
+                : $session->currentSubmission;
+            $displayFile = $currentFile ?? $session->currentFile ?? null;
+            $filePath = $displayFile?->file_path;
+            $fileUrl = $filePath ? asset('storage/' . $filePath) : null;
+            $extension = strtolower(pathinfo($filePath ?? '', PATHINFO_EXTENSION));
+            $isImage = in_array(
+                $extension,
+                ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'],
+                true
+            );
+        @endphp
 
-            {{-- Submission selector --}}
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-1">
-                <h2 class="font-semibold text-slate-800">
-                    เลือกผลงาน
-                </h2>
+        {{-- Submission control and current submission --}}
+        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-200 bg-slate-50 px-5 py-5 sm:px-6">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-sm font-bold text-white">
+                                1
+                            </span>
+                            <div>
+                                <h2 class="font-semibold text-slate-800">เลือกผลงานที่ต้องการแสดง</h2>
+                                <p class="mt-0.5 text-sm text-slate-500">
+                                    เมื่อยืนยัน ผลงานนี้จะแสดงให้กรรมการทุกคนทันที
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-                <p class="mt-1 text-sm text-slate-500">
-                    ผลงานที่เลือกจะแสดงให้กรรมการทุกคน
-                </p>
-
-                @if (!$session->isEnded() && !$session->isClosed())
+                    @if (!$session->isEnded() && !$session->isClosed())
                     <form
                         action="{{ route(
                             'competition-admin.competitions.judging-room.submission',
                             $competition
                         ) }}"
                         method="POST"
-                        class="mt-4"
+                        class="flex w-full flex-col gap-3 sm:flex-row lg:max-w-2xl"
                     >
                         @csrf
                         @method('PUT')
@@ -247,7 +268,7 @@
                         <select
                             name="submission_id"
                             required
-                            class="w-full rounded-xl border border-slate-300 bg-slate-50
+                            class="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white
                                    px-4 py-3 text-sm text-slate-700 outline-none
                                    transition focus:border-blue-500 focus:bg-white
                                    focus:ring-4 focus:ring-blue-100"
@@ -270,97 +291,151 @@
                             @endforeach
                         </select>
 
-                        @error('submission_id')
-                            <p class="mt-2 text-sm text-red-600">
-                                {{ $message }}
-                            </p>
-                        @enderror
-
                         <button
                             type="submit"
-                            class="mt-3 w-full rounded-xl bg-blue-600 px-4 py-3
-                                   text-sm font-semibold text-white transition
-                                   hover:bg-blue-700"
+                            class="shrink-0 rounded-xl bg-blue-600 px-5 py-3 text-sm
+                                   font-semibold text-white shadow-sm transition hover:bg-blue-700
+                                   focus:outline-none focus:ring-4 focus:ring-blue-100"
                         >
                             แสดงผลงานนี้
                         </button>
                     </form>
-                @else
-                    <div class="mt-4 rounded-xl bg-slate-100 p-4 text-sm text-slate-500">
-                        ห้องนี้จบหรือปิดแล้ว ไม่สามารถเปลี่ยนผลงานได้
-                    </div>
-                @endif
-            </section>
-
-            {{-- Current submission --}}
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
-                <div class="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">
-                            ผลงานปัจจุบัน
-                        </p>
-
-                        @if ($session->currentSubmission)
-                            <h2 class="mt-2 text-xl font-bold text-slate-800">
-                                {{ $session->currentSubmission->project_title }}
-                            </h2>
-
-                            <p class="mt-1 text-sm text-slate-500">
-                                {{ $session->currentSubmission->submission_code }}
-                            </p>
-                        @else
-                            <h2 class="mt-2 text-lg font-semibold text-slate-500">
-                                ยังไม่ได้เลือกผลงาน
-                            </h2>
-                        @endif
-                    </div>
-
-                    @if ($session->currentSubmission)
-                        <span class="rounded-full bg-blue-50 px-3 py-1
-                                     text-xs font-semibold text-blue-700">
-                            {{ $session->currentSubmission->status }}
-                        </span>
+                    @else
+                        <div class="rounded-xl bg-slate-200 px-4 py-3 text-sm text-slate-600">
+                            ห้องจบหรือปิดแล้ว ไม่สามารถเปลี่ยนผลงานได้
+                        </div>
                     @endif
                 </div>
 
-                @if ($session->currentSubmission)
-                    <div class="mt-5 rounded-xl bg-slate-50 p-4">
-                        <p class="text-sm leading-6 text-slate-600">
-                            {{ $session->currentSubmission->project_description
-                                ?: 'ไม่มีรายละเอียดผลงาน' }}
-                        </p>
+                @error('submission_id')
+                    <p class="mt-3 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            @if ($currentSubmission)
+                <div class="p-5 sm:p-6">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                                <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                                    ผลงานปัจจุบันที่กรรมการกำลังเห็น
+                                </p>
+                            </div>
+                            <h2 class="mt-2 text-xl font-bold text-slate-800 sm:text-2xl">
+                                {{ $currentSubmission->project_title }}
+                            </h2>
+                            <p class="mt-1 text-sm font-medium text-slate-500">
+                                รหัส {{ $currentSubmission->submission_code }}
+                            </p>
+                        </div>
+                        <span class="w-fit shrink-0 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                            {{ $currentSubmission->status }}
+                        </span>
                     </div>
 
-                    <div class="mt-5">
-                        <h3 class="text-sm font-semibold text-slate-700">
-                            ไฟล์ผลงาน
-                        </h3>
+                    <div class="mt-5 grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
+                        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                            @if ($fileUrl && $isImage)
+                                <div class="flex min-h-80 items-center justify-center p-4 sm:min-h-[28rem]">
+                                    <img src="{{ $fileUrl }}"
+                                         alt="ผลงาน {{ $currentSubmission->project_title }}"
+                                         class="max-h-[70vh] w-auto max-w-full rounded-xl object-contain">
+                                </div>
+                            @elseif ($fileUrl)
+                                <div class="flex min-h-80 flex-col items-center justify-center p-8 text-center">
+                                    <p class="font-medium text-slate-700">ไฟล์นี้ไม่ใช่รูปภาพ</p>
+                                    <p class="mt-1 text-sm text-slate-500">เปิดไฟล์ในหน้าต่างใหม่เพื่อดูผลงาน</p>
+                                    <a href="{{ $fileUrl }}" target="_blank" rel="noopener"
+                                       class="mt-4 inline-flex rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+                                        เปิดผลงาน
+                                    </a>
+                                </div>
+                            @else
+                                <div class="flex min-h-80 items-center justify-center p-8 text-center text-sm text-slate-400">
+                                    ยังไม่ได้เลือกไฟล์สำหรับแสดง
+                                </div>
+                            @endif
+                        </div>
 
-                        <div class="mt-3 space-y-2">
-                            @forelse ($session->currentSubmission->files as $file)
-                                <div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3">
-                                    <div class="min-w-0">
-                                        <p class="truncate text-sm font-medium text-slate-700">
-                                            {{ $file->original_name ?? $file->file_name ?? 'ไฟล์ผลงาน' }}
-                                        </p>
+                        <aside class="space-y-5">
+                            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                                <h3 class="text-sm font-semibold text-slate-700">ข้อมูลผู้ส่งผลงาน</h3>
+
+                                <dl class="mt-3 space-y-3 text-sm">
+                                    <div>
+                                        <dt class="text-xs font-medium text-slate-400">ชื่อผู้ติดต่อ</dt>
+                                        <dd class="mt-1 font-medium text-slate-700">
+                                            {{ $currentSubmission->contact_name ?: 'ไม่ระบุชื่อ' }}
+                                        </dd>
                                     </div>
 
-                                    @if ($session->current_file_id === $file->id)
-                                        <span class="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                                            กำลังแสดง
-                                        </span>
-                                    @endif
-                                </div>
-                            @empty
-                                <p class="text-sm text-slate-400">
-                                    ไม่มีไฟล์แนบ
+                                    <div>
+                                        <dt class="text-xs font-medium text-slate-400">อีเมล</dt>
+                                        <dd class="mt-1 break-all text-slate-700">
+                                            {{ $currentSubmission->contact_email ?: 'ไม่ระบุอีเมล' }}
+                                        </dd>
+                                    </div>
+
+                                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                                        <div>
+                                            <dt class="text-xs font-medium text-slate-400">ทีม</dt>
+                                            <dd class="mt-1 text-slate-700">
+                                                {{ $currentSubmission->team_name ?: '-' }}
+                                            </dd>
+                                        </div>
+
+                                        <div>
+                                            <dt class="text-xs font-medium text-slate-400">โทรศัพท์</dt>
+                                            <dd class="mt-1 text-slate-700">
+                                                {{ $currentSubmission->contact_phone ?: '-' }}
+                                            </dd>
+                                        </div>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            <div class="rounded-2xl bg-slate-50 p-4">
+                                <h3 class="text-sm font-semibold text-slate-700">รายละเอียดผลงาน</h3>
+                                <p class="mt-2 text-sm leading-6 text-slate-600">
+                                    {{ $currentSubmission->project_description ?: 'ไม่มีรายละเอียดผลงาน' }}
                                 </p>
-                            @endforelse
-                        </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-sm font-semibold text-slate-700">ไฟล์ผลงาน</h3>
+                                <div class="mt-3 space-y-2">
+                                    @forelse ($currentSubmission->files as $file)
+                                        <div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3">
+                                            <p class="min-w-0 truncate text-sm font-medium text-slate-700">
+                                                {{ $file->original_name ?? $file->file_name ?? 'ไฟล์ผลงาน' }}
+                                            </p>
+                                            @if ($session->current_file_id === $file->id)
+                                                <span class="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                                                    กำลังแสดง
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @empty
+                                        <div class="rounded-xl border border-dashed border-slate-200 p-4 text-center text-sm text-slate-400">
+                                            ไม่มีไฟล์แนบ
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </aside>
                     </div>
-                @endif
-            </section>
-        </div>
+                </div>
+            @else
+                <div class="px-5 py-14 text-center sm:px-6">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-lg font-bold text-slate-400">
+                        2
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-slate-700">ยังไม่ได้เลือกผลงาน</h2>
+                    <p class="mt-1 text-sm text-slate-500">เลือกผลงานจากรายการด้านบนเพื่อเริ่มแสดงให้กรรมการ</p>
+                </div>
+            @endif
+        </section>
 
         {{-- Judges --}}
         <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -415,5 +490,5 @@
                 กลับหน้ารายการห้อง
             </a>
         </div>
-    </div>
+    </div>                                                                                                                  
 @endsection

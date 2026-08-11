@@ -5,7 +5,6 @@ namespace App\Http\Controllers\CompetitionAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Competition;
 use App\Models\JudgingSession;
-use App\Models\Submission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -66,12 +65,12 @@ class JudgingSessionController extends Controller
             },
             'submissions' => function ($query) {
                 $query
-                    ->whereIn('status', [
+                ->whereIn('status', [
                         'submitted',
                         'under_review',
                     ])
-                    ->with('files')
-                    ->latest('submitted_at');
+                    ->with('files',)
+                    ->oldest('submitted_at');
             },
             'judgeAssignments.judge',
         ]);
@@ -89,6 +88,8 @@ class JudgingSessionController extends Controller
                 'submissions' => $competition->submissions,
                 'rubrics' => $competition->rubrics,
                 'assignments' => $competition->judgeAssignments,
+                'currentSubmission' => $session->currentSubmission,
+                'currentFile' => $session->currentFile,
             ]
         );
     }
@@ -138,8 +139,14 @@ class JudgingSessionController extends Controller
             $session,
             $firstSubmission
         ) {
-            $submission = $session->currentSubmission
-                ?: $firstSubmission;
+            $submission = $competition
+                ->submissions()
+                ->whereKey($session->current_submission_id)
+                ->whereIn('status', [
+                    'submitted',
+                    'under_review',
+                ])
+                ->first() ?? $firstSubmission;
 
             $currentFileId = $session->current_file_id;
 
@@ -151,6 +158,7 @@ class JudgingSessionController extends Controller
             ) {
                 $currentFileId = $submission
                     ->files()
+                    ->oldest('id')
                     ->value('id');
             }
 
@@ -278,6 +286,7 @@ class JudgingSessionController extends Controller
                 'current_submission_id' => $submission->id,
                 'current_file_id' => $submission
                     ->files()
+                    ->oldest('id')
                     ->value('id'),
                 'current_page' => 1,
                 'scroll_progress' => 0,

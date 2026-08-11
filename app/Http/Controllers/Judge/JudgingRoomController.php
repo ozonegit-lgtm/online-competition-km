@@ -304,8 +304,7 @@ class JudgingRoomController extends Controller
             ->sort()
             ->values();
 
-        $rubricIds = $rubrics
-            ->modelKeys()
+        $rubricIds = collect($rubrics->modelKeys())
             ->map(fn ($id) => (int) $id)
             ->sort()
             ->values();
