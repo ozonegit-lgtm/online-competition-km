@@ -125,7 +125,62 @@
                                     ?: 'ไม่มีรายละเอียดผลงาน' }}
                             </p>
                         </div>
+                        @if ($currentFile?->file_path)
+                            @php
+                                $previewUrl = asset('storage/' . $currentFile->file_path);
 
+                                $extension = strtolower(pathinfo(
+                                    $currentFile->file_path,
+                                    PATHINFO_EXTENSION
+                                ));
+
+                                $isImage = in_array(
+                                    $extension,
+                                    ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'],
+                                    true
+                                );
+                            @endphp
+
+                            <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                                <div class="border-b border-slate-200 bg-white px-4 py-3">
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                                        ผลงานที่กำลังนำเสนอ
+                                    </p>
+
+                                    <p class="mt-1 truncate text-sm font-medium text-slate-700">
+                                        {{ $currentFile->original_name
+                                            ?? $currentFile->file_name
+                                            ?? $submission->project_title }}
+                                    </p>
+                                </div>
+
+                                @if ($isImage)
+                                    <div class="flex min-h-80 items-center justify-center bg-slate-100 p-4">
+                                        <img
+                                            src="{{ $previewUrl }}"
+                                            alt="{{ $submission->project_title }}"
+                                            class="max-h-[70vh] w-auto max-w-full rounded-xl object-contain"
+                                        >
+                                    </div>
+                                @else
+                                    <div class="p-6 text-center">
+                                        <p class="text-sm text-slate-500">
+                                            ไฟล์นี้ไม่ใช่รูปภาพ จึงไม่สามารถแสดงตัวอย่างได้
+                                        </p>
+
+                                        <a
+                                            href="{{ $previewUrl }}"
+                                            target="_blank"
+                                            rel="noopener"
+                                            class="mt-4 inline-flex rounded-xl bg-blue-600 px-4 py-2.5
+                                                text-sm font-semibold text-white hover:bg-blue-700"
+                                        >
+                                            เปิดผลงาน
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                         @if ($submission->team_name)
                             <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
                                 <span class="text-sm text-slate-500">
