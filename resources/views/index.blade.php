@@ -10,7 +10,7 @@
         HERO
     ========================================================== --}}
     <section
-        class="relative isolate overflow-hidden border-b border-emerald-100
+        class="relative isolate overflow-hidden
         bg-gradient-to-br from-emerald-50 via-white to-emerald-50"
     >
 
@@ -517,67 +517,99 @@
                 </div>
 
 
-                {{-- SORT --}}
+            {{-- SORT --}}
                 <form
                     method="GET"
                     action="{{ route('home') }}"
+                    id="sort-form"
                 >
 
                     @if (request('search'))
-
-                        <input
-                            type="hidden"
-                            name="search"
-                            value="{{ request('search') }}"
-                        >
-
+                        <input type="hidden" name="search" value="{{ request('search') }}">
                     @endif
-
 
                     @if (request('category'))
-
-                        <input
-                            type="hidden"
-                            name="category"
-                            value="{{ request('category') }}"
-                        >
-
+                        <input type="hidden" name="category" value="{{ request('category') }}">
                     @endif
 
+                    <input type="hidden" name="sort" id="sort-value" value="{{ request('sort', 'latest') }}">
 
-                    <select
-                        name="sort"
-                        onchange="this.form.submit()"
-                        class="rounded-xl border border-slate-200
-                        bg-white px-4 py-3 text-sm
-                        text-slate-600 shadow-sm outline-none
-                        focus:border-emerald-500
-                        focus:ring-4
-                        focus:ring-emerald-500/10"
-                    >
+                    {{-- Custom Dropdown --}}
+                    <div class="relative" id="sort-dropdown">
 
-                        <option
-                            value="latest"
-                            @selected(request('sort', 'latest') === 'latest')
+                        @php
+                            $sortOptions = [
+                                'latest' => ['label' => 'ล่าสุด', 'icon' => 'clock'],
+                                'score'  => ['label' => 'คะแนนสูงสุด', 'icon' => 'star'],
+                                'title'  => ['label' => 'ชื่อผลงาน', 'icon' => 'text'],
+                            ];
+                            $currentSort = request('sort', 'latest');
+                        @endphp
+
+                        {{-- Trigger button --}}
+                        <button
+                            type="button"
+                            id="sort-trigger"
+                            class="flex w-48 items-center justify-between rounded-2xl
+                            bg-white px-5 py-3.5 text-sm font-bold text-slate-700
+                            shadow-md transition hover:shadow-lg
+                            focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
                         >
-                            ล่าสุด
-                        </option>
+                            <span id="sort-label">{{ $sortOptions[$currentSort]['label'] }}</span>
 
-                        <option
-                            value="score"
-                            @selected(request('sort') === 'score')
+                            <svg
+                                id="sort-chevron"
+                                class="h-4 w-4 text-slate-400 transition-transform duration-200"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                            >
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+
+                        {{-- Panel --}}
+                        <div
+                            id="sort-panel"
+                            class="absolute right-0 z-20 mt-2 hidden w-48 overflow-hidden
+                            rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-100"
                         >
-                            คะแนนสูงสุด
-                        </option>
 
-                        <option
-                            value="title"
-                            @selected(request('sort') === 'title')
-                        >
-                            ชื่อผลงาน
-                        </option>
+                            @foreach ($sortOptions as $value => $option)
 
-                    </select>
+                                <button
+                                    type="button"
+                                    data-value="{{ $value }}"
+                                    data-label="{{ $option['label'] }}"
+                                    class="sort-option flex w-full items-center justify-between
+                                    rounded-xl px-4 py-3 text-left text-sm font-semibold
+                                    text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700
+                                    {{ $currentSort === $value ? 'bg-emerald-50 text-emerald-700' : '' }}"
+                                >
+                                    {{ $option['label'] }}
+
+                                    @if ($option['icon'] === 'clock')
+                                        <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="9"/>
+                                            <path d="M12 7v5l3 3"/>
+                                        </svg>
+                                    @elseif ($option['icon'] === 'star')
+                                        <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 2 9.5 8.5 2 9.5l5.5 5-1.5 7.5 6-4 6 4-1.5-7.5 5.5-5-7.5-1L12 2Z"/>
+                                        </svg>
+                                    @else
+                                        <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 6h16M4 12h10M4 18h7"/>
+                                        </svg>
+                                    @endif
+                                </button>
+
+                            @endforeach
+
+                        </div>
+
+                    </div>
 
                 </form>
 
@@ -802,5 +834,48 @@
     </footer>
 
 </div>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const trigger = document.getElementById('sort-trigger');
+            const panel   = document.getElementById('sort-panel');
+            const chevron = document.getElementById('sort-chevron');
+            const label   = document.getElementById('sort-label');
+            const hidden  = document.getElementById('sort-value');
+
+            if (!trigger || !panel) {
+                console.error('sort-trigger หรือ sort-panel หาไม่เจอ');
+                return;
+            }
+
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                panel.classList.toggle('hidden');
+                chevron.classList.toggle('rotate-180');
+            });
+
+            document.querySelectorAll('.sort-option').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const form = btn.closest('form');
+
+                    if (!form) {
+                        console.error('ปุ่มนี้ไม่ได้อยู่ใน <form>:', btn);
+                        return;
+                    }
+
+                    hidden.value = btn.dataset.value;
+                    label.textContent = btn.dataset.label;
+                    form.submit();
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!trigger.contains(e.target) && !panel.contains(e.target)) {
+                    panel.classList.add('hidden');
+                    chevron.classList.remove('rotate-180');
+                }
+            });
+        });
+    </script>
 
 @endsection

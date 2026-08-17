@@ -165,210 +165,79 @@
 
         </div>
 
-        {{-- Existing competition template form fields --}}
+{{-- Existing competition template form fields (read-only preview) --}}
         <div class="border-t border-slate-100 px-8 py-8">
             <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-800">แก้ไขช่องกรอกข้อมูล</h2>
+                    <h2 class="text-lg font-bold text-slate-800">ช่องกรอกข้อมูลของ Template นี้</h2>
                     <p class="mt-1 text-sm text-slate-500">
-                        ข้อมูลจากตาราง competition_template_form_fields
+                        ต้องการแก้ไขคำถาม กรุณาไปที่ Form Builder
                     </p>
                 </div>
 
-                <a
-                    href="{{ route('superadmin.templates.form-fields.create', ['template' => $template->id]) }}"
-                    class="inline-flex h-10 items-center justify-center rounded-xl bg-blue-50 px-4 text-sm font-semibold text-blue-700 ring-1 ring-blue-200 transition hover:bg-blue-100">
-                    จัดการ Form Builder
-                </a>
+                @if ($template->formFields->isNotEmpty())
+
+                    <!-- <a
+                        href="{{ route('superadmin.templates.form-fields.edit', $template) }}"
+                        class="inline-flex h-10 items-center justify-center rounded-xl bg-blue-50 px-4 text-sm font-semibold text-blue-700 ring-1 ring-blue-200 transition hover:bg-blue-100">
+                        แก้ไขใน Form Builder
+                    </a> -->
+
+                @else
+
+                    <a
+                        href="{{ route('superadmin.templates.form-fields.create', $template) }}"
+                        class="inline-flex h-10 items-center justify-center rounded-xl bg-blue-50 px-4 text-sm font-semibold text-blue-700 ring-1 ring-blue-200 transition hover:bg-blue-100">
+                        สร้างฟอร์มใน Form Builder
+                    </a>
+
+                @endif
             </div>
 
-            @error('form_fields')
-                <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {{ $message }}
-                </div>
-            @enderror
-
-            <div class="space-y-5">
+            <div class="space-y-3">
                 @forelse($template->formFields as $index => $field)
-                    @php
-                        $fieldOptions = is_array($field->options)
-                            ? implode(PHP_EOL, $field->options)
-                            : $field->options;
-                    @endphp
 
-                    <section class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                        <div class="mb-5 flex items-center justify-between gap-3">
-                            <div class="flex items-center gap-3">
-                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-                                    {{ $index + 1 }}
-                                </span>
-                                <div>
-                                    <h3 class="font-semibold text-slate-800">{{ $field->label }}</h3>
-                                    <p class="text-xs text-slate-400">รหัสฟิลด์ #{{ $field->id }}</p>
-                                </div>
-                            </div>
+                    <div class="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
 
-                            <span class="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">
-                                {{ ucfirst($field->field_type) }}
+                        <div class="flex items-center gap-3">
+                            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                                {{ $index + 1 }}
                             </span>
-                        </div>
-
-                        <input
-                            type="hidden"
-                            name="form_fields[{{ $field->id }}][id]"
-                            value="{{ $field->id }}">
-
-                        <div class="grid gap-5 md:grid-cols-2">
-                            <div>
-                                <label for="field_label_{{ $field->id }}" class="mb-2 block text-sm font-medium text-slate-700">
-                                    ชื่อช่องกรอก <span class="text-red-500">*</span>
-                                </label>
-                                <input
-                                    id="field_label_{{ $field->id }}"
-                                    type="text"
-                                    name="form_fields[{{ $field->id }}][label]"
-                                    value="{{ old("form_fields.{$field->id}.label", $field->label) }}"
-                                    required
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                                @error("form_fields.{$field->id}.label")
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
 
                             <div>
-                                <label for="field_type_{{ $field->id }}" class="mb-2 block text-sm font-medium text-slate-700">
-                                    ประเภทข้อมูล <span class="text-red-500">*</span>
-                                </label>
-                                <select
-                                    id="field_type_{{ $field->id }}"
-                                    name="form_fields[{{ $field->id }}][field_type]"
-                                    required
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                                    @foreach([
-                                        'text' => 'ข้อความสั้น',
-                                        'textarea' => 'ข้อความยาว',
-                                        'number' => 'ตัวเลข',
-                                        'email' => 'อีเมล',
-                                        'phone' => 'เบอร์โทรศัพท์',
-                                        'date' => 'วันที่',
-                                        'file' => 'อัปโหลดไฟล์',
-                                        'select' => 'Dropdown',
-                                        'radio' => 'Radio',
-                                        'checkbox' => 'Checkbox',
-                                    ] as $typeValue => $typeLabel)
-                                        <option
-                                            value="{{ $typeValue }}"
-                                            {{ old("form_fields.{$field->id}.field_type", $field->field_type) === $typeValue ? 'selected' : '' }}>
-                                            {{ $typeLabel }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error("form_fields.{$field->id}.field_type")
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                <p class="font-semibold text-slate-800">
+                                    {{ $field->label }}
 
-                            <div>
-                                <label for="field_system_field_{{ $field->id }}" class="mb-2 block text-sm font-medium text-slate-700">
-                                    ฟิลด์ระบบ
-                                    <span class="text-xs font-normal text-slate-400">(ใช้จับคู่ข้อมูลผู้ติดต่อ/ผลงาน)</span>
-                                </label>
-                                <select
-                                    id="field_system_field_{{ $field->id }}"
-                                    name="form_fields[{{ $field->id }}][system_field]"
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                                    <option value="">-- ไม่ใช่ฟิลด์ระบบ --</option>
-                                    @foreach([
-                                        'contact_name' => 'contact_name (ชื่อผู้ติดต่อ) *จำเป็น',
-                                        'contact_email' => 'contact_email (อีเมล) *จำเป็น',
-                                        'contact_phone' => 'contact_phone (เบอร์โทร) *จำเป็น',
-                                        'project_title' => 'project_title (ชื่อผลงาน)',
-                                        'project_description' => 'project_description (รายละเอียดผลงาน)',
-                                        'project_file' => 'project_file (ไฟล์ผลงาน)',
-                                    ] as $sysValue => $sysLabel)
-                                        <option
-                                            value="{{ $sysValue }}"
-                                            {{ old("form_fields.{$field->id}.system_field", $field->system_field) === $sysValue ? 'selected' : '' }}>
-                                            {{ $sysLabel }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error("form_fields.{$field->id}.system_field")
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                                    @if ($field->is_required)
+                                        <span class="ml-1 text-xs font-normal text-red-500">*จำเป็น</span>
+                                    @endif
+                                </p>
 
-                            <div>
-                                <label for="field_placeholder_{{ $field->id }}" class="mb-2 block text-sm font-medium text-slate-700">
-                                    Placeholder
-                                </label>
-                                <input
-                                    id="field_placeholder_{{ $field->id }}"
-                                    type="text"
-                                    name="form_fields[{{ $field->id }}][placeholder]"
-                                    value="{{ old("form_fields.{$field->id}.placeholder", $field->placeholder) }}"
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                            </div>
-
-                            <div>
-                                <label for="field_help_{{ $field->id }}" class="mb-2 block text-sm font-medium text-slate-700">
-                                    คำอธิบาย
-                                </label>
-                                <input
-                                    id="field_help_{{ $field->id }}"
-                                    type="text"
-                                    name="form_fields[{{ $field->id }}][help_text]"
-                                    value="{{ old("form_fields.{$field->id}.help_text", $field->help_text) }}"
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <label for="field_options_{{ $field->id }}" class="mb-2 block text-sm font-medium text-slate-700">
-                                    ตัวเลือก
-                                </label>
-                                <textarea
-                                    id="field_options_{{ $field->id }}"
-                                    name="form_fields[{{ $field->id }}][options]"
-                                    rows="3"
-                                    placeholder="หนึ่งตัวเลือกต่อหนึ่งบรรทัด ใช้กับ Dropdown, Radio และ Checkbox"
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">{{ old("form_fields.{$field->id}.options", $fieldOptions) }}</textarea>
+                                <p class="mt-0.5 text-xs text-slate-400">
+                                    รหัสฟิลด์ #{{ $field->id }}
+                                    @unless ($field->is_active)
+                                        &middot; <span class="text-rose-500">ปิดใช้งาน</span>
+                                    @endunless
+                                </p>
                             </div>
                         </div>
 
-                        <div class="mt-5 flex flex-wrap gap-6 border-t border-slate-200 pt-4">
-                            <label class="inline-flex items-center gap-2 text-sm text-slate-700">
-                                <input type="hidden" name="form_fields[{{ $field->id }}][is_required]" value="0">
-                                <input
-                                    type="checkbox"
-                                    name="form_fields[{{ $field->id }}][is_required]"
-                                    value="1"
-                                    {{ old("form_fields.{$field->id}.is_required", $field->is_required) ? 'checked' : '' }}
-                                    class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                                จำเป็นต้องกรอก
-                            </label>
+                        <span class="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">
+                            {{ ucfirst($field->field_type) }}
+                        </span>
 
-                            <label class="inline-flex items-center gap-2 text-sm text-slate-700">
-                                <input type="hidden" name="form_fields[{{ $field->id }}][is_active]" value="0">
-                                <input
-                                    type="checkbox"
-                                    name="form_fields[{{ $field->id }}][is_active]"
-                                    value="1"
-                                    {{ old("form_fields.{$field->id}.is_active", $field->is_active) ? 'checked' : '' }}
-                                    class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                                เปิดใช้งาน
-                            </label>
-                        </div>
-                    </section>
+                    </div>
+
                 @empty
+
                     <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 py-12 text-center">
                         <p class="font-medium text-slate-600">ยังไม่มีช่องกรอกข้อมูล</p>
                         <p class="mt-1 text-sm text-slate-400">เพิ่มช่องกรอกข้อมูลผ่าน Form Builder ก่อน</p>
                     </div>
+
                 @endforelse
             </div>
         </div>
-
-        {{-- Footer / actions --}}
         <div class="flex justify-end gap-3 border-t border-slate-100 bg-slate-50 px-8 py-5">
             <a href="{{ route('superadmin.templates.index') }}"
                class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 font-medium text-slate-700 transition hover:bg-slate-100">

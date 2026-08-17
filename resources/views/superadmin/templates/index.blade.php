@@ -118,10 +118,21 @@
 
         <div class="mt-6 space-y-3 border-t border-slate-100 pt-4">
 
-            <a href="{{ route('superadmin.templates.form-fields.create', ['template' => $template->id]) }}"
-               class="flex w-full items-center justify-center rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-blue-200">
-                จัดการ Form
-            </a>
+            @if (($template->form_fields_count ?? 0) > 0)
+
+                <a href="{{ route('superadmin.templates.form-fields.edit', $template) }}"
+                   class="flex w-full items-center justify-center rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-blue-200">
+                    แก้ไข Form
+                </a>
+
+            @else
+
+                <a href="{{ route('superadmin.templates.form-fields.create', $template) }}"
+                   class="flex w-full items-center justify-center rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-blue-200">
+                    สร้าง Form
+                </a>
+
+            @endif
 
             {{-- <a href="{{ route('superadmin.templates.edit',$template) }}"
                class="flex w-full items-center justify-center rounded-xl border border-blue-200 bg-white py-2.5 text-center text-sm font-semibold text-blue-600 transition duration-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100">

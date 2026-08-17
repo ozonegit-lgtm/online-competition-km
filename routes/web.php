@@ -93,6 +93,8 @@ Route::middleware('auth')->group(function () {
             Route::resource('categories', CompetitionCategoryController::class)->parameters(['categories' => 'competitionCategory',]);
             Route::get('/templates/{template}/form-fields/create',[CompetitionTemplateFormFieldController::class, 'create'])->name('templates.form-fields.create');
             Route::post('/templates/{template}/form-fields',[CompetitionTemplateFormFieldController::class, 'store'])->name('templates.form-fields.store');
+            Route::get('/templates/{template}/form-fields/edit',[CompetitionTemplateFormFieldController::class, 'edit'])->name('templates.form-fields.edit');
+            Route::put('/templates/{template}/form-fields',[CompetitionTemplateFormFieldController::class, 'update'])->name('templates.form-fields.update');    
             Route::get('/competitions-judges',[CompetitionJudgeController::class, 'competitions'])->name('competitions.judges.list');
             Route::get('/competitions/{competition}/judges',[CompetitionJudgeController::class, 'index'])->name('competitions.judges.index');
             Route::put('/competitions/{competition}/judges',[CompetitionJudgeController::class, 'sync'])->name('competitions.judges.sync');
