@@ -194,23 +194,29 @@
                     </a>
                     <a
                         href="{{ route('superadmin.competitions.judges.list') }}"
-                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3
+                        data-tooltip="จัดการสิทธิ์การตัดสินการแข่งขัน"
+                        class="sidebar-tooltip-trigger flex w-full items-center gap-3 rounded-xl px-3 py-3
                             text-sm font-medium transition
                             {{ request()->routeIs('superadmin.competitions.judges.*')
-                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
-                                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}" >
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
                         <svg
-                            class="h-5 w-5"
+                            class="h-5 w-5 shrink-0"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2" >
+                            stroke-width="2"
+                        >
                             <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/>
                             <circle cx="9" cy="7" r="4"/>
                             <path d="M22 21v-2a4 4 0 00-3-3.87"/>
                             <path d="M16 3.13a4 4 0 010 7.75"/>
                         </svg>
-                        <span>จัดการกรรมการ</span>
+
+                        <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                            จัดการสิทธิ์การตัดสินการแข่งขัน
+                        </span>
                     </a>
 
                 </div>
@@ -411,3 +417,45 @@
 
     </div>
 </aside>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const tooltip = document.createElement('div');
+    tooltip.className = `
+        pointer-events-none fixed z-[9999] w-max max-w-xs rounded-lg
+        bg-slate-900 px-3 py-2 text-xs font-normal text-white shadow-xl
+        opacity-0 scale-95 transition-all duration-150 ease-out
+    `.trim().replace(/\s+/g, ' ');
+    document.body.appendChild(tooltip);
+
+    let hideTimeout;
+
+    document.querySelectorAll('.sidebar-tooltip-trigger').forEach((trigger) => {
+        trigger.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+            const text = trigger.dataset.tooltip;
+            if (!text) return;
+
+            tooltip.textContent = text;
+            tooltip.style.opacity = '0';
+
+            // วางตำแหน่งชั่วคราวเพื่อวัดขนาด แล้วค่อยจัดจริง
+            const rect = trigger.getBoundingClientRect();
+            tooltip.style.left = `${rect.right + 10}px`;
+            tooltip.style.top = `${rect.top + rect.height / 2}px`;
+            tooltip.style.transform = 'translateY(-50%) scale(0.95)';
+
+            requestAnimationFrame(() => {
+                tooltip.style.opacity = '1';
+                tooltip.style.transform = 'translateY(-50%) scale(1)';
+            });
+        });
+
+        trigger.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                tooltip.style.opacity = '0';
+                tooltip.style.transform = 'translateY(-50%) scale(0.95)';
+            }, 50);
+        });
+    });
+});
+</script>

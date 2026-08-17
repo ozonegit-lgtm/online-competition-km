@@ -137,7 +137,8 @@ class JudgingSessionController extends Controller
 
         DB::transaction(function () use (
             $session,
-            $firstSubmission
+            $firstSubmission,
+            $competition
         ) {
             $submission = $competition
                 ->submissions()

@@ -139,12 +139,22 @@
                             </form>
                         </div>
                     @elseif ($assignment?->assignment_status === 'accepted')
-                        <a
-                            href="{{ route('judge.judging-rooms.show', $room) }}"
-                            class="mt-5 flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
-                        >
-                            เข้าห้องตัดสิน
-                        </a>
+                        @if ($room->status === 'live')
+                            <a
+                                href="{{ route('judge.judging-rooms.show', $room) }}"
+                                class="mt-5 flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                            >
+                                เข้าห้องตัดสิน
+                            </a>
+                        @elseif ($room->status === 'ended')
+                            <div class="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-center text-sm text-slate-500">
+                                ห้องตัดสินสิ้นสุดแล้ว
+                            </div>
+                        @else
+                            <div class="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-center text-sm text-amber-700">
+                                ห้องตัดสินยังไม่เปิด
+                            </div>
+                        @endif
                     @elseif ($assignment?->assignment_status === 'declined')
                         <div class="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-center text-sm text-slate-500">
                             คุณปฏิเสธงานตัดสินนี้แล้ว

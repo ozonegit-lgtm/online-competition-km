@@ -49,6 +49,11 @@ class JudgingRoomController extends Controller
 
     public function show(JudgingSession $session): View
     {
+        abort_unless(
+            $session->status === JudgingSession::STATUS_LIVE, 
+            403,
+            'ห้องตัดสินจบแล้วกรุณาลองใหม่ในพายหลัง'
+        );
         $assignment = $this->getAcceptedAssignment($session);
 
         $session->load([

@@ -238,41 +238,78 @@
                                 @break
 
                                 @case('file')
-                                    <div class="mt-3 rounded-xl border border-dashed border-slate-300 bg-white p-4">
-                                        <input id="field_{{ $field->id }}" type="file" name="{{ $fieldName }}"
-                                            @required($field->is_required)
-                                            accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.ppt,.pptx,.zip"
-                                            class="js-file-input sr-only"
-                                            data-file-name-target="file_name_{{ $field->id }}">
+                                <div class="mt-3 rounded-xl border border-dashed border-slate-300 bg-white p-4">
+                                    <input
+                                        id="field_{{ $field->id }}"
+                                        type="file"
+                                        name="{{ $fieldName }}"
+                                        @required($field->is_required)
+                                        accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.ppt,.pptx,.zip"
+                                        class="js-file-input sr-only"
+                                        data-file-name-target="file_name_{{ $field->id }}"
+                                        data-file-preview-target="file_preview_{{ $field->id }}"
+                                    >
 
+                                    <div class="flex flex-col gap-4">
                                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                             <div class="flex min-w-0 items-center gap-3">
                                                 <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                                        stroke="currentColor" aria-hidden="true">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M12 16.5V9.75m0 0 2.625 2.625M12 9.75l-2.625 2.625M8.25 6.75h7.5A2.25 2.25 0 0 1 18 9v9a2.25 2.25 0 0 1-2.25 2.25h-7.5A2.25 2.25 0 0 1 6 18V9a2.25 2.25 0 0 1 2.25-2.25Z" />
+                                                    <svg
+                                                        class="h-5 w-5"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 16.5V9.75m0 0 2.625 2.625M12 9.75l-2.625 2.625M8.25 6.75h7.5A2.25 2.25 0 0 1 18 9v9a2.25 2.25 0 0 1-2.25 2.25h-7.5A2.25 2.25 0 0 1 6 18V9a2.25 2.25 0 0 1 2.25-2.25Z"
+                                                        />
                                                     </svg>
                                                 </span>
+
                                                 <div class="min-w-0">
-                                                    <p class="text-sm font-semibold text-slate-800">แนบไฟล์ผลงาน</p>
-                                                    <p id="file_name_{{ $field->id }}"
-                                                        class="mt-0.5 truncate text-xs text-slate-500">
+                                                    <p class="text-sm font-semibold text-slate-800">
+                                                        แนบไฟล์ผลงาน
+                                                    </p>
+
+                                                    <p
+                                                        id="file_name_{{ $field->id }}"
+                                                        class="mt-0.5 truncate text-xs text-slate-500"
+                                                    >
                                                         ยังไม่ได้เลือกไฟล์
                                                     </p>
                                                 </div>
                                             </div>
 
-                                            <label for="field_{{ $field->id }}" style="min-height: 44px;"
-                                                class="inline-flex w-full shrink-0 cursor-pointer items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 sm:w-auto">
+                                            <label
+                                                for="field_{{ $field->id }}"
+                                                class="inline-flex min-h-[44px] w-full shrink-0 cursor-pointer items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 sm:w-auto"
+                                            >
                                                 เลือกไฟล์
                                             </label>
                                         </div>
+
+                                        {{-- Image Preview --}}
+                                        <div
+                                            id="file_preview_{{ $field->id }}"
+                                            class="hidden overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+                                        >
+                                            <img
+                                                src=""
+                                                alt="ตัวอย่างรูปภาพ"
+                                                class="max-h-80 w-full object-contain"
+                                            >
+                                        </div>
                                     </div>
-                                    <p class="mt-2 text-xs leading-5 text-slate-500">
-                                        รองรับ JPG, PNG, WEBP, PDF, Word, PowerPoint และ ZIP ขนาดไม่เกิน 10 MB
-                                    </p>
-                                @break
+                                </div>
+
+                                <p class="mt-2 text-xs leading-5 text-slate-500">
+                                    รองรับ JPG, PNG, WEBP, PDF, Word, PowerPoint และ ZIP ขนาดไม่เกิน 10 MB
+                                </p>
+                            @break
 
                                 @default
                                     @php
@@ -355,14 +392,38 @@
 
     <script>
         document.querySelectorAll('.js-file-input').forEach((input) => {
-            input.addEventListener('change', () => {
-                const fileName = input.files && input.files.length
-                    ? input.files[0].name
-                    : 'ยังไม่ได้เลือกไฟล์';
-                const target = document.getElementById(input.dataset.fileNameTarget);
+            input.addEventListener('change', function () {
+                const file = this.files[0];
+                const fileNameTarget = document.getElementById(
+                    this.dataset.fileNameTarget
+                );
+                const previewTarget = document.getElementById(
+                    this.dataset.filePreviewTarget
+                );
+                if (!file) {
+                    fileNameTarget.textContent = 'ยังไม่ได้เลือกไฟล์';
+                    previewTarget.classList.add('hidden');
+                    const image = previewTarget.querySelector('img');
+                    image.src = '';
 
-                if (target) {
-                    target.textContent = fileName;
+                    return;
+                }
+                // แสดงชื่อไฟล์
+                fileNameTarget.textContent = file.name;
+
+                // ถ้าเป็นรูปภาพ → แสดง Preview
+                if (file.type.startsWith('image/')) {
+                    const image = previewTarget.querySelector('img');
+                    image.src = URL.createObjectURL(file);
+                    previewTarget.classList.remove('hidden');
+                    image.onload = () => {
+                        URL.revokeObjectURL(image.src);
+                    };
+                } else {
+                    // ถ้าไม่ใช่รูป → ซ่อน Preview
+                    previewTarget.classList.add('hidden');
+                    const image = previewTarget.querySelector('img');
+                    image.src = '';
                 }
             });
         });

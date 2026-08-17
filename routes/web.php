@@ -21,6 +21,7 @@ use App\Http\Controllers\CompetitionJudgeController;
 use App\Http\Controllers\Judge\JudgingRoomController;
 use App\Http\Controllers\CompetitionAdmin\JudgingSessionController;
 use App\Http\Controllers\JudgeAssignmentController;
+use App\Http\Controllers\KnowledgeManagementController;
 
 
 
@@ -30,8 +31,7 @@ use App\Http\Controllers\JudgeAssignmentController;
 | หน้าแรก
 |--------------------------------------------------------------------------
 */
-
-Route::get('/', function () {return redirect()->route('login');});
+Route::get('/', [KnowledgeManagementController::class, 'index'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
