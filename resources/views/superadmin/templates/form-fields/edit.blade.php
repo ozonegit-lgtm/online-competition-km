@@ -19,15 +19,18 @@
             {{-- ขั้นตอนการสร้าง Template --}}
         <div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="grid sm:grid-cols-2">
-
-                {{-- ขั้นตอนที่ 1 --}}
-                <div class="flex items-center gap-4 px-6 py-5">
+            {{-- ขั้นตอนที่ 1 --}}
+                <a
+                    href="{{ route('superadmin.templates.edit', $template) }}"
+                    class="flex items-center gap-4 px-6 py-5 transition hover:bg-slate-50"
+                >
                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 font-bold text-slate-500">
                         1
                     </span>
 
                     <div>
                         <p class="font-semibold text-slate-600">
+                            
                             ข้อมูล Template
                         </p>
 
@@ -35,10 +38,13 @@
                             แก้ไขข้อมูลพื้นฐานแล้ว
                         </p>
                     </div>
-                </div>
+                </a>
 
                 {{-- ขั้นตอนที่ 2 --}}
-                <div class="flex items-center gap-4 border-b border-slate-200 bg-blue-50 px-6 py-5 sm:border-b-0 sm:border-r">
+                <a
+                    href="{{ route('superadmin.templates.form-fields.edit', $template) }}"
+                    class="flex items-center gap-4 border-b border-slate-200 bg-blue-50 px-6 py-5 transition hover:bg-blue-100 sm:border-b-0 sm:border-r"
+                >
                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 font-bold text-white">
                         2
                     </span>
@@ -52,7 +58,7 @@
                             แก้ไขช่องกรอกข้อมูลที่มีอยู่ หรือเพิ่มใหม่
                         </p>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 

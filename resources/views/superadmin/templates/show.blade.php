@@ -258,7 +258,7 @@
                 class="inline-flex h-11 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-6 text-sm font-semibold text-blue-700 transition hover:bg-blue-100">
                 จัดการ Form
             </a> -->
-            <a href="{{ route('superadmin.templates.form-fields.edit', $template) }}"
+            <a href="{{ route('superadmin.templates.edit', $template) }}"
                 class="inline-flex h-11 items-center justify-center rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700">
                 แก้ไขข้อมูล
             </a>
