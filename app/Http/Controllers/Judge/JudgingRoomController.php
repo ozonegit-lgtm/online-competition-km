@@ -208,7 +208,10 @@ class JudgingRoomController extends Controller
             );
         }
 
-        DB::transaction(function () use ($scores) {
+        DB::transaction(function () use (
+            $scores,
+            $session
+        ) {
             $submittedAt = now();
 
             foreach ($scores as $score) {
@@ -216,6 +219,11 @@ class JudgingRoomController extends Controller
                     'submitted_at' => $submittedAt,
                 ]);
             }
+
+            $this->updateFinalScore(
+                $session->current_submission_id,
+                $session->competition_id
+            );
         });
 
         return back()->with(
@@ -223,7 +231,57 @@ class JudgingRoomController extends Controller
             'ยืนยันส่งคะแนนเรียบร้อยแล้ว'
         );
     }
+    private function updateFinalScore( int $submissionId, int $competitionId
+        ): void {
+            $rubrics = Rubric::query()
+                ->where('competition_id', $competitionId)
+                ->where('is_active', true)
+                ->get();
 
+            if ($rubrics->isEmpty()) {
+                return;
+            }
+
+            $scores = Score::query()
+                ->where('submission_id', $submissionId)
+                ->whereNotNull('submitted_at')
+                ->with('rubric')
+                ->get();
+
+            if ($scores->isEmpty()) {
+                return;
+            }
+
+            $judgeIds = $scores
+                ->pluck('judge_assignment_id')
+                ->unique();
+
+            $judgeTotals = $judgeIds->map(function ($judgeId) use ($scores) {
+                $judgeScores = $scores->where(
+                    'judge_assignment_id',
+                    $judgeId
+                );
+
+                return $judgeScores->sum(
+                    fn (Score $score) => $score->weighted_score
+                );
+            });
+
+            if ($judgeTotals->isEmpty()) {
+                return;
+            }
+
+            $finalScore = round(
+                $judgeTotals->average(),
+                2
+            );
+
+            \App\Models\Submission::query()
+                ->whereKey($submissionId)
+                ->update([
+                    'final_score' => $finalScore,
+                ]);
+        }
     private function getAssignment(
         JudgingSession $session
     ): JudgeAssignment {

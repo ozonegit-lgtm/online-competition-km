@@ -6,7 +6,7 @@
 <div class="flex items-start justify-between">
 
     <div>
-        <h1 class="text-3xl font-bold tracking-tight text-slate-800">
+        <h1 class="text-2xl font-bold text-slate-800">
             จัดการ Templates
         </h1>
 

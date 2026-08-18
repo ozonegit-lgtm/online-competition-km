@@ -15,7 +15,7 @@
 @endsection
 
 @section('content')
-    <div class="mx-auto max-w-5xl">
+    <div class="mx-auto max-w-5xl px-6 py-8">
             {{-- ขั้นตอนการสร้าง Template --}}
         <div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="grid sm:grid-cols-2">

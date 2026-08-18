@@ -4,8 +4,12 @@
 
 @section('header')
 <div>
-    <h1 class="text-3xl font-bold text-slate-800">แก้ไข Template</h1>
-    <p class="mt-2 text-sm text-slate-500">แก้ไขข้อมูลแม่แบบการแข่งขัน</p>
+    <h1 class="text-2xl font-bold text-slate-800">
+        แก้ไข Template
+    </h2>
+    <p class="mt-2 text-sm text-slate-500">
+        แก้ไขข้อมูลแม่แบบการแข่งขัน
+    </p>
 </div>
 @endsection
 

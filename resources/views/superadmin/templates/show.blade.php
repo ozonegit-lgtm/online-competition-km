@@ -4,8 +4,12 @@
 
 @section('header')
 <div>
-    <h1 class="text-3xl font-bold tracking-tight text-slate-800">รายละเอียด Template</h1>
-    <p class="mt-2 text-sm text-slate-500">แสดงรายละเอียดและช่องกรอกข้อมูลของ Template การแข่งขัน</p>
+    <h1 class="text-2xl font-bold text-slate-800">
+        รายละเอียด Template
+    </h1>
+    <p class="mt-2 text-sm text-slate-500">
+        แสดงรายละเอียดและช่องกรอกข้อมูลของ Template การแข่งขัน
+    </p>
 </div>
 @endsection
 
