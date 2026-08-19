@@ -49,6 +49,7 @@ class SubmissionController extends Controller
      */
     public function store(Request $request, Competition $competition)
     {
+
         $this->ensureCompetitionIsAcceptingSubmissions($competition);
 
         $fields = $competition->formFields()
@@ -228,25 +229,9 @@ class SubmissionController extends Controller
         Competition $competition
     ): void {
         abort_unless(
-            $competition->status === 'open',
+            $competition->isRegistrationOpen(),
             403,
-            'การแข่งขันนี้ยังไม่เปิดรับผลงาน'
-        );
-
-        $now = now();
-
-        abort_if(
-            $competition->registration_start &&
-            $now->lt($competition->registration_start),
-            403,
-            'ยังไม่ถึงเวลาเปิดรับผลงาน'
-        );
-
-        abort_if(
-            $competition->registration_end &&
-            $now->gt($competition->registration_end),
-            403,
-            'การแข่งขันนี้ปิดรับผลงานแล้ว'
+            'หมดเวลารับผลงานแล้ว'
         );
     }
 

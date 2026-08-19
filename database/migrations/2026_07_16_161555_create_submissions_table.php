@@ -21,22 +21,13 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('submission_code',30)->unique();
-
             $table->string('project_title',255);
-
             $table->text('project_description')->nullable();
-
             $table->string('team_name',255)->nullable();
-
             $table->string('contact_name',150);
-
             $table->string('contact_email',150);
-
             $table->string('contact_phone',20);
-
-            $table->decimal('final_score',8,2)
-                ->default(0);
-
+            $table->decimal('final_score',8,2)->default(0);
             $table->enum('status',[
                 'draft',
                 'submitted',

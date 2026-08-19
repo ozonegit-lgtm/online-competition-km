@@ -295,13 +295,11 @@
                         </label>
                         <select id="status" name="status" required
                             class="mt-2 w-full rounded-xl border bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:bg-white focus:ring-4 {{ $errors->has('status') ? 'border-red-400 focus:border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-100' }}">
-                            <option value="draft" @selected(old('status', $competition->status) === 'draft')>ฉบับร่าง</option>
-                            <option value="published" @selected(old('status', $competition->status) === 'published')>เผยแพร่แล้ว</option>
+
+
                             <option value="open" @selected(old('status', $competition->status) === 'open')>เปิดรับผลงาน</option>
                             <option value="closed" @selected(old('status', $competition->status) === 'closed')>ปิดรับผลงาน</option>
-                            <option value="judging" @selected(old('status', $competition->status) === 'judging')>กำลังตัดสิน</option>
-                            <option value="completed" @selected(old('status', $competition->status) === 'completed')>เสร็จสิ้น</option>
-                            <option value="archived" @selected(old('status', $competition->status) === 'archived')>เก็บถาวร</option>
+
                         </select>
                         @error('status')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

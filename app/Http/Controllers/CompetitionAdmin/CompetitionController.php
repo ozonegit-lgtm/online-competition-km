@@ -105,7 +105,7 @@ class CompetitionController extends Controller
                     'judging_start' => $validated['judging_start'],
                     'judging_end' => $validated['judging_end'],
                     'result_announcement' => $validated['result_announcement'],
-                    'status' => 'draft',
+                    'status' => 'open',
                     'access_code' => $validated['visibility'] === 'private'
                         ? $validated['access_code']
                         : null,
@@ -209,7 +209,7 @@ class CompetitionController extends Controller
                 'result_announcement' => ['required','date','after_or_equal:judging_end',],
                 'publish_scores' => ['nullable', 'boolean'],
                 'publish_km' => ['nullable', 'boolean'],
-                'status' => ['required','in:draft,published,open,closed,judging,completed,archived',],
+                'status' => ['required', 'in:open,closed'],
             ], [
                 'category_id.required' => 'กรุณาเลือกหมวดหมู่การแข่งขัน',
                 'category_id.exists' => 'ไม่พบหมวดหมู่การแข่งขันที่เลือก',

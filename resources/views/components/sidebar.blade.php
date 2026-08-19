@@ -15,7 +15,7 @@
 
 <aside
     id="app-sidebar"
-    class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col
+    class="fixed inset-y-0 left-0 z-50 flex w-60 -translate-x-full flex-col
            border-r border-slate-800 bg-slate-950 text-white shadow-xl
            transition-transform duration-300 ease-in-out
            lg:static lg:z-auto lg:translate-x-0 lg:shadow-none"
@@ -259,27 +259,53 @@
                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
                             : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
                     >
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+
                         <span>สร้างการแข่งขัน</span>
                     </a>
-                    
+
                     <a
                         href="{{ route('competition-admin.submissions.index') }}"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
                         {{ request()->routeIs('competition-admin.submissions.*')
                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
                             : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M9 5a3 3 0 0 1 6 0v2H9V5Z"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M8 12h8M8 16h5"
+                            />
+                        </svg>
+
                         <span>ผลงานที่ส่ง</span>
                     </a>
 
-                    <a
-                        href="{{ route('competition-admin.competitions.index') }}"
-                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
-                        {{ request()->routeIs('competition-admin.competitions.rubrics.*')
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
-                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
 
-                        <span>เกณฑ์การตัดสิน</span>
-                    </a>
                     <a
                         href="{{ route('competition-admin.judging-rooms.index') }}"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3
@@ -381,6 +407,21 @@
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium
                             text-slate-500 cursor-not-allowed"
                     >
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="12" cy="12" r="9"/>
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 7v5l3 3"
+                            />
+                        </svg>
+
                         <span>ประวัติการให้คะแนน</span>
                         <span class="ml-auto text-xs">เร็ว ๆ นี้</span>
                     </a>

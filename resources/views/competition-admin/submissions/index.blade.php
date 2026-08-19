@@ -4,7 +4,7 @@
 
 @section('header')
 <div>
-    <h1 class="text-2xl font-bold text-slate-800">
+    <h1 class="text-xl font-bold text-slate-800">
         ผลงานที่ส่งเข้าประกวด
     </h1>
 
@@ -16,11 +16,11 @@
 
 @section('content')
 
-<div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+<div class="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
 
 @forelse($submissions as $submission)
 
-<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
     <div class="aspect-video overflow-hidden bg-slate-100">
 
@@ -37,7 +37,7 @@
 
         @else
 
-            <div class="flex h-full items-center justify-center text-sm text-slate-400">
+            <div class="flex h-full items-center justify-center text-xs text-slate-400">
                 ไม่มีรูปภาพ
             </div>
 
@@ -45,24 +45,24 @@
 
     </div>
 
-    <div class="p-5">
+    <div class="p-3">
 
-        <span class="rounded-lg bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+        <span class="rounded-lg bg-blue-100 px-2 py-0.5 text-[11px] font-medium text-blue-700">
             {{ $submission->competition->category->category_name }}
         </span>
 
-        <h3 class="mt-3 text-lg font-bold text-slate-800">
+        <h3 class="mt-2 line-clamp-2 text-sm font-bold text-slate-800">
             {{ $submission->project_title }}
         </h3>
 
-        <div class="mt-3 space-y-1 text-sm text-slate-600">
+        <div class="mt-2 space-y-0.5 text-xs text-slate-600">
 
-            <p>
+            <p class="truncate">
                 <span class="font-medium">การแข่งขัน :</span>
                 {{ $submission->competition->title }}
             </p>
 
-            <p>
+            <p class="truncate">
                 <span class="font-medium">รหัสผลงาน :</span>
                 {{ $submission->submission_code }}
             </p>
@@ -88,7 +88,7 @@
 
 @empty
 
-<div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
+<div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
     ยังไม่มีผลงานที่ส่งเข้าประกวด
 </div>
 
@@ -96,7 +96,7 @@
 
 </div>
 
-<div class="mt-8">
+<div class="mt-6">
     {{ $submissions->links() }}
 </div>
 

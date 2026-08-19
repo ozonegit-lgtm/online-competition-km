@@ -66,8 +66,8 @@
 
         {{-- HERO CONTENT --}}
         <div
-            class="relative mx-auto flex min-h-[475px] max-w-7xl
-            items-center justify-center px-4 py-16
+            class="relative mx-auto flex min-h-[340px] max-w-7xl
+            items-center justify-center px-4 py-10
             sm:px-6 lg:px-8"
         >
 
@@ -75,9 +75,9 @@
 
                 {{-- Badge --}}
                 <div
-                    class="mb-7 inline-flex items-center gap-2 rounded-full
-                    border border-emerald-400 bg-white/90 px-4 py-2
-                    text-sm font-medium text-emerald-700 shadow-sm"
+                    class="mb-5 inline-flex items-center gap-2 rounded-full
+                    border border-emerald-400 bg-white/90 px-3 py-1.5
+                    text-xs font-medium text-emerald-700 shadow-sm"
                 >
                     <span
                         class="h-2 w-2 rounded-full bg-emerald-500"
@@ -89,9 +89,9 @@
 
                 {{-- Heading --}}
                 <h1
-                    class="mx-auto max-w-4xl text-4xl font-extrabold
+                    class="mx-auto max-w-4xl text-3xl font-extrabold
                     leading-tight tracking-tight text-slate-900
-                    sm:text-5xl lg:text-6xl"
+                    sm:text-4xl lg:text-5xl"
                 >
                     ผลงานที่สร้างแรงบันดาลใจ
 
@@ -105,8 +105,8 @@
 
                 {{-- Description --}}
                 <p
-                    class="mx-auto mt-7 max-w-2xl text-base
-                    leading-8 text-slate-500 sm:text-lg"
+                    class="mx-auto mt-4 max-w-2xl text-sm
+                    leading-7 text-slate-500 sm:text-base"
                 >
                     รวบรวมผลงานจากการแข่งขันที่ผ่านการตัดสินและตรวจสอบแล้ว
                     <br class="hidden sm:block">
@@ -118,7 +118,7 @@
                 <form
                     method="GET"
                     action="{{ route('home') }}"
-                    class="mx-auto mt-9 w-full max-w-2xl"
+                    class="mx-auto mt-6 w-full max-w-2xl"
                 >
 
                     <div
@@ -129,8 +129,8 @@
                         <div class="relative flex-1">
 
                             <svg
-                                class="pointer-events-none absolute left-5
-                                top-1/2 h-5 w-5 -translate-y-1/2
+                                class="pointer-events-none absolute left-4
+                                top-1/2 h-4 w-4 -translate-y-1/2
                                 text-slate-400"
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -146,8 +146,8 @@
                                 name="search"
                                 value="{{ request('search') }}"
                                 placeholder="ค้นหาผลงาน หรือชื่อการแข่งขัน..."
-                                class="h-14 w-full rounded-2xl border
-                                border-slate-200 bg-white pl-12 pr-5
+                                class="h-12 w-full rounded-2xl border
+                                border-slate-200 bg-white pl-11 pr-5
                                 text-sm text-slate-700 shadow-sm
                                 outline-none transition
                                 placeholder:text-slate-400
@@ -162,8 +162,8 @@
                         {{-- Button --}}
                         <button
                             type="submit"
-                            class="h-14 shrink-0 rounded-2xl
-                            bg-emerald-600 px-8 text-sm font-bold
+                            class="h-12 shrink-0 rounded-2xl
+                            bg-emerald-600 px-7 text-sm font-bold
                             text-white shadow-sm transition
                             hover:bg-emerald-700 hover:shadow-md
                             focus:outline-none focus:ring-4
@@ -179,7 +179,7 @@
 
                 {{-- Helper --}}
                 <p
-                    class="mt-4 text-xs text-slate-400"
+                    class="mt-3 text-xs text-slate-400"
                 >
                     ค้นหาจากชื่อผลงาน ชื่อทีม หรือชื่อการแข่งขัน
                 </p>
@@ -215,7 +215,7 @@
     ========================================================== --}}
     <main
         class="relative mx-auto w-full max-w-7xl
-        px-4 py-12 sm:px-6 lg:px-8"
+        px-4 py-8 sm:px-6 lg:px-8"
     >
 
 
@@ -224,16 +224,16 @@
         ====================================================== --}}
         <section>
 
-            <div class="mb-5">
+            <div class="mb-4">
 
                 <p
-                    class="text-sm font-semibold text-emerald-600"
+                    class="text-xs font-semibold text-emerald-600"
                 >
                     สำรวจผลงาน
                 </p>
 
                 <h2
-                    class="mt-1 text-2xl font-bold text-slate-900"
+                    class="mt-1 text-xl font-bold text-slate-900"
                 >
                     หมวดหมู่
                 </h2>
@@ -248,7 +248,7 @@
                 {{-- ALL --}}
                 <a
                     href="{{ route('home') }}"
-                    class="shrink-0 rounded-full border px-5 py-2.5
+                    class="shrink-0 rounded-full border px-4 py-2
                     text-sm font-medium transition
                     {{ !request('category')
                         ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm'
@@ -263,7 +263,7 @@
 
                     <a
                         href="{{ route('home', ['category' => $category->id]) }}"
-                        class="shrink-0 rounded-full border px-5 py-2.5
+                        class="shrink-0 rounded-full border px-4 py-2
                         text-sm font-medium transition
                         {{ request('category') == $category->id
                             ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm'
@@ -284,20 +284,20 @@
         ====================================================== --}}
         @if (($featuredWorks ?? collect())->isNotEmpty())
 
-            <section class="mt-14">
+            <section class="mt-10">
 
-                <div class="mb-6">
+                <div class="mb-5">
 
                     <div class="flex items-center gap-3">
 
                         <div
-                            class="flex h-10 w-10 items-center
+                            class="flex h-9 w-9 items-center
                             justify-center rounded-xl
                             bg-yellow-100 text-yellow-700"
                         >
 
                             <svg
-                                class="h-5 w-5"
+                                class="h-4 w-4"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
@@ -315,14 +315,14 @@
                         <div>
 
                             <p
-                                class="text-sm font-medium
+                                class="text-xs font-medium
                                 text-yellow-600"
                             >
                                 ผลงานที่ได้รับรางวัล
                             </p>
 
                             <h2
-                                class="text-2xl font-bold
+                                class="text-xl font-bold
                                 text-slate-900"
                             >
                                 ผลงานเด่น
@@ -336,7 +336,7 @@
 
 
                 <div
-                    class="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
+                    class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
                 >
 
                     @foreach ($featuredWorks as $work)
@@ -401,7 +401,7 @@
                                         <span
                                             class="inline-flex items-center
                                             gap-1.5 rounded-full
-                                            bg-yellow-400 px-3 py-1.5
+                                            bg-yellow-400 px-2.5 py-1
                                             text-xs font-bold
                                             text-yellow-950 shadow-sm"
                                         >
@@ -414,17 +414,17 @@
                                 </div>
 
 
-                                <div class="p-5">
+                                <div class="p-4">
 
                                     <p
-                                        class="mb-2 line-clamp-1 text-xs
+                                        class="mb-1.5 line-clamp-1 text-xs
                                         text-slate-400"
                                     >
                                         {{ $work->competition?->title ?? 'ไม่ระบุการแข่งขัน' }}
                                     </p>
 
                                     <h3
-                                        class="line-clamp-2 text-lg
+                                        class="line-clamp-2 text-base
                                         font-bold text-slate-800
                                         transition
                                         group-hover:text-emerald-700"
@@ -435,7 +435,7 @@
                                     @if ($work->project_description)
 
                                         <p
-                                            class="mt-2 line-clamp-2
+                                            class="mt-1.5 line-clamp-2
                                             text-sm leading-6
                                             text-slate-500"
                                         >
@@ -446,19 +446,19 @@
 
 
                                     <div
-                                        class="mt-4 flex items-center
+                                        class="mt-3 flex items-center
                                         justify-between border-t
-                                        border-slate-100 pt-4"
+                                        border-slate-100 pt-3"
                                     >
 
                                         <span
-                                            class="text-sm text-slate-400"
+                                            class="text-xs text-slate-400"
                                         >
                                             คะแนน
                                         </span>
 
                                         <span
-                                            class="font-bold
+                                            class="text-sm font-bold
                                             text-emerald-600"
                                         >
                                             {{ $work->final_score ?? '-' }}
@@ -484,10 +484,10 @@
         {{-- =====================================================
             ALL WORKS
         ====================================================== --}}
-        <section class="mt-14">
+        <section class="mt-10">
 
             <div
-                class="mb-6 flex flex-col gap-4
+                class="mb-5 flex flex-col gap-3
                 sm:flex-row sm:items-end
                 sm:justify-between"
             >
@@ -495,14 +495,14 @@
                 <div>
 
                     <p
-                        class="text-sm font-medium
+                        class="text-xs font-medium
                         text-emerald-600"
                     >
                         คลังผลงาน
                     </p>
 
                     <h2
-                        class="mt-1 text-2xl font-bold
+                        class="mt-1 text-xl font-bold
                         text-slate-900"
                     >
                         ผลงานทั้งหมด
@@ -550,8 +550,8 @@
                         <button
                             type="button"
                             id="sort-trigger"
-                            class="flex w-48 items-center justify-between rounded-2xl
-                            bg-white px-5 py-3.5 text-sm font-bold text-slate-700
+                            class="flex w-44 items-center justify-between rounded-2xl
+                            bg-white px-4 py-2.5 text-sm font-bold text-slate-700
                             shadow-md transition hover:shadow-lg
                             focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
                         >
@@ -572,7 +572,7 @@
                         {{-- Panel --}}
                         <div
                             id="sort-panel"
-                            class="absolute right-0 z-20 mt-2 hidden w-48 overflow-hidden
+                            class="absolute right-0 z-20 mt-2 hidden w-44 overflow-hidden
                             rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-100"
                         >
 
@@ -583,7 +583,7 @@
                                     data-value="{{ $value }}"
                                     data-label="{{ $option['label'] }}"
                                     class="sort-option flex w-full items-center justify-between
-                                    rounded-xl px-4 py-3 text-left text-sm font-semibold
+                                    rounded-xl px-3 py-2.5 text-left text-sm font-semibold
                                     text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700
                                     {{ $currentSort === $value ? 'bg-emerald-50 text-emerald-700' : '' }}"
                                 >
@@ -620,7 +620,7 @@
             @if (($works ?? collect())->isNotEmpty())
 
                 <div
-                    class="grid gap-5 sm:grid-cols-2
+                    class="grid gap-4 sm:grid-cols-2
                     lg:grid-cols-3 xl:grid-cols-4"
                 >
 
@@ -679,7 +679,7 @@
                                 </div>
 
 
-                                <div class="p-4">
+                                <div class="p-3">
 
                                     <p
                                         class="line-clamp-1 text-xs
@@ -690,7 +690,7 @@
 
 
                                     <h3
-                                        class="mt-1 line-clamp-2
+                                        class="mt-1 line-clamp-2 text-sm
                                         font-semibold text-slate-800
                                         transition
                                         group-hover:text-emerald-700"
@@ -702,8 +702,8 @@
                                     @if ($work->project_description)
 
                                         <p
-                                            class="mt-2 line-clamp-2
-                                            text-sm leading-5
+                                            class="mt-1.5 line-clamp-2
+                                            text-xs leading-5
                                             text-slate-500"
                                         >
                                             {{ $work->project_description }}
@@ -713,7 +713,7 @@
 
 
                                     <div
-                                        class="mt-4 flex items-center
+                                        class="mt-3 flex items-center
                                         justify-between"
                                     >
 
@@ -747,7 +747,7 @@
                 {{-- Pagination --}}
                 @if (method_exists($works, 'links'))
 
-                    <div class="mt-8">
+                    <div class="mt-6">
                         {{ $works->withQueryString()->links() }}
                     </div>
 
@@ -758,19 +758,19 @@
 
                 <div
                     class="rounded-2xl border border-dashed
-                    border-slate-300 bg-white px-6 py-16
+                    border-slate-300 bg-white px-6 py-12
                     text-center"
                 >
 
                     <div
-                        class="mx-auto flex h-14 w-14
+                        class="mx-auto flex h-12 w-12
                         items-center justify-center
                         rounded-2xl bg-emerald-50
                         text-emerald-600"
                     >
 
                         <svg
-                            class="h-7 w-7"
+                            class="h-6 w-6"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -795,7 +795,7 @@
 
 
                     <h3
-                        class="mt-4 font-semibold
+                        class="mt-3 font-semibold text-sm
                         text-slate-700"
                     >
                         ยังไม่มีผลงาน
@@ -819,16 +819,12 @@
     {{-- =========================================================
         FOOTER
     ========================================================== --}}
-    <footer
-        class="border-t border-slate-200 bg-white"
-    >
+    <footer class="border-t border-slate-200 bg-white">
 
-        <div
-            class="mx-auto max-w-7xl px-4 py-8
-            text-center text-sm text-slate-400
-            sm:px-6 lg:px-8"
-        >
-            คลังผลงานการประกวดและองค์ความรู้
+        <div class="mx-auto max-w-7xl px-4 py-6
+             text-center text-sm text-slate-400
+             sm:px-6 lg:px-8">
+             คลังผลงานการประกวดและองค์ความรู้
         </div>
 
     </footer>

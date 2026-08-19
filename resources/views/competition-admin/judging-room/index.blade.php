@@ -4,7 +4,7 @@
 
 @section('header')
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">
+        <h1 class="text-xl font-bold text-slate-800">
             ห้องตัดสิน
         </h1>
 
@@ -15,29 +15,29 @@
 @endsection
 
 @section('content')
-    <div class="space-y-5">
+    <div class="mx-auto w-full max-w-6xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
 
         {{-- Summary --}}
-        <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div class="flex flex-wrap items-center justify-between gap-4">
+        <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <p class="text-sm text-slate-500">
+                    <p class="text-xs text-slate-500">
                         การแข่งขันที่คุณดูแล
                     </p>
 
-                    <p class="mt-1 text-2xl font-bold text-slate-800">
+                    <p class="mt-0.5 text-xl font-bold text-slate-800">
                         {{ $competitions->total() }} รายการ
                     </p>
                 </div>
 
-                <div class="rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                <div class="rounded-xl bg-blue-50 px-3 py-2 text-xs text-blue-700">
                     เลือกการแข่งขันเพื่อเข้าสู่หน้าควบคุม
                 </div>
             </div>
         </section>
 
         {{-- Competition rooms --}}
-        <div class="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             @forelse ($competitions as $competition)
                 @php
                     $session = $competition->judgingSession;
@@ -96,7 +96,7 @@
 
                 <article class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                     {{-- Competition header image --}}
-                    <div class="h-44 overflow-hidden bg-slate-100">
+                    <div class="h-24 overflow-hidden bg-slate-100">
                         @if ($coverUrl)
                             <img
                                 src="{{ $coverUrl }}"
@@ -105,9 +105,9 @@
                                 loading="lazy"
                             >
                         @else
-                            <div class="flex h-full flex-col items-center justify-center gap-2 text-slate-400">
+                            <div class="flex h-full flex-col items-center justify-center gap-1 text-slate-400">
                                 <svg
-                                    class="h-9 w-9"
+                                    class="h-5 w-5"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     stroke="currentColor"
@@ -119,73 +119,73 @@
                                     <path d="m4 17 5-5 4 4 2-2 5 4" />
                                 </svg>
 
-                                <span class="text-sm">ไม่มีรูปภาพรายการ</span>
+                                <span class="text-[11px]">ไม่มีรูปภาพรายการ</span>
                             </div>
                         @endif
                     </div>
 
-                    <div class="flex flex-1 flex-col p-5">
-                        <div class="flex items-start justify-between gap-4">
+                    <div class="flex flex-1 flex-col p-3">
+                        <div class="flex items-start justify-between gap-2">
                             <div class="min-w-0">
-                                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-400">
                                     การแข่งขัน
                                 </p>
 
-                                <h2 class="mt-1 line-clamp-2 text-lg font-bold text-slate-800">
+                                <h2 class="mt-0.5 line-clamp-2 text-sm font-bold text-slate-800">
                                     {{ $competition->title }}
                                 </h2>
 
-                                <p class="mt-1 line-clamp-1 text-sm text-slate-500">
+                                <p class="mt-0.5 line-clamp-1 text-[11px] text-slate-500">
                                     แบบฟอร์ม: {{ $templateTitle }}
                                 </p>
                             </div>
 
                         <span
-                            class="inline-flex shrink-0 items-center gap-2 rounded-full
-                                   px-3 py-1 text-xs font-semibold ring-1
+                            class="inline-flex shrink-0 items-center gap-1 rounded-full
+                                   px-2 py-0.5 text-[10px] font-semibold ring-1
                                    {{ $statusConfig['class'] }}"
                         >
-                            <span class="h-2 w-2 rounded-full {{ $statusConfig['dot'] }}"></span>
+                            <span class="h-1.5 w-1.5 rounded-full {{ $statusConfig['dot'] }}"></span>
 
                             {{ $statusConfig['label'] }}
                         </span>
                     </div>
 
                     {{-- Counts --}}
-                    <div class="mt-5 grid grid-cols-3 gap-2">
-                        <div class="rounded-xl bg-slate-50 p-3 text-center">
-                            <p class="text-xl font-bold text-slate-800">
+                    <div class="mt-3 grid grid-cols-3 gap-1.5">
+                        <div class="rounded-lg bg-slate-50 p-2 text-center">
+                            <p class="text-sm font-bold text-slate-800">
                                 {{ $competition->submissions_count }}
                             </p>
 
-                            <p class="mt-1 text-xs text-slate-500">
+                            <p class="mt-0.5 text-[10px] text-slate-500">
                                 ผลงาน
                             </p>
                         </div>
 
-                        <div class="rounded-xl bg-slate-50 p-3 text-center">
-                            <p class="text-xl font-bold text-slate-800">
+                        <div class="rounded-lg bg-slate-50 p-2 text-center">
+                            <p class="text-sm font-bold text-slate-800">
                                 {{ $competition->rubrics_count }}
                             </p>
 
-                            <p class="mt-1 text-xs text-slate-500">
+                            <p class="mt-0.5 text-[10px] text-slate-500">
                                 เกณฑ์
                             </p>
                         </div>
 
-                        <div class="rounded-xl bg-slate-50 p-3 text-center">
-                            <p class="text-xl font-bold text-slate-800">
+                        <div class="rounded-lg bg-slate-50 p-2 text-center">
+                            <p class="text-sm font-bold text-slate-800">
                                 {{ $competition->judge_assignments_count }}
                             </p>
 
-                            <p class="mt-1 text-xs text-slate-500">
+                            <p class="mt-0.5 text-[10px] text-slate-500">
                                 กรรมการ
                             </p>
                         </div>
                     </div>
 
                     {{-- Readiness --}}
-                    <div class="mt-4 space-y-2 text-sm">
+                    <div class="mt-2.5 space-y-1 text-[11px]">
                         <div class="flex items-center justify-between">
                             <span class="text-slate-500">
                                 ผลงานพร้อมตัดสิน
@@ -231,18 +231,18 @@
                         </div>
                     </div>
 
-                        <div class="mt-auto pt-5">
+                        <div class="mt-auto pt-3">
                         <a
                             href="{{ route(
                                 'competition-admin.competitions.judging-room.show',
                                 $competition
                             ) }}"
-                            class="flex w-full items-center justify-center gap-2 rounded-xl
-                                   bg-blue-600 px-4 py-3 text-sm font-semibold text-white
+                            class="flex w-full items-center justify-center gap-1.5 rounded-lg
+                                   bg-blue-600 px-3 py-2 text-xs font-semibold text-white
                                    shadow-sm transition hover:bg-blue-700
                                    focus:outline-none focus:ring-4 focus:ring-blue-100">
                             <svg
-                                class="h-5 w-5"
+                                class="h-3.5 w-3.5"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
@@ -269,10 +269,10 @@
                     </div>
                 </article>
             @empty
-                <div class="col-span-full rounded-2xl border-2 border-dashed border-slate-200 bg-white py-16 text-center">
-                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                <div class="col-span-full rounded-2xl border-2 border-dashed border-slate-200 bg-white py-12 text-center">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
                         <svg
-                            class="h-7 w-7"
+                            class="h-6 w-6"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -285,7 +285,7 @@
                         </svg>
                     </div>
 
-                    <h2 class="mt-4 font-semibold text-slate-700">
+                    <h2 class="mt-3 text-sm font-semibold text-slate-700">
                         ยังไม่มีการแข่งขัน
                     </h2>
 
