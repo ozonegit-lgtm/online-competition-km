@@ -49,11 +49,7 @@ class JudgingRoomController extends Controller
 
     public function show(JudgingSession $session): View
     {
-        abort_unless(
-            $session->status === JudgingSession::STATUS_LIVE, 
-            403,
-            'ห้องตัดสินจบแล้วกรุณาลองใหม่ในพายหลัง'
-        );
+
         $assignment = $this->getAcceptedAssignment($session);
 
         $session->load([
@@ -125,7 +121,18 @@ class JudgingRoomController extends Controller
         $this->ensureSessionCanBeScored($session);
 
         $rubrics = $this->getActiveRubrics($session);
+        $alreadySubmitted = Score::query()
+            ->where('judge_assignment_id', $assignment->id)
+            ->where('submission_id', $session->current_submission_id)
+            ->whereIn('rubric_id', $rubrics->modelKeys())
+            ->whereNotNull('submitted_at')
+            ->exists();
 
+        abort_if(
+            $alreadySubmitted,
+            422,
+            'คะแนนของผลงานนี้ถูกยืนยันแล้ว ไม่สามารถแก้ไขได้'
+        );
         $validated = $request->validate([
             'scores' => ['required', 'array'],
             'scores.*.score' => ['required', 'numeric', 'min:0'],
@@ -161,8 +168,7 @@ class JudgingRoomController extends Controller
                     [
                         'score' => $input['score'],
                         'comment' =>
-                            $input['comment'] ?? null,
-                        'submitted_at' => null,
+                        $input['comment'] ?? null,
                     ]
                 );
             }

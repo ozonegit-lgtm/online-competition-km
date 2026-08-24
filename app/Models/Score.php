@@ -71,12 +71,20 @@ class Score extends Model
      */
     public function getWeightedScoreAttribute(): float
     {
-        if (!$this->rubric) {
+        if (! $this->rubric) {
             return (float) $this->score;
         }
 
+        $maxScore = (float) $this->rubric->max_score;
+        $weight = (float) $this->rubric->weight;
+        $score = (float) $this->score;
+
+        if ($maxScore <= 0) {
+            return 0.0;
+        }
+
         return round(
-            ($this->score * $this->rubric->weight) / 100,
+            ($score / $maxScore) * $weight,
             2
         );
     }

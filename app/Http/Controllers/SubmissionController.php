@@ -106,34 +106,19 @@ class SubmissionController extends Controller
         try {
             $submissionCode = $this->generateSubmissionCode();
 
-            /*
-             * Template Form เป็นแหล่งข้อมูลหลัก แล้วคัดลอกคำตอบของฟิลด์ระบบ
-             * ลงคอลัมน์หลักเพื่อให้หน้ารายการและห้องตัดสินใช้งานได้ทันที
-             */
-            $systemValues = $fields
-                ->filter(fn (CompetitionFormField $field) => filled($field->system_field))
-                ->mapWithKeys(function (CompetitionFormField $field) use ($validated) {
-                    $value = data_get($validated, "fields.{$field->id}");
 
-                    return [$field->system_field => is_scalar($value) ? (string) $value : null];
-                });
 
             $submission = Submission::create([
                 'competition_id' => $competition->id,
                 'submission_code' => $submissionCode,
-                /*
-                * ระบบ Dynamic Form ไม่มีช่องชื่อผลงานแบบตายตัว
-                * จึงใช้รหัสการส่งเป็นชื่อรายการเริ่มต้น
-                */
-                'project_title' => $systemValues->get('project_title')
-                    ?: "ผลงาน {$submissionCode}",
+                'project_title' => $validated['project_title'],
                 'project_description' => null,
                 'team_name' => $competition->competition_type === 'team'
                     ? ($validated['team_name'] ?? null)
                     : null,
-                'contact_name' => $systemValues->get('contact_name'),
-                'contact_email' => $systemValues->get('contact_email'),
-                'contact_phone' => $systemValues->get('contact_phone'),
+                'contact_name' => $validated['contact_name'],
+                'contact_email' => $validated['contact_email'],
+                'contact_phone' => $validated['contact_phone'],
                 'final_score' => 0,
                 'status' => 'submitted',
                 'submitted_at' => now(),
@@ -251,6 +236,27 @@ class SubmissionController extends Controller
         Collection $fields
     ): array {
         $rules = [
+            'project_title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'contact_name' => [
+                'required',
+                'string',
+                'max:150',
+            ],
+            'contact_email' => [
+                'required',
+                'email',
+                'max:150',
+            ],
+            'contact_phone' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[0-9+\\-\\s()]{8,20}$/',
+            ],
             'access_code' => $competition->visibility === 'private'
                 ? ['required', 'string', 'max:100']
                 : ['nullable'],
@@ -264,9 +270,13 @@ class SubmissionController extends Controller
         ];
 
         $attributes = [
-            'access_code' => 'รหัสเข้าร่วม',
-            'team_name' => 'ชื่อทีม',
-            'terms' => 'การยืนยันข้อมูล',
+        'project_title' => 'ชื่อผลงาน',
+        'contact_name' => 'ชื่อ-นามสกุลผู้ส่ง',
+        'contact_email' => 'อีเมล',
+        'contact_phone' => 'เบอร์โทรศัพท์',
+        'access_code' => 'รหัสเข้าร่วม',
+        'team_name' => 'ชื่อทีม',
+        'terms' => 'การยืนยันข้อมูล',
         ];
 
         foreach ($fields as $field) {

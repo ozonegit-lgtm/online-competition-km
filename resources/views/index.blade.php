@@ -282,7 +282,7 @@
         {{-- =====================================================
             FEATURED WORKS
         ====================================================== --}}
-        @if (($featuredWorks ?? collect())->isNotEmpty())
+        @if ($featuredItems->isNotEmpty())
 
             <section class="mt-10">
 
@@ -318,7 +318,7 @@
                                 class="text-xs font-medium
                                 text-yellow-600"
                             >
-                                ผลงานที่ได้รับรางวัล
+                                ผลงานที่ได้รับการแนะนำ
                             </p>
 
                             <h2
@@ -339,22 +339,23 @@
                     class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
                 >
 
-                    @foreach ($featuredWorks as $work)
+                    @foreach ($featuredItems as $item)
 
                         @php
+                            $submission = $item->submission;
 
-                            $image = $work->files->first();
+                            $image = $submission?->files
+                                ?->firstWhere('is_primary', true)
+                                ?? $submission?->files?->first();
 
-                            $imageUrl = $image
-                                ? \Illuminate\Support\Facades\Storage::disk('public')->url(
-                                    $image->file_path ?? $image->path
-                                )
+                            $imagePath = $item->cover_image
+                                ?: ($image?->file_path ?? null);
+
+                            $imageUrl = $imagePath
+                                ? \Illuminate\Support\Facades\Storage::disk('public')
+                                    ->url($imagePath)
                                 : null;
-
-                            $award = $work->awards->first();
-
                         @endphp
-
 
                         <article
                             class="group overflow-hidden rounded-2xl
@@ -374,7 +375,7 @@
 
                                         <img
                                             src="{{ $imageUrl }}"
-                                            alt="{{ $work->project_title }}"
+                                            alt="{{ $item->title }}"
                                             class="h-full w-full object-cover
                                             transition duration-500
                                             group-hover:scale-105"
@@ -405,8 +406,7 @@
                                             text-xs font-bold
                                             text-yellow-950 shadow-sm"
                                         >
-                                            🏆
-                                            {{ $award->name ?? 'ผลงานรางวัล' }}
+                                            ★ ผลงานแนะนำ
                                         </span>
 
                                     </div>
@@ -420,7 +420,7 @@
                                         class="mb-1.5 line-clamp-1 text-xs
                                         text-slate-400"
                                     >
-                                        {{ $work->competition?->title ?? 'ไม่ระบุการแข่งขัน' }}
+                                        {{ $submission?->competition?->title ?? 'ไม่ระบุการแข่งขัน' }}
                                     </p>
 
                                     <h3
@@ -429,17 +429,17 @@
                                         transition
                                         group-hover:text-emerald-700"
                                     >
-                                        {{ $work->project_title }}
+                                        {{ $item->title }}
                                     </h3>
 
-                                    @if ($work->project_description)
+                                    @if ($item->summary)
 
                                         <p
                                             class="mt-1.5 line-clamp-2
                                             text-sm leading-6
                                             text-slate-500"
                                         >
-                                            {{ $work->project_description }}
+                                            {{ $item->summary }}
                                         </p>
 
                                     @endif
@@ -461,7 +461,9 @@
                                             class="text-sm font-bold
                                             text-emerald-600"
                                         >
-                                            {{ $work->final_score ?? '-' }}
+                                            {{ $submission?->final_score !== null
+                                                ? number_format((float) $submission->final_score, 2)
+                                                : '-' }}
                                         </span>
 
                                     </div>
@@ -617,25 +619,29 @@
 
 
             {{-- WORKS --}}
-            @if (($works ?? collect())->isNotEmpty())
+            @if ($knowledgeItems->isNotEmpty())
 
                 <div
                     class="grid gap-4 sm:grid-cols-2
                     lg:grid-cols-3 xl:grid-cols-4"
                 >
 
-                    @foreach ($works as $work)
+                    @foreach ($knowledgeItems as $item)
 
                         @php
+                            $submission = $item->submission;
 
-                            $image = $work->files->first();
+                            $image = $submission?->files
+                                ?->firstWhere('is_primary', true)
+                                ?? $submission?->files?->first();
 
-                            $imageUrl = $image
-                                ? \Illuminate\Support\Facades\Storage::disk('public')->url(
-                                    $image->file_path ?? $image->path
-                                )
+                            $imagePath = $item->cover_image
+                                ?: ($image?->file_path ?? null);
+
+                            $imageUrl = $imagePath
+                                ? \Illuminate\Support\Facades\Storage::disk('public')
+                                    ->url($imagePath)
                                 : null;
-
                         @endphp
 
 
@@ -657,7 +663,7 @@
 
                                         <img
                                             src="{{ $imageUrl }}"
-                                            alt="{{ $work->project_title }}"
+                                            alt="{{ $item->title }}"
                                             class="h-full w-full object-cover
                                             transition duration-500
                                             group-hover:scale-105"
@@ -685,7 +691,7 @@
                                         class="line-clamp-1 text-xs
                                         text-emerald-600"
                                     >
-                                        {{ $work->competition?->title ?? 'ไม่ระบุการแข่งขัน' }}
+                                        {{ $submission?->competition?->title ?? 'ไม่ระบุการแข่งขัน' }}
                                     </p>
 
 
@@ -695,18 +701,18 @@
                                         transition
                                         group-hover:text-emerald-700"
                                     >
-                                        {{ $work->project_title }}
+                                        {{ $item->title }}
                                     </h3>
 
 
-                                    @if ($work->project_description)
+                                    @if ($item->summary)
 
                                         <p
                                             class="mt-1.5 line-clamp-2
                                             text-xs leading-5
                                             text-slate-500"
                                         >
-                                            {{ $work->project_description }}
+                                            {{ $item->summary }}
                                         </p>
 
                                     @endif
@@ -728,7 +734,9 @@
                                             class="text-sm font-bold
                                             text-slate-700"
                                         >
-                                            {{ $work->final_score ?? '-' }}
+                                            {{ $submission?->final_score !== null
+                                                ? number_format((float) $submission->final_score, 2)
+                                                : '-' }}
                                         </span>
 
                                     </div>
@@ -745,12 +753,10 @@
 
 
                 {{-- Pagination --}}
-                @if (method_exists($works, 'links'))
-
+                @if ($knowledgeItems->hasPages())
                     <div class="mt-6">
-                        {{ $works->withQueryString()->links() }}
+                        {{ $knowledgeItems->links() }}
                     </div>
-
                 @endif
 
 

@@ -22,6 +22,9 @@ use App\Http\Controllers\Judge\JudgingRoomController;
 use App\Http\Controllers\CompetitionAdmin\JudgingSessionController;
 use App\Http\Controllers\JudgeAssignmentController;
 use App\Http\Controllers\KnowledgeManagementController;
+use App\Http\Controllers\CompetitionAdmin\ResultController;
+use App\Http\Controllers\CompetitionAdmin\KmSubmissionController;
+
 
 
 
@@ -121,6 +124,11 @@ Route::prefix('competition-admin')->name('competition-admin.')->middleware(['aut
         Route::put('/competitions/{competition}/judging-room/submission',[JudgingSessionController::class, 'selectSubmission'])->name('competitions.judging-room.submission');
         Route::post('/competitions/{competition}/judging-room/end',[JudgingSessionController::class, 'end'])->name('competitions.judging-room.end');
         Route::post('/competitions/{competition}/judging-room/close',[JudgingSessionController::class, 'close'])->name('competitions.judging-room.close');
+        Route::get('/competitions/{competition}/results',[ResultController::class, 'index'])->name('competitions.results.index');
+        Route::get('/km/submissions',[KmSubmissionController::class, 'index'])->name('km.submissions.index');
+        Route::post('/submissions/{submission}/km/publish',[KmSubmissionController::class, 'publish'])->name('submissions.km.publish');
+        Route::delete('/submissions/{submission}/km/publish',[KmSubmissionController::class, 'unpublish'])->name('submissions.km.unpublish');
+
     });
 
 /*

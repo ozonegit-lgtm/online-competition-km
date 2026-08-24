@@ -2,87 +2,174 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Submission;
 use App\Models\CompetitionCategory;
+use App\Models\KnowledgeItem;
+use App\Models\Submission;
 use Illuminate\Http\Request;
 
 class KnowledgeManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Submission::query()
-        ->with([
-            'competition.category',
-            'files',
-            'awards',
-        ])
-        ->whereHas('scores', function ($q) {
-            $q->whereNotNull('submitted_at');
-        });
+        /*
+        |--------------------------------------------------------------------------
+        | รายการผลงาน KM
+        |--------------------------------------------------------------------------
+        |
+        | แสดงเฉพาะรายการที่ผู้จัดเลือกเผยแพร่
+        | และผลงานต้องไม่ถูกตัดสิทธิ์
+        |
+        */
+        $query = KnowledgeItem::query()
+            ->with([
+                'submission.competition.category',
+                'submission.files',
+            ])
+            ->where('status', 'published')
+            ->whereHas('submission', function ($query) {
+                $query->where(
+                    'status',
+                    '!=',
+                    'disqualified'
+                );
+            });
 
-        // ค้นหา
+        /*
+        |--------------------------------------------------------------------------
+        | ค้นหา
+        |--------------------------------------------------------------------------
+        */
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = $request
+                ->string('search')
+                ->toString();
 
-            $query->where(function ($q) use ($search) {
-                $q->where('project_title', 'like', "%{$search}%")
-                    ->orWhere('project_description', 'like', "%{$search}%")
-                    ->orWhere('team_name', 'like', "%{$search}%")
-                    ->orWhereHas('competition', function ($q) use ($search) {
-                        $q->where('title', 'like', "%{$search}%");
-                    });
+            $query->where(function ($query) use ($search) {
+                $query
+                    ->where(
+                        'title',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'summary',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'content',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhereHas(
+                        'submission.competition',
+                        function ($query) use ($search) {
+                            $query->where(
+                                'title',
+                                'like',
+                                "%{$search}%"
+                            );
+                        }
+                    );
             });
         }
 
-        // กรองหมวดหมู่
+        /*
+        |--------------------------------------------------------------------------
+        | กรองหมวดหมู่
+        |--------------------------------------------------------------------------
+        */
         if ($request->filled('category')) {
-            $query->whereHas('competition', function ($q) use ($request) {
-                $q->where('category_id', $request->category);
-            });
+            $query->whereHas(
+                'submission.competition',
+                function ($query) use ($request) {
+                    $query->where(
+                        'category_id',
+                        $request->category
+                    );
+                }
+            );
         }
 
-        // เรียงข้อมูล
+        /*
+        |--------------------------------------------------------------------------
+        | เรียงลำดับ
+        |--------------------------------------------------------------------------
+        */
         switch ($request->get('sort', 'latest')) {
             case 'score':
-                $query->orderByDesc('final_score');
+                $query
+                    ->orderByDesc(
+                        Submission::query()
+                            ->select('final_score')
+                            ->whereColumn(
+                                'submissions.id',
+                                'knowledge_items.submission_id'
+                            )
+                            ->limit(1)
+                    )
+                    ->orderByDesc('published_at');
                 break;
 
             case 'title':
-                $query->orderBy('project_title');
+                $query
+                    ->orderBy('title')
+                    ->orderByDesc('published_at');
                 break;
 
             default:
-                $query->latest('submitted_at');
+                $query->orderByDesc('published_at');
                 break;
         }
 
-        $works = $query->paginate(12);
+        /*
+        |--------------------------------------------------------------------------
+        | แบ่งหน้า
+        |--------------------------------------------------------------------------
+        */
+        $knowledgeItems = $query
+            ->paginate(12)
+            ->withQueryString();
 
-        // ผลงานที่ได้รับรางวัล
-        $featuredWorks = Submission::query()
-        ->with([
-            'competition.category',
-            'files',
-            'awards',
-        ])
-        ->whereHas('scores', function ($q) {
-            $q->whereNotNull('submitted_at');
-        })
-        ->whereHas('awards')
-        ->orderByDesc('final_score')
-        ->take(6)
-        ->get();
+        /*
+        |--------------------------------------------------------------------------
+        | ผลงานแนะนำ
+        |--------------------------------------------------------------------------
+        |
+        | ต้องเผยแพร่แล้วและต้องไม่ถูกตัดสิทธิ์
+        |
+        */
+        $featuredItems = KnowledgeItem::query()
+            ->with([
+                'submission.competition.category',
+                'submission.files',
+            ])
+            ->where('status', 'published')
+            ->whereHas('submission', function ($query) {
+                $query->where(
+                    'status',
+                    '!=',
+                    'disqualified'
+                );
+            })
+            ->where('is_featured', true)
+            ->orderByDesc('published_at')
+            ->take(6)
+            ->get();
 
-        // หมวดหมู่
+        /*
+        |--------------------------------------------------------------------------
+        | หมวดหมู่
+        |--------------------------------------------------------------------------
+        */
         $categories = CompetitionCategory::query()
-        ->where('is_active', true)
-        ->orderBy('category_name')
-        ->get();
+            ->where('is_active', true)
+            ->orderBy('category_name')
+            ->get();
 
         return view('index', [
-            'works' => $works,
-            'featuredWorks' => $featuredWorks,
+            'knowledgeItems' => $knowledgeItems,
+            'featuredItems' => $featuredItems,
             'categories' => $categories,
         ]);
     }

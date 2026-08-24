@@ -201,6 +201,108 @@
                     </section>
                 @endif
 
+                {{-- ข้อมูลผู้ส่งผลงาน --}}
+                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">
+                            ข้อมูลผู้ส่งผลงาน
+                        </h2>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            กรุณากรอกข้อมูลสำหรับติดต่อเกี่ยวกับผลงานที่ส่งเข้าประกวด
+                        </p>
+                    </div>
+
+                    <div class="mt-6 grid gap-5 sm:grid-cols-2">
+                        {{-- ชื่อผู้ส่ง --}}
+                        <div class="sm:col-span-2">
+                            <label
+                                for="contact_name"
+                                class="block text-sm font-semibold text-slate-700"
+                            >
+                                ชื่อ-นามสกุลผู้ส่ง
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <input
+                                id="contact_name"
+                                type="text"
+                                name="contact_name"
+                                value="{{ old('contact_name') }}"
+                                required
+                                maxlength="150"
+                                autocomplete="name"
+                                placeholder="กรอกชื่อ-นามสกุล"
+                                class="{{ $inputClass }}"
+                            >
+
+                            @error('contact_name')
+                                <p class="mt-2 text-sm text-red-600">
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+
+                        {{-- อีเมล --}}
+                        <div>
+                            <label
+                                for="contact_email"
+                                class="block text-sm font-semibold text-slate-700"
+                            >
+                                อีเมล
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <input
+                                id="contact_email"
+                                type="email"
+                                name="contact_email"
+                                value="{{ old('contact_email') }}"
+                                required
+                                maxlength="150"
+                                autocomplete="email"
+                                placeholder="example@email.com"
+                                class="{{ $inputClass }}"
+                            >
+
+                            @error('contact_email')
+                                <p class="mt-2 text-sm text-red-600">
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+
+                        {{-- เบอร์โทรศัพท์ --}}
+                        <div>
+                            <label
+                                for="contact_phone"
+                                class="block text-sm font-semibold text-slate-700"
+                            >
+                                เบอร์โทรศัพท์
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <input
+                                id="contact_phone"
+                                type="tel"
+                                name="contact_phone"
+                                value="{{ old('contact_phone') }}"
+                                required
+                                maxlength="20"
+                                autocomplete="tel"
+                                placeholder="08xxxxxxxx"
+                                class="{{ $inputClass }}"
+                            >
+
+                            @error('contact_phone')
+                                <p class="mt-2 text-sm text-red-600">
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                        </div>
+                    </div>
+                </section>
+
                 @if ($competition->competition_type === 'team')
                     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                         <h2 class="text-lg font-bold text-slate-900">
@@ -253,6 +355,35 @@
                         </span>
                     </div>
 
+                    {{-- ชื่อผลงาน --}}
+                    <div class="mt-7">
+                        <label
+                            for="project_title"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            ชื่อผลงาน
+                            <span class="text-red-500">*</span>
+                        </label>
+
+                        <input
+                            id="project_title"
+                            type="text"
+                            name="project_title"
+                            value="{{ old('project_title') }}"
+                            required
+                            maxlength="255"
+                            placeholder="กรอกชื่อผลงาน"
+                            class="{{ $inputClass }}"
+                        >
+
+                        @error('project_title')
+                            <p class="mt-2 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- คำถามจาก Template Form --}}
                     <div class="mt-7 space-y-6">
                         @foreach ($fields as $field)
                             @php

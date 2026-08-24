@@ -111,10 +111,12 @@ class JudgingSessionController extends Controller
             );
         }
 
-        if (!$competition->judgeAssignments()->exists()) {
+        if (! $competition->judgeAssignments()
+            ->where('assignment_status', 'accepted')
+            ->exists()) {
             return back()->with(
                 'error',
-                'ยังไม่สามารถเริ่ม Live ได้ เนื่องจากยังไม่มีกรรมการ'
+                'ยังไม่สามารถเริ่ม Live ได้ เนื่องจากยังไม่มีกรรมการตอบรับงานตัดสิน'
             );
         }
 

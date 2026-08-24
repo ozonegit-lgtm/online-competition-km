@@ -110,159 +110,31 @@
         |--------------------------------------------------------------------------
         | Submitter data
         |--------------------------------------------------------------------------
-        | รองรับกรณีข้อมูลผู้ส่งอยู่ใน relation หรืออยู่ในข้อมูลของ submission
+        | ข้อมูลผู้ส่งถูกบันทึกโดยตรงในตาราง submissions
+        | จากหน้าแบบฟอร์มส่งผลงาน
         |--------------------------------------------------------------------------
         */
 
-        $submitter = null;
-
-        foreach (['user', 'participant', 'submitter', 'owner'] as $relation) {
-            try {
-                if ($submission && $submission->{$relation}) {
-                    $submitter = $submission->{$relation};
-                    break;
-                }
-            } catch (\Throwable $e) {
-                // relation ไม่มี ไม่ต้องทำอะไร
-            }
-        }
+        $submitterName = $submission?->contact_name;
+        $submitterEmail = $submission?->contact_email;
+        $submitterPhone = $submission?->contact_phone;
 
         /*
         |--------------------------------------------------------------------------
-        | Direct fields
+        | Optional submitter data
+        |--------------------------------------------------------------------------
+        | ตอนนี้ระบบยังไม่มีคอลัมน์มาตรฐานสำหรับ LINE / หน่วยงาน
+        | จึงปล่อยเป็น null จนกว่าจะเพิ่มฟิลด์เหล่านี้อย่างเป็นทางการ
         |--------------------------------------------------------------------------
         */
 
-        $submitterName =
-            $submission?->submitter_name
-            ?? $submission?->participant_name
-            ?? $submission?->applicant_name
-            ?? $submission?->full_name
-            ?? $submitter?->name
-            ?? $submitter?->full_name;
-
-        $submitterEmail =
-            $submission?->submitter_email
-            ?? $submission?->participant_email
-            ?? $submission?->applicant_email
-            ?? $submission?->email
-            ?? $submitter?->email;
-
-        $submitterPhone =
-            $submission?->submitter_phone
-            ?? $submission?->participant_phone
-            ?? $submission?->applicant_phone
-            ?? $submission?->phone
-            ?? $submission?->mobile
-            ?? $submitter?->phone
-            ?? $submitter?->mobile;
-
-        $submitterLine =
-            $submission?->line_id
-            ?? $submission?->submitter_line_id
-            ?? $submission?->participant_line_id
-            ?? $submitter?->line_id;
-
-        $submitterWorkplace =
-            $submission?->workplace
-            ?? $submission?->organization
-            ?? $submission?->institution
-            ?? $submission?->company
-            ?? $submitter?->workplace
-            ?? $submitter?->organization;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Form data / JSON fallback
-        |--------------------------------------------------------------------------
-        */
-
-        $formData = [];
-
-        foreach ([
-            'form_data',
-            'form_values',
-            'data',
-            'answers',
-            'participant_data',
-            'submitter_data',
-        ] as $dataField) {
-            try {
-                $rawData = $submission?->{$dataField};
-
-                if (is_array($rawData)) {
-                    $formData = $rawData;
-                    break;
-                }
-
-                if (is_string($rawData) && $rawData !== '') {
-                    $decoded = json_decode($rawData, true);
-
-                    if (is_array($decoded)) {
-                        $formData = $decoded;
-                        break;
-                    }
-                }
-            } catch (\Throwable $e) {
-                // ข้าม field ที่ไม่มี
-            }
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | หา field จาก form data ตามชื่อที่เป็นไปได้
-        |--------------------------------------------------------------------------
-        */
-
-        $findFormValue = function (array $data, array $keywords) {
-            foreach ($data as $key => $value) {
-                $keyText = mb_strtolower((string) $key);
-
-                foreach ($keywords as $keyword) {
-                    if (
-                        str_contains($keyText, mb_strtolower($keyword))
-                        && !is_array($value)
-                        && !is_object($value)
-                    ) {
-                        return $value;
-                    }
-                }
-            }
-
-            return null;
-        };
-
-        $submitterName ??= $findFormValue(
-            $formData,
-            ['ชื่อผู้ส่ง', 'ชื่อ-นามสกุล', 'ชื่อ นามสกุล', 'ชื่อ', 'fullname', 'full_name', 'name']
-        );
-
-        $submitterEmail ??= $findFormValue(
-            $formData,
-            ['อีเมล', 'email', 'e-mail']
-        );
-
-        $submitterPhone ??= $findFormValue(
-            $formData,
-            ['เบอร์มือถือ', 'เบอร์โทร', 'โทรศัพท์', 'phone', 'mobile', 'tel']
-        );
-
-        $submitterLine ??= $findFormValue(
-            $formData,
-            ['line id', 'line_id', 'ไลน์', 'line']
-        );
-
-        $submitterWorkplace ??= $findFormValue(
-            $formData,
-            ['หน่วยงาน', 'สถานศึกษา', 'องค์กร', 'ที่ทำงาน', 'workplace', 'organization', 'institution']
-        );
+        $submitterLine = null;
+        $submitterWorkplace = null;
 
         $hasSubmitterInfo =
             filled($submitterName) ||
             filled($submitterEmail) ||
-            filled($submitterPhone) ||
-            filled($submitterLine) ||
-            filled($submitterWorkplace);
+            filled($submitterPhone);
     @endphp
 
     <div class="mx-auto w-full max-w-7xl space-y-4 sm:space-y-6">
