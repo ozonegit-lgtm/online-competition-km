@@ -17,6 +17,26 @@
 @section('content')
     <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
 
+    @error('rubric')
+        <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4">
+            <p class="text-sm font-semibold text-red-700">
+                {{ $message }}
+            </p>
+        </div>
+    @enderror
+
+    @if ($rubricsLocked)
+        <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+            <p class="text-sm font-bold text-amber-800">
+                เกณฑ์การให้คะแนนถูกล็อกแล้ว
+            </p>
+
+            <p class="mt-1 text-sm leading-6 text-amber-700">
+                การแข่งขันเริ่มตัดสินแล้ว
+                ไม่สามารถเพิ่ม แก้ไข เปิด/ปิด หรือลบเกณฑ์ได้
+            </p>
+        </div>
+    @endif
 
         {{-- สรุปคะแนน --}}
         <div class="mb-6 grid gap-4 sm:grid-cols-3">
@@ -81,15 +101,17 @@
                     </p>
                 </div>
 
-                <form
-                    method="POST"
-                    action="{{ route(
-                        'competition-admin.competitions.rubrics.store',
-                        $competition
-                    ) }}"
-                    class="space-y-5 p-6">
+@if (! $rubricsLocked)
 
-                    @csrf
+            <form
+                method="POST"
+                action="{{ route(
+                    'competition-admin.competitions.rubrics.store',
+                    $competition
+                ) }}"
+                class="space-y-5 p-6">
+
+                @csrf
 
                     <div>
                         <label
@@ -167,8 +189,22 @@
                         class="w-full rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-200">
                         + เพิ่มเกณฑ์
                     </button>
-                </form>
-            </section>
+                    </form>
+                    @else
+                        <div class="p-6">
+                            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                                <p class="text-sm font-semibold text-amber-800">
+                                    ไม่สามารถเพิ่มเกณฑ์ได้
+                                </p>
+                                <p class="mt-1 text-xs leading-5 text-amber-700">
+                                    การแข่งขันเริ่มเข้าสู่กระบวนการตัดสินแล้ว
+                                </p>
+                            </div>
+                        </div>
+
+                    @endif
+
+                    </section>
 
             {{-- รายการเกณฑ์ --}}
             <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -239,11 +275,12 @@
                                     </div>
                                 </div>
 
+                                @if (! $rubricsLocked)
+
                                 <details class="mt-5 rounded-xl border border-slate-200 bg-slate-50">
                                     <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-700">
                                         แก้ไขเกณฑ์
                                     </summary>
-
                                     <form
                                         method="POST"
                                         action="{{ route(
@@ -334,6 +371,14 @@
                                         ลบเกณฑ์
                                     </button>
                                 </form>
+                        @else
+                            <div class="mt-5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                <p class="text-xs font-medium text-slate-500">
+                                    เกณฑ์นี้อยู่ในโหมดอ่านอย่างเดียว
+                                    เนื่องจากเริ่มการตัดสินแล้ว
+                                </p>
+                            </div>
+                        @endif
                             </article>
                         @endforeach
                     </div>

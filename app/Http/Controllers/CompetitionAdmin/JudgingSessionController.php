@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Score;
 
 class JudgingSessionController extends Controller
 {
@@ -80,6 +81,10 @@ class JudgingSessionController extends Controller
             'currentFile',
         ]);
 
+        $scoreOverview = $this->buildScoreOverview(
+            $competition
+        );
+
         return view(
             'competition-admin.judging-room.show',
             [
@@ -87,7 +92,10 @@ class JudgingSessionController extends Controller
                 'session' => $session,
                 'submissions' => $competition->submissions,
                 'rubrics' => $competition->rubrics,
-                'assignments' => $competition->judgeAssignments,
+                'assignments' => $scoreOverview['assignments'],
+                'scoreProgress' => $scoreOverview['scoreProgress'],
+                'missingScores' => $scoreOverview['missingScores'],
+                'allScoresComplete' => $scoreOverview['allScoresComplete'],
                 'currentSubmission' => $session->currentSubmission,
                 'currentFile' => $session->currentFile,
             ]
@@ -98,22 +106,50 @@ class JudgingSessionController extends Controller
      * เริ่มการตัดสินแบบ Live
      */
     public function start(
-        Competition $competition
-    ): RedirectResponse {
-        $this->authorizeCompetition($competition);
+            Competition $competition
+        ): RedirectResponse {
+            $this->authorizeCompetition($competition);
 
-        $session = $this->getSession($competition);
+            $session = $this->getSession($competition);
 
-        if (!$competition->rubrics()->where('is_active', true)->exists()) {
-            return back()->with(
-                'error',
-                'ยังไม่สามารถเริ่ม Live ได้ เนื่องจากยังไม่มีเกณฑ์ที่เปิดใช้งาน'
-            );
-        }
+            if (! $competition->rubrics()
+        ->where('is_active', true)
+        ->exists()) {
+        return back()->with(
+            'error',
+            'ยังไม่สามารถเริ่ม Live ได้ เนื่องจากยังไม่มีเกณฑ์ที่เปิดใช้งาน'
+        );
+    }
 
-        if (! $competition->judgeAssignments()
-            ->where('assignment_status', 'accepted')
-            ->exists()) {
+    /*
+    * คะแนนเต็มและน้ำหนักของ Rubric ที่เปิดใช้งาน
+    * ต้องรวมเท่ากับ 100 ก่อนเริ่ม Live
+    */
+    $totalActiveMaxScore = (float) $competition
+        ->rubrics()
+        ->where('is_active', true)
+        ->sum('max_score');
+
+    $totalActiveWeight = (float) $competition
+        ->rubrics()
+        ->where('is_active', true)
+        ->sum('weight');
+
+    if (
+        abs($totalActiveMaxScore - 100.0) > 0.01 ||
+        abs($totalActiveWeight - 100.0) > 0.01
+    ) {
+        return back()->with(
+            'error',
+            'ยังไม่สามารถเริ่ม Live ได้ '
+            . 'คะแนนเต็มและน้ำหนักของเกณฑ์ที่เปิดใช้งาน '
+            . 'ต้องรวมเท่ากับ 100'
+        );
+    }
+
+    if (! $competition->judgeAssignments()
+        ->where('assignment_status', 'accepted')
+        ->exists()) {
             return back()->with(
                 'error',
                 'ยังไม่สามารถเริ่ม Live ได้ เนื่องจากยังไม่มีกรรมการตอบรับงานตัดสิน'
@@ -310,13 +346,9 @@ class JudgingSessionController extends Controller
     /**
      * จบการตัดสิน
      */
-    public function end(
-        Competition $competition
-    ): RedirectResponse {
+    public function end( Competition $competition ): RedirectResponse {
         $this->authorizeCompetition($competition);
-
         $session = $this->getSession($competition);
-
         if (
             !$session->isLive() &&
             !$session->isPaused()
@@ -324,6 +356,20 @@ class JudgingSessionController extends Controller
             return back()->with(
                 'error',
                 'ห้องนี้ไม่ได้อยู่ระหว่างการตัดสิน'
+            );
+        }
+
+        $scoreOverview = $this->buildScoreOverview(
+            $competition
+        );
+
+        if (! $scoreOverview['allScoresComplete']) {
+            $missingCount =
+                $scoreOverview['missingScores']->count();
+
+            return back()->with(
+                'error',
+                "ยังจบการตัดสินไม่ได้ มีรายการคะแนนที่ส่งไม่ครบ {$missingCount} รายการ"
             );
         }
 
@@ -366,8 +412,132 @@ class JudgingSessionController extends Controller
     }
 
     /**
-     * ดึงห้องตัดสินของการแข่งขัน
+     * ตรวจความครบถ้วนของคะแนนแยกตามกรรมการและผลงาน
      */
+    private function buildScoreOverview(
+        Competition $competition
+    ): array {
+        $submissions = $competition
+            ->submissions()
+            ->whereIn('status', [
+                'submitted',
+                'under_review',
+            ])
+            ->oldest('submitted_at')
+            ->get();
+
+        $rubrics = $competition
+            ->rubrics()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        $assignments = $competition
+            ->judgeAssignments()
+            ->where('assignment_status', 'accepted')
+            ->with('judge')
+            ->get();
+
+        $submissionIds = $submissions->modelKeys();
+        $rubricIds = $rubrics->modelKeys();
+        $assignmentIds = $assignments->modelKeys();
+
+        $submittedCounts = collect();
+
+        if (
+            $submissionIds !== [] &&
+            $rubricIds !== [] &&
+            $assignmentIds !== []
+        ) {
+            $submittedCounts = Score::query()
+                ->whereIn('submission_id', $submissionIds)
+                ->whereIn('rubric_id', $rubricIds)
+                ->whereIn(
+                    'judge_assignment_id',
+                    $assignmentIds
+                )
+                ->whereNotNull('submitted_at')
+                ->selectRaw(
+                    'judge_assignment_id,
+                    submission_id,
+                    COUNT(DISTINCT rubric_id) as submitted_count'
+                )
+                ->groupBy(
+                    'judge_assignment_id',
+                    'submission_id'
+                )
+                ->get()
+                ->keyBy(function ($score) {
+                    return $score->judge_assignment_id
+                        . ':'
+                        . $score->submission_id;
+                });
+        }
+
+        $requiredRubricCount = $rubrics->count();
+
+        $scoreProgress = collect();
+        $missingScores = collect();
+
+        foreach ($assignments as $assignment) {
+            foreach ($submissions as $submission) {
+                $key = $assignment->id
+                    . ':'
+                    . $submission->id;
+
+                $submittedCount = (int) (
+                    $submittedCounts
+                        ->get($key)
+                        ?->submitted_count ?? 0
+                );
+
+                $isSubmitted =
+                    $requiredRubricCount > 0 &&
+                    $submittedCount === $requiredRubricCount;
+
+                $progress = [
+                    'assignment_id' => $assignment->id,
+                    'submission_id' => $submission->id,
+                    'submission_code' =>
+                        $submission->submission_code,
+                    'project_title' =>
+                        $submission->project_title,
+                    'submitted_count' => $submittedCount,
+                    'required_count' => $requiredRubricCount,
+                    'missing_count' => max(
+                        $requiredRubricCount - $submittedCount,
+                        0
+                    ),
+                    'is_submitted' => $isSubmitted,
+                ];
+
+                $scoreProgress->put($key, $progress);
+
+                if (! $isSubmitted) {
+                    $missingScores->push([
+                        ...$progress,
+                        'judge_name' =>
+                            $assignment->judge->name
+                            ?? $assignment->judge->username
+                            ?? 'ไม่พบข้อมูลกรรมการ',
+                    ]);
+                }
+            }
+        }
+
+        $allScoresComplete =
+            $submissions->isNotEmpty() &&
+            $rubrics->isNotEmpty() &&
+            $assignments->isNotEmpty() &&
+            $missingScores->isEmpty();
+
+        return [
+            'assignments' => $assignments,
+            'scoreProgress' => $scoreProgress,
+            'missingScores' => $missingScores,
+            'allScoresComplete' => $allScoresComplete,
+        ];
+    }
     private function getSession(
         Competition $competition
     ): JudgingSession {

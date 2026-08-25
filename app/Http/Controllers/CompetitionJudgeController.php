@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class CompetitionJudgeController extends Controller
@@ -53,7 +54,9 @@ class CompetitionJudgeController extends Controller
     public function index(Competition $competition): View 
     {
         Gate::authorize('assignJudges',$competition);
-
+            $judgesLocked = $this->judgesAreLocked(
+                $competition
+            );
         $competition->load([
             'judgeAssignments.judge.adminProfile',
         ]);
@@ -69,21 +72,17 @@ class CompetitionJudgeController extends Controller
             ->all();
 
         return view('superadmin.competition-judges.index',
-            compact('competition', 'judges','assignedJudgeIds')
+            compact('competition', 'judges','assignedJudgeIds','judgesLocked')
         );
     }
     /**
      * บันทึกรายชื่อกรรมการของการแข่งขัน
      */
-    public function sync(
-        Request $request,
-        Competition $competition
-    ): RedirectResponse {
-        Gate::authorize(
-            'assignJudges',
+    public function sync( Request $request, Competition $competition ): RedirectResponse {
+        Gate::authorize('assignJudges', $competition);
+        $this->ensureJudgesAreEditable(
             $competition
         );
-
         $validated = $request->validate(
             [
                 'judge_ids' => [
@@ -215,15 +214,12 @@ class CompetitionJudgeController extends Controller
     /**
      * นำกรรมการออกจากการแข่งขัน
      */
-    public function destroy(
-        Competition $competition,
-        User $judge
-    ): RedirectResponse {
-        Gate::authorize(
-            'assignJudges',
-            $competition
-        );
-
+    public function destroy( Competition $competition, User $judge ): RedirectResponse 
+    {
+        Gate::authorize('assignJudges', $competition );
+            $this->ensureJudgesAreEditable(
+                $competition
+            );
         $assignment = $competition
             ->judgeAssignments()
             ->where('judge_id', $judge->id)
@@ -243,4 +239,47 @@ class CompetitionJudgeController extends Controller
             'นำกรรมการออกจากการแข่งขันเรียบร้อยแล้ว'
         );
     }
+
+
+
+    private function judgesAreLocked( Competition $competition ): bool 
+        {
+            $session = $competition
+                ->judgingSession()
+                ->first();
+
+            if (! $session) {
+                return false;
+            }
+
+            return
+                $session->started_at !== null ||
+                in_array(
+                    $session->status,
+                    [
+                        'live',
+                        'paused',
+                        'ended',
+                        'closed',
+                    ],
+                    true
+                );
+        }
+
+        /**
+         * หยุดการเพิ่มหรือถอดกรรมการหลังเริ่มตัดสิน
+         *
+         * @throws ValidationException
+         */
+        private function ensureJudgesAreEditable(
+            Competition $competition
+        ): void {
+            if ($this->judgesAreLocked($competition)) {
+                throw ValidationException::withMessages([
+                    'judges' =>
+                        'เริ่มการตัดสินแล้ว '
+                        . 'ไม่สามารถเพิ่มหรือถอดกรรมการได้',
+                ]);
+            }
+        }
 }

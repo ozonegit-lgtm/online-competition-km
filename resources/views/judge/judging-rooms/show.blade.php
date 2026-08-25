@@ -795,12 +795,18 @@
                         {{-- Score form --}}
                         <form
                             action="{{ route(
-                                'judge.judging-rooms.scores.draft',
+                                'judge.judging-rooms.scores.submit',
                                 $session
                             ) }}"
                             method="POST"
+                            onsubmit="return confirm('ยืนยันส่งคะแนนของผลงานนี้หรือไม่?\n\nหลังยืนยันแล้วจะไม่สามารถแก้ไขคะแนนได้')"
                         >
                             @csrf
+                            <input
+                                type="hidden"
+                                name="submission_id"
+                                value="{{ $submission->id }}"
+                            >
 
                             <div class="divide-y divide-slate-100">
 
@@ -983,7 +989,7 @@
                                             <path d="M17 21v-8H7v8M7 3v5h8"/>
                                         </svg>
 
-                                        บันทึกร่างคะแนน
+                                        ยืนยันและส่งคะแนนผลงานนี้
                                     </button>
 
                                 @else
@@ -1001,62 +1007,6 @@
                                 @endif
                             </div>
                         </form>
-
-                        {{-- Final submit --}}
-                        @if ($isLive && !$isSubmitted)
-
-                            <div class="border-t border-slate-100 bg-white p-4 sm:p-5">
-
-                                <div class="mb-3 flex items-start gap-2.5">
-                                    <svg
-                                        class="mt-0.5 h-4 w-4 shrink-0 text-amber-500"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <path d="M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>
-                                        <path d="M12 9v4M12 17h.01"/>
-                                    </svg>
-
-                                    <p class="text-xs leading-5 text-slate-500">
-                                        ตรวจสอบคะแนนให้ครบถ้วนก่อนยืนยัน
-
-                                        <span class="font-semibold text-slate-700">
-                                            หลังส่งแล้วจะไม่สามารถแก้ไขได้
-                                        </span>
-                                    </p>
-                                </div>
-
-                                <form
-                                    action="{{ route(
-                                        'judge.judging-rooms.scores.submit',
-                                        $session
-                                    ) }}"
-                                    method="POST"
-                                    onsubmit="return confirm('ยืนยันส่งคะแนนของผลงานนี้หรือไม่?\n\nหลังยืนยันแล้วจะไม่สามารถแก้ไขคะแนนได้')"
-                                >
-                                    @csrf
-
-                                    <button
-                                        type="submit"
-                                        class="flex w-full items-center justify-center gap-2 rounded-xl
-                                               bg-emerald-600 px-4 py-3.5 text-sm font-bold
-                                               text-white shadow-sm transition
-                                               hover:bg-emerald-700 active:bg-emerald-800"
-                                    >
-                                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M22 2 11 13"/>
-                                            <path d="m22 2-7 20-4-9-9-4Z"/>
-                                        </svg>
-
-                                        ยืนยันส่งคะแนน
-                                    </button>
-                                </form>
-
-                            </div>
-
-                        @endif
 
                     @endif
 

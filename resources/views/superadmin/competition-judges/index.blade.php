@@ -24,6 +24,32 @@
     @endphp
 
     <div class="mx-auto max-w-6xl">
+            @if ($errors->any())
+                <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4">
+                    <p class="text-sm font-bold text-red-700">
+                        ไม่สามารถบันทึกรายชื่อกรรมการได้
+                    </p>
+
+                    <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-red-600">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if ($judgesLocked)
+                <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                    <p class="text-sm font-bold text-amber-800">
+                        รายชื่อกรรมการถูกล็อกแล้ว
+                    </p>
+
+                    <p class="mt-1 text-sm leading-6 text-amber-700">
+                        การแข่งขันเริ่มตัดสินแล้ว
+                        ไม่สามารถเพิ่มหรือถอดกรรมการได้
+                    </p>
+                </div>
+            @endif
 
         {{-- ข้อมูลการแข่งขัน --}}
         <section class="mb-6 rounded-2xl border border-slate-200
@@ -136,9 +162,11 @@
                             @endphp
 
                             <label
-                                class="group relative cursor-pointer rounded-2xl
-                                       border p-4 transition
-                                       {{ $isSelected
+                                class="group relative rounded-2xl border p-4 transition
+                                    {{ $judgesLocked
+                                            ? 'cursor-not-allowed opacity-75'
+                                            : 'cursor-pointer' }}
+                                    {{ $isSelected
                                             ? 'border-blue-400 bg-blue-50'
                                             : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50' }}"
                             >
@@ -149,8 +177,11 @@
                                         name="judge_ids[]"
                                         value="{{ $judge->id }}"
                                         @checked($isSelected)
+                                        @disabled($judgesLocked)
                                         class="mt-1 h-5 w-5 rounded border-slate-300
-                                               text-blue-600 focus:ring-blue-500"
+                                            text-blue-600 focus:ring-blue-500
+                                            disabled:cursor-not-allowed
+                                            disabled:opacity-60"
                                     >
 
                                     @if ($avatarUrl)
@@ -223,21 +254,29 @@
                                 bg-slate-50 px-6 py-5 sm:flex-row
                                 sm:items-center sm:justify-between">
 
-                        <p class="text-sm text-slate-500">
-                            กรรมการที่เลือกจะได้รับสิทธิ์เข้าห้องตัดสินทันที
-                        </p>
+                        @if ($judgesLocked)
+                            <p class="text-sm font-semibold text-amber-700">
+                                ดูรายชื่อได้อย่างเดียว
+                                เนื่องจากเริ่มการตัดสินแล้ว
+                            </p>
+                        @else
+                            <p class="text-sm text-slate-500">
+                                กรรมการที่เลือกจะได้รับสิทธิ์เข้าห้องตัดสินทันที
+                            </p>
 
-                        <button
-                            type="submit"
-                            class="inline-flex items-center justify-center
-                                   rounded-xl bg-blue-600 px-6 py-3
-                                   text-sm font-semibold text-white
-                                   shadow-sm transition hover:bg-blue-700
-                                   focus:outline-none focus:ring-4
-                                   focus:ring-blue-200"
-                        >
-                            บันทึกรายชื่อกรรมการ
-                        </button>
+                            <button
+                                type="submit"
+                                class="inline-flex items-center justify-center
+                                    rounded-xl bg-blue-600 px-6 py-3
+                                    text-sm font-semibold text-white
+                                    shadow-sm transition hover:bg-blue-700
+                                    focus:outline-none focus:ring-4
+                                    focus:ring-blue-200"
+                            >
+                                บันทึกรายชื่อกรรมการ
+                            </button>
+
+                        @endif
                     </div>
                 @endif
             </section>

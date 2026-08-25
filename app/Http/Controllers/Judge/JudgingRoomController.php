@@ -7,6 +7,7 @@ use App\Models\JudgeAssignment;
 use App\Models\JudgingSession;
 use App\Models\Rubric;
 use App\Models\Score;
+use App\Models\Submission;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -71,6 +72,10 @@ class JudgingRoomController extends Controller
                     'submission_id',
                     $session->current_submission_id
                 )
+                ->whereIn(
+                    'rubric_id',
+                    $session->competition->rubrics->modelKeys()
+                )
                 ->get()
                 ->keyBy('rubric_id');
         }
@@ -112,7 +117,8 @@ class JudgingRoomController extends Controller
         ]);
     }
 
-    public function saveDraft(
+    
+    public function submit(
         Request $request,
         JudgingSession $session
     ): RedirectResponse {
@@ -121,10 +127,57 @@ class JudgingRoomController extends Controller
         $this->ensureSessionCanBeScored($session);
 
         $rubrics = $this->getActiveRubrics($session);
+
+        $validated = $request->validate([
+            'submission_id' => ['required', 'integer'],
+            'scores' => ['required', 'array'],
+            'scores.*.score' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
+            'scores.*.comment' => [
+                'nullable',
+                'string',
+                'max:2000',
+            ],
+        ]);
+
+        $submissionId = (int) $validated['submission_id'];
+
+        abort_unless(
+            $submissionId === (int) $session->current_submission_id,
+            422,
+            'ผู้จัดเปลี่ยนผลงานที่กำลังตัดสินแล้ว กรุณารีเฟรชหน้า'
+        );
+        
+        abort_unless(
+            Submission::query()
+                ->whereKey($submissionId)
+                ->where(
+                    'competition_id',
+                    $session->competition_id
+                )
+                ->exists(),
+            422,
+            'ผลงานไม่อยู่ในการแข่งขันนี้'
+        );
+
+        $this->validateSubmittedRubrics(
+            $validated['scores'],
+            $rubrics
+        );
+
         $alreadySubmitted = Score::query()
-            ->where('judge_assignment_id', $assignment->id)
-            ->where('submission_id', $session->current_submission_id)
-            ->whereIn('rubric_id', $rubrics->modelKeys())
+            ->where(
+                'judge_assignment_id',
+                $assignment->id
+            )
+            ->where('submission_id', $submissionId)
+            ->whereIn(
+                'rubric_id',
+                $rubrics->modelKeys()
+            )
             ->whereNotNull('submitted_at')
             ->exists();
 
@@ -133,161 +186,114 @@ class JudgingRoomController extends Controller
             422,
             'คะแนนของผลงานนี้ถูกยืนยันแล้ว ไม่สามารถแก้ไขได้'
         );
-        $validated = $request->validate([
-            'scores' => ['required', 'array'],
-            'scores.*.score' => ['required', 'numeric', 'min:0'],
-            'scores.*.comment' => [
-                'nullable',
-                'string',
-                'max:2000',
-            ],
-        ]);
-
-        $this->validateSubmittedRubrics(
-            $validated['scores'],
-            $rubrics
-        );
 
         DB::transaction(function () use (
             $validated,
             $rubrics,
             $assignment,
+            $submissionId,
             $session
         ) {
+            $submittedAt = now();
+
             foreach ($rubrics as $rubric) {
                 $input = $validated['scores'][$rubric->id];
 
                 Score::query()->updateOrCreate(
                     [
-                        'submission_id' =>
-                            $session->current_submission_id,
+                        'submission_id' => $submissionId,
                         'rubric_id' => $rubric->id,
-                        'judge_assignment_id' =>
-                            $assignment->id,
+                        'judge_assignment_id' => $assignment->id,
                     ],
                     [
                         'score' => $input['score'],
-                        'comment' =>
-                        $input['comment'] ?? null,
+                        'comment' => $input['comment'] ?? null,
+                        'submitted_at' => $submittedAt,
                     ]
                 );
             }
-        });
-
-        return back()->with(
-            'success',
-            'บันทึกร่างคะแนนเรียบร้อยแล้ว'
-        );
-    }
-
-    public function submit(
-        JudgingSession $session
-    ): RedirectResponse {
-        $assignment = $this->getAcceptedAssignment($session);
-
-        $this->ensureSessionCanBeScored($session);
-
-        $rubrics = $this->getActiveRubrics($session);
-
-        $scores = Score::query()
-            ->where('judge_assignment_id', $assignment->id)
-            ->where(
-                'submission_id',
-                $session->current_submission_id
-            )
-            ->whereIn('rubric_id', $rubrics->modelKeys())
-            ->get();
-
-        if ($scores->count() !== $rubrics->count()) {
-            return back()->with(
-                'error',
-                'กรุณาบันทึกร่างคะแนนให้ครบทุกเกณฑ์ก่อนยืนยัน'
-            );
-        }
-
-        if ($scores->every(
-            fn (Score $score) => $score->submitted_at !== null
-        )) {
-            return back()->with(
-                'success',
-                'คะแนนของผลงานนี้ถูกยืนยันแล้ว'
-            );
-        }
-
-        DB::transaction(function () use (
-            $scores,
-            $session
-        ) {
-            $submittedAt = now();
-
-            foreach ($scores as $score) {
-                $score->update([
-                    'submitted_at' => $submittedAt,
-                ]);
-            }
 
             $this->updateFinalScore(
-                $session->current_submission_id,
+                $submissionId,
                 $session->competition_id
             );
         });
 
         return back()->with(
             'success',
-            'ยืนยันส่งคะแนนเรียบร้อยแล้ว'
+            'ยืนยันส่งคะแนนผลงานนี้เรียบร้อยแล้ว'
         );
     }
-    private function updateFinalScore( int $submissionId, int $competitionId
-        ): void {
-            $rubrics = Rubric::query()
-                ->where('competition_id', $competitionId)
-                ->where('is_active', true)
-                ->get();
+    
+    private function updateFinalScore(
+        int $submissionId,
+        int $competitionId
+    ): void {
+        $rubrics = Rubric::query()
+            ->where('competition_id', $competitionId)
+            ->where('is_active', true)
+            ->get();
 
-            if ($rubrics->isEmpty()) {
-                return;
-            }
-
-            $scores = Score::query()
-                ->where('submission_id', $submissionId)
-                ->whereNotNull('submitted_at')
-                ->with('rubric')
-                ->get();
-
-            if ($scores->isEmpty()) {
-                return;
-            }
-
-            $judgeIds = $scores
-                ->pluck('judge_assignment_id')
-                ->unique();
-
-            $judgeTotals = $judgeIds->map(function ($judgeId) use ($scores) {
-                $judgeScores = $scores->where(
-                    'judge_assignment_id',
-                    $judgeId
-                );
-
-                return $judgeScores->sum(
-                    fn (Score $score) => $score->weighted_score
-                );
-            });
-
-            if ($judgeTotals->isEmpty()) {
-                return;
-            }
-
-            $finalScore = round(
-                $judgeTotals->average(),
-                2
-            );
-
-            \App\Models\Submission::query()
-                ->whereKey($submissionId)
-                ->update([
-                    'final_score' => $finalScore,
-                ]);
+        if ($rubrics->isEmpty()) {
+            return;
         }
+
+        $acceptedAssignmentIds = JudgeAssignment::query()
+            ->where('competition_id', $competitionId)
+            ->where('assignment_status', 'accepted')
+            ->pluck('id');
+
+        if ($acceptedAssignmentIds->isEmpty()) {
+            return;
+        }
+
+        $rubricIds = $rubrics->modelKeys();
+
+        $scores = Score::query()
+            ->where('submission_id', $submissionId)
+            ->whereIn('rubric_id', $rubricIds)
+            ->whereIn(
+                'judge_assignment_id',
+                $acceptedAssignmentIds
+            )
+            ->whereNotNull('submitted_at')
+            ->with('rubric')
+            ->get();
+
+        $expectedScoreCount =
+            $acceptedAssignmentIds->count()
+            * count($rubricIds);
+
+        if ($scores->count() !== $expectedScoreCount) {
+            return;
+        }
+
+        $judgeTotals = $acceptedAssignmentIds->map(
+            function ($judgeAssignmentId) use ($scores) {
+                return $scores
+                    ->where(
+                        'judge_assignment_id',
+                        $judgeAssignmentId
+                    )
+                    ->sum(
+                        fn (Score $score) =>
+                            $score->weighted_score
+                    );
+            }
+        );
+
+        $finalScore = round(
+            $judgeTotals->average(),
+            2
+        );
+
+        Submission::query()
+            ->whereKey($submissionId)
+            ->update([
+                'final_score' => $finalScore,
+            ]);
+    }
+
     private function getAssignment(
         JudgingSession $session
     ): JudgeAssignment {

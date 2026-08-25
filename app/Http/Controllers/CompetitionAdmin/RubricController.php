@@ -1,18 +1,22 @@
 <?php
 
-
 namespace App\Http\Controllers\CompetitionAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Competition;
 use App\Models\Rubric;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+
+
 class RubricController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Competition $competition)
+    public function index(Competition $competition): View
     {
         abort_unless(
             (int) $competition->created_by === (int) auth()->id(),
@@ -21,8 +25,9 @@ class RubricController extends Controller
 
         $rubrics = $competition->rubrics()->orderBy('sort_order')->orderBy('id')->get();
 
-        $totalMaxScore = $rubrics->where('is_active', true)->sum('max_score');
-        return view('competition-admin.rubrics.index', compact('competition', 'rubrics', 'totalMaxScore'));
+        $totalMaxScore = $rubrics->where('is_active', true)->sum('max_score'); 
+        $rubricsLocked = $this->rubricsAreLocked($competition);
+        return view('competition-admin.rubrics.index', compact('competition','rubrics','totalMaxScore','rubricsLocked'));
     }
 
     /**
@@ -36,11 +41,15 @@ class RubricController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Competition $competition)
+    public function store(Request $request, Competition $competition): RedirectResponse
     {
         abort_unless(
             (int) $competition->created_by === (int) auth()->id(),
             403
+        );
+
+        $this->ensureRubricsAreEditable(
+            $competition
         );
 
         $validated = $request->validate([
@@ -87,7 +96,7 @@ class RubricController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Competition $competition, Rubric $rubric)
+    public function update(Request $request, Competition $competition, Rubric $rubric): RedirectResponse
     {
         abort_unless(
             (int) $competition->created_by === (int) auth()->id(),
@@ -98,6 +107,8 @@ class RubricController extends Controller
             (int) $rubric->competition_id === (int) $competition->id,
             404
         );
+
+        $this->ensureRubricsAreEditable($competition);
  
         $validated = $request->validate([
             'criteria_name' => ['required', 'string', 'max:255'],
@@ -127,7 +138,7 @@ class RubricController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Competition $competition, Rubric $rubric)
+    public function destroy(Competition $competition, Rubric $rubric): RedirectResponse
     {
         abort_unless(
             (int) $competition->created_by === (int) auth()->id(),
@@ -140,6 +151,8 @@ class RubricController extends Controller
             404
         );
 
+        $this->ensureRubricsAreEditable($competition);
+
         if($rubric->scores()->exists()) {
             return back()->withErrors([
                 'rubric' => 'ไม่สามารถลบเกณฑ์ที่มีการให้คะแนนแล้ว',
@@ -149,4 +162,46 @@ class RubricController extends Controller
         $rubric->delete();
         return back()->with('success','ลบเกณฑ์การให้คะแนนสำเร็จ');
     }
+    private function rubricsAreLocked( Competition $competition ): bool 
+    {
+        $session = $competition
+            ->judgingSession()
+            ->first();
+
+        if (! $session) {
+            return false;
+        }
+
+        return
+            $session->started_at !== null ||
+            in_array(
+                $session->status,
+                [
+                    'live',
+                    'paused',
+                    'ended',
+                    'closed',
+                ],
+                true
+            );
+    }
+
+    /**
+     * หยุดการแก้ Rubric เมื่อเริ่มตัดสินแล้ว
+     *
+     * @throws ValidationException
+     */
+    private function ensureRubricsAreEditable(
+        Competition $competition
+    ): void {
+        if ($this->rubricsAreLocked($competition)) {
+            throw ValidationException::withMessages([
+                'rubric' =>
+                    'เริ่มการตัดสินแล้ว '
+                    . 'ไม่สามารถเพิ่ม แก้ไข เปิด/ปิด '
+                    . 'หรือลบเกณฑ์การให้คะแนนได้',
+            ]);
+        }
+    }
+
 }

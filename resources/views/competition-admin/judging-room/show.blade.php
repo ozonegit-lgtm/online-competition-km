@@ -112,6 +112,18 @@
 
     <div class="mx-auto w-full max-w-7xl space-y-5 sm:space-y-6">
 
+        @if (session('error'))
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
+                {{ session('success') }}
+            </div>
+        @endif
+
         {{-- =========================================================
              ROOM CONTROL
         ========================================================== --}}
@@ -1247,80 +1259,90 @@
                             $assignment->judge->email
                             ?? '-';
 
-                        $hasSubmitted =
-                            $assignment->submitted_at !== null;
+                        $judgeProgress = $submissions->map(
+                            function ($submission) use ($assignment, $scoreProgress) {
+                                return $scoreProgress->get(
+                                    $assignment->id . ':' . $submission->id
+                                );
+                            }
+                        )->filter();
+
+                        $submittedWorkCount = $judgeProgress
+                            ->where('is_submitted', true)
+                            ->count();
+
+                        $judgeComplete =
+                            $submissions->isNotEmpty() &&
+                            $submittedWorkCount === $submissions->count();
                     @endphp
 
-                    <div class="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                    <div class="px-4 py-5 sm:px-6">
 
-                        <div class="flex min-w-0 items-center gap-3">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-500">
-                                {{ mb_substr($judgeName, 0, 1) }}
+                            <div class="flex min-w-0 items-center gap-3">
+
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-500">
+                                    {{ mb_substr($judgeName, 0, 1) }}
+                                </div>
+
+                                <div class="min-w-0">
+
+                                    <p class="truncate text-sm font-semibold text-slate-700">
+                                        {{ $judgeName }}
+                                    </p>
+
+                                    <p class="mt-0.5 break-all text-xs text-slate-400">
+                                        {{ $judgeEmail }}
+                                    </p>
+
+                                </div>
                             </div>
 
-                            <div class="min-w-0">
-
-                                <p class="truncate text-sm font-semibold text-slate-700">
-                                    {{ $judgeName }}
-                                </p>
-
-                                <p class="mt-0.5 break-all text-xs text-slate-400">
-                                    {{ $judgeEmail }}
-                                </p>
-
-                            </div>
+                            @if ($judgeComplete)
+                                <span class="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200">
+                                    ส่งครบทุกผลงานแล้ว
+                                </span>
+                            @else
+                                <span class="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 ring-1 ring-amber-200">
+                                    ส่งแล้ว {{ $submittedWorkCount }} / {{ $submissions->count() }} ผลงาน
+                                </span>
+                            @endif
 
                         </div>
 
+                        <div class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                            @foreach ($submissions as $submission)
+                                @php
+                                    $progress = $scoreProgress->get(
+                                        $assignment->id . ':' . $submission->id
+                                    );
+                                    $hasSubmitted = $progress['is_submitted'] ?? false;
+                                @endphp
 
-                        <div class="flex items-center justify-between gap-4 sm:justify-end">
+                                <div class="rounded-xl border p-3 {{ $hasSubmitted ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50' }}">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="min-w-0">
+                                            <p class="truncate text-xs font-bold text-slate-700">
+                                                {{ $submission->submission_code }}
+                                            </p>
+                                            <p class="mt-1 line-clamp-2 text-[11px] leading-5 text-slate-500">
+                                                {{ $submission->project_title }}
+                                            </p>
+                                        </div>
 
-                            <div class="text-left sm:text-right">
-
-                                <p class="text-xs font-semibold text-slate-600">
-                                    {{ $assignment->assignment_status }}
-                                </p>
-
-                                <p class="mt-1 text-[11px] text-slate-400">
-                                    {{ $hasSubmitted
-                                        ? 'ส่งคะแนนแล้ว'
-                                        : 'ยังไม่ส่งคะแนน' }}
-                                </p>
-
-                            </div>
-
-                            @if ($hasSubmitted)
-
-                                <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-                                    <svg
-                                        class="h-4 w-4"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.5"
-                                    >
-                                        <path d="m5 12 4 4L19 6"/>
-                                    </svg>
-                                </span>
-
-                            @else
-
-                                <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-500">
-                                    <svg
-                                        class="h-4 w-4"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="1.8"
-                                    >
-                                        <circle cx="12" cy="12" r="9"/>
-                                        <path d="M12 7v5l3 2"/>
-                                    </svg>
-                                </span>
-
-                            @endif
-
+                                        @if ($hasSubmitted)
+                                            <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">
+                                                ส่งแล้ว
+                                            </span>
+                                        @else
+                                            <span class="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-700">
+                                                ขาด {{ $progress['missing_count'] ?? $rubrics->count() }} เกณฑ์
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
 
                     </div>
@@ -1343,11 +1365,11 @@
                         </div>
 
                         <p class="mt-3 text-sm font-semibold text-slate-600">
-                            ยังไม่มีกรรมการในห้องนี้
+                            ยังไม่มีกรรมการที่ตอบรับ
                         </p>
 
                         <p class="mt-1 text-xs text-slate-400">
-                            เพิ่มกรรมการก่อนเริ่มการตัดสิน
+                            ต้องมีกรรมการสถานะ accepted ก่อนเริ่มการตัดสิน
                         </p>
 
                     </div>
