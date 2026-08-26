@@ -124,7 +124,10 @@ Route::prefix('competition-admin')->name('competition-admin.')->middleware(['aut
         Route::put('/competitions/{competition}/judging-room/submission',[JudgingSessionController::class, 'selectSubmission'])->name('competitions.judging-room.submission');
         Route::post('/competitions/{competition}/judging-room/end',[JudgingSessionController::class, 'end'])->name('competitions.judging-room.end');
         Route::post('/competitions/{competition}/judging-room/close',[JudgingSessionController::class, 'close'])->name('competitions.judging-room.close');
+        Route::get('/results',[ResultController::class, 'competitions'])->name('results.index');
         Route::get('/competitions/{competition}/results',[ResultController::class, 'index'])->name('competitions.results.index');
+        Route::post('/competitions/{competition}/results/publish',[ResultController::class, 'publish'])->name('competitions.results.publish');
+        Route::delete('/competitions/{competition}/results/publish',[ResultController::class, 'unpublish'])->name('competitions.results.unpublish');
         Route::get('/km/submissions',[KmSubmissionController::class, 'index'])->name('km.submissions.index');
         Route::post('/submissions/{submission}/km/publish',[KmSubmissionController::class, 'publish'])->name('submissions.km.publish');
         Route::delete('/submissions/{submission}/km/publish',[KmSubmissionController::class, 'unpublish'])->name('submissions.km.unpublish');

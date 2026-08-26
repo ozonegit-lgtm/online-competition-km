@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CompetitionCategory;
+use App\Models\Competition;
 use App\Models\KnowledgeItem;
 use App\Models\Submission;
 use Illuminate\Http\Request;
@@ -157,6 +158,108 @@ class KnowledgeManagementController extends Controller
             ->take(6)
             ->get();
 
+
+            /*
+|--------------------------------------------------------------------------
+| ผลการแข่งขันที่ Admin ประกาศ
+|--------------------------------------------------------------------------
+|
+| แยกออกจาก KnowledgeItem โดยสมบูรณ์
+| ใช้ publish_scores เป็นสถานะว่าต้องแสดงหน้า Public หรือไม่
+|
+*/
+        $publishedResults = Competition::query()
+            ->with([
+                'category:id,category_name',
+
+                'submissions' => function ($query) {
+                    $query
+                        ->where('status', '!=', 'disqualified')
+                        ->whereNotNull('final_score')
+                        ->with([
+                            'files' => fn ($query) => $query
+                                ->orderByDesc('is_primary')
+                                ->orderBy('id'),
+                        ])
+                        ->orderByDesc('final_score')
+                        ->orderBy('id');
+                },
+            ])
+            ->where('publish_scores', true)
+            ->whereNotNull('result_announcement')
+            ->orderByDesc('result_announcement')
+            ->get()
+            ->map(function ($competition) {
+                $lastScore = null;
+                $lastRank = 0;
+
+                /*
+                * จัดอันดับร่วมแบบ 1, 1, 3
+                * ใช้คะแนนหน่วยสตางค์เพื่อไม่ให้มีปัญหา Float
+                */
+                $rankedSubmissions = $competition
+                    ->submissions
+                    ->values()
+                    ->map(function (
+                        $submission,
+                        $index
+                    ) use (
+                        &$lastScore,
+                        &$lastRank
+                    ) {
+                        $currentScore = (int) round(
+                            (float) $submission->final_score * 100
+                        );
+
+                        if (
+                            $lastScore === null ||
+                            $currentScore !== $lastScore
+                        ) {
+                            $lastRank = $index + 1;
+                            $lastScore = $currentScore;
+                        }
+
+                        $submission->setAttribute(
+                            'rank',
+                            $lastRank
+                        );
+
+                        return $submission;
+                    });
+
+                $rankCounts = $rankedSubmissions->countBy(
+                    fn ($submission) =>
+                        (int) $submission->rank
+                );
+
+                $topSubmissions = $rankedSubmissions
+                    ->filter(
+                        fn ($submission) =>
+                            (int) $submission->rank <= 3
+                    )
+                    ->each(function ($submission) use ($rankCounts) {
+                        $submission->setAttribute(
+                            'is_shared_rank',
+                            $rankCounts->get(
+                                (int) $submission->rank,
+                                0
+                            ) > 1
+                        );
+                    })
+                    ->values();
+
+                $competition->setRelation(
+                    'submissions',
+                    $topSubmissions
+                );
+
+                return $competition;
+            })
+            ->filter(
+                fn ($competition) =>
+                    $competition->submissions->isNotEmpty()
+            )
+            ->values();
         /*
         |--------------------------------------------------------------------------
         | หมวดหมู่
@@ -168,6 +271,7 @@ class KnowledgeManagementController extends Controller
             ->get();
 
         return view('index', [
+            'publishedResults' => $publishedResults,
             'knowledgeItems' => $knowledgeItems,
             'featuredItems' => $featuredItems,
             'categories' => $categories,

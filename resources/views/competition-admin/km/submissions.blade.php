@@ -233,8 +233,7 @@
                     stroke-width="2.2"
                     aria-hidden="true"
                 >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" />
-                </svg>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" />                </svg>
 
                 เฉพาะการแข่งขันที่ตัดสินเสร็จแล้ว
             </div>
@@ -264,7 +263,7 @@
                 @endphp
 
                 <article
-                    data-km-card
+                    id="km-submission-{{ $submission->id }}"
                     class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
                 >
                     <div class="flex h-full flex-col sm:flex-row">
@@ -420,25 +419,22 @@
                                             : 'ตรวจสอบข้อมูลก่อนเผยแพร่สู่ Knowledge Management' }}
                                     </p>
 
-                                    <form
-                                        data-km-toggle-form
-                                        data-mode="{{ $isPublished ? 'unpublish' : 'publish' }}"
-                                        data-publish-url="{{ route('competition-admin.submissions.km.publish', $submission) }}"
-                                        data-unpublish-url="{{ route('competition-admin.submissions.km.unpublish', $submission) }}"
-                                        action="{{ $isPublished
+                                    <x-ajax-form
+                                        :action="$isPublished
                                             ? route('competition-admin.submissions.km.unpublish', $submission)
-                                            : route('competition-admin.submissions.km.publish', $submission) }}"
-                                        method="POST"
+                                            : route('competition-admin.submissions.km.publish', $submission)"
+                                        :method="$isPublished ? 'DELETE' : 'POST'"
+                                        :confirm="$isPublished
+                                            ? 'ยืนยันถอนผลงานนี้ออกจาก KM หรือไม่? ผลงานต้นฉบับจะไม่ถูกลบ'
+                                            : 'ยืนยันเผยแพร่ผลงานนี้เข้าสู่ KM หรือไม่?'"
+                                        :success="$isPublished
+                                            ? 'ถอนผลงานออกจาก KM เรียบร้อยแล้ว'
+                                            : 'เผยแพร่ผลงานสู่ KM เรียบร้อยแล้ว'"
+                                        :target="'#km-submission-' . $submission->id"
+                                        loading="กำลังบันทึก..."
                                         class="shrink-0"
                                     >
-                                        @csrf
-
-                                        @if ($isPublished)
-                                            @method('DELETE')
-                                        @endif
-
                                         <button
-                                            data-km-toggle-button
                                             type="submit"
                                             class="{{ $isPublished
                                                 ? 'inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-4 focus:ring-red-100'
@@ -456,7 +452,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                                                 </svg>
 
-                                                <span data-km-button-text>
+                                                <span data-ajax-submit-label>
                                                     ถอนออกจาก KM
                                                 </span>
                                             @else
@@ -472,12 +468,12 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
                                                 </svg>
 
-                                                <span data-km-button-text>
+                                                <span data-ajax-submit-label>
                                                     เผยแพร่สู่ KM
                                                 </span>
                                             @endif
                                         </button>
-                                    </form>
+                                    </x-ajax-form>
                                 </div>
                             </div>
                         </div>
@@ -532,260 +528,5 @@
         @endif
 
     </div>
-        {{-- AJAX Feedback --}}
-        <div
-            id="km-action-toast"
-            class="pointer-events-none fixed bottom-6 right-6 z-[100] hidden max-w-sm rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-xl"
-            role="status"
-            aria-live="polite"
-        >
-            <div class="flex items-center gap-3">
-                <div
-                    id="km-action-toast-icon"
-                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"
-                >
-                    <svg
-                        class="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.2"
-                        aria-hidden="true"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" />
-                    </svg>
-                </div>
-
-                <p
-                    id="km-action-toast-text"
-                    class="text-sm font-semibold text-slate-800"
-                ></p>
-            </div>
-        </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const toast = document.getElementById('km-action-toast');
-                const toastText = document.getElementById('km-action-toast-text');
-                const toastIcon = document.getElementById('km-action-toast-icon');
-
-                let toastTimer = null;
-
-                const publishButtonClass =
-                    'inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-100';
-
-                const unpublishButtonClass =
-                    'inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-4 focus:ring-red-100';
-
-                const publishIcon = `
-                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 16V4m0 0L8 8m4-4 4 4" />
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
-                    </svg>
-                    <span data-km-button-text>เผยแพร่สู่ KM</span>
-                `;
-
-                const unpublishIcon = `
-                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                    <span data-km-button-text>ถอนออกจาก KM</span>
-                `;
-
-                function showToast(message, type = 'success') {
-                    if (!toast || !toastText || !toastIcon) {
-                        return;
-                    }
-
-                    clearTimeout(toastTimer);
-
-                    toastText.textContent = message;
-                    toast.classList.remove('hidden');
-
-                    if (type === 'error') {
-                        toastIcon.className =
-                            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-700';
-
-                        toastIcon.innerHTML = `
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M6 18 18 6M6 6l12 12" />
-                            </svg>
-                        `;
-                    } else {
-                        toastIcon.className =
-                            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700';
-
-                        toastIcon.innerHTML = `
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="m5 12 4 4L19 6" />
-                            </svg>
-                        `;
-                    }
-
-                    toastTimer = setTimeout(() => {
-                        toast.classList.add('hidden');
-                    }, 2600);
-                }
-
-                function setCardState(card, form, isPublished) {
-                    const overlay = card.querySelector('[data-km-overlay]');
-                    const overlayDot = card.querySelector('[data-km-overlay-dot]');
-                    const overlayText = card.querySelector('[data-km-overlay-text]');
-                    const statePill = card.querySelector('[data-km-state-pill]');
-                    const stateDot = card.querySelector('[data-km-state-dot]');
-                    const stateText = card.querySelector('[data-km-state-text]');
-                    const publishedTime = card.querySelector('[data-km-published-time]');
-                    const help = card.querySelector('[data-km-help]');
-                    const button = form.querySelector('[data-km-toggle-button]');
-
-                    let methodInput = form.querySelector('input[name="_method"]');
-
-                    if (isPublished) {
-                        overlay.className =
-                            'inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm';
-                        overlayDot.className =
-                            'h-1.5 w-1.5 rounded-full bg-white';
-                        overlayText.textContent = 'เผยแพร่ใน KM';
-
-                        statePill.className =
-                            'inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100';
-                        stateDot.className =
-                            'h-1.5 w-1.5 rounded-full bg-emerald-500';
-                        stateText.textContent = 'เผยแพร่แล้ว';
-
-                        publishedTime.textContent = 'เผยแพร่เมื่อสักครู่';
-                        publishedTime.classList.remove('hidden');
-
-                        help.textContent =
-                            'ผลงานนี้กำลังแสดงอยู่ใน Knowledge Management';
-
-                        form.dataset.mode = 'unpublish';
-                        form.action = form.dataset.unpublishUrl;
-
-                        if (!methodInput) {
-                            methodInput = document.createElement('input');
-                            methodInput.type = 'hidden';
-                            methodInput.name = '_method';
-                            form.appendChild(methodInput);
-                        }
-
-                        methodInput.value = 'DELETE';
-
-                        button.className = unpublishButtonClass;
-                        button.innerHTML = unpublishIcon;
-                    } else {
-                        overlay.className =
-                            'inline-flex items-center gap-1.5 rounded-full bg-slate-900/85 px-2.5 py-1 text-xs font-semibold text-white shadow-sm backdrop-blur-sm';
-                        overlayDot.className =
-                            'h-1.5 w-1.5 rounded-full bg-slate-300';
-                        overlayText.textContent = 'ยังไม่เผยแพร่';
-
-                        statePill.className =
-                            'inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-600';
-                        stateDot.className =
-                            'h-1.5 w-1.5 rounded-full bg-slate-400';
-                        stateText.textContent = 'ฉบับร่าง';
-
-                        publishedTime.textContent = '';
-                        publishedTime.classList.add('hidden');
-
-                        help.textContent =
-                            'ตรวจสอบข้อมูลก่อนเผยแพร่สู่ Knowledge Management';
-
-                        form.dataset.mode = 'publish';
-                        form.action = form.dataset.publishUrl;
-
-                        if (methodInput) {
-                            methodInput.remove();
-                        }
-
-                        button.className = publishButtonClass;
-                        button.innerHTML = publishIcon;
-                    }
-                }
-
-                document.querySelectorAll('[data-km-toggle-form]').forEach((form) => {
-                    form.addEventListener('submit', async (event) => {
-                        event.preventDefault();
-
-                        const mode = form.dataset.mode;
-                        const card = form.closest('[data-km-card]');
-                        const button = form.querySelector('[data-km-toggle-button]');
-
-                        if (!card || !button) {
-                            return;
-                        }
-
-                        if (
-                            mode === 'unpublish'
-                            && !window.confirm('ยืนยันการถอนผลงานนี้ออกจาก KM หรือไม่?')
-                        ) {
-                            return;
-                        }
-
-                        const previousHtml = button.innerHTML;
-                        button.disabled = true;
-                        button.classList.add('cursor-wait', 'opacity-70');
-                        button.innerHTML = `
-                            <svg class="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="9" class="opacity-25"></circle>
-                                <path stroke-linecap="round" d="M21 12a9 9 0 0 0-9-9"></path>
-                            </svg>
-                            <span>กำลังบันทึก...</span>
-                        `;
-
-                        try {
-                            const response = await fetch(form.action, {
-                                method: 'POST',
-                                body: new FormData(form),
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'text/html,application/xhtml+xml'
-                                },
-                                credentials: 'same-origin'
-                            });
-
-                            if (!response.ok) {
-                                throw new Error('ไม่สามารถบันทึกข้อมูลได้');
-                            }
-
-                            const willPublish = mode === 'publish';
-
-                            setCardState(
-                                card,
-                                form,
-                                willPublish
-                            );
-
-                            showToast(
-                                willPublish
-                                    ? 'เผยแพร่ผลงานสู่ KM เรียบร้อยแล้ว'
-                                    : 'ถอนผลงานออกจาก KM เรียบร้อยแล้ว'
-                            );
-                        } catch (error) {
-                            button.innerHTML = previousHtml;
-
-                            showToast(
-                                error?.message || 'เกิดข้อผิดพลาด กรุณาลองใหม่',
-                                'error'
-                            );
-                        } finally {
-                            button.disabled = false;
-                            button.classList.remove('cursor-wait', 'opacity-70');
-                        }
-                    });
-                });
-            });
-        </script>
-
 @endsection
+

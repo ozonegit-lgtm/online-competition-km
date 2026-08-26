@@ -341,7 +341,39 @@
 
                         <span>ควบคุมห้องตัดสิน</span>
                     </a>
+                    <a
+                        href="{{ route('competition-admin.results.index') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3
+                            text-sm font-medium transition
+                            {{ request()->routeIs(
+                                'competition-admin.results.*',
+                                'competition-admin.competitions.results.*'
+                            )
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
+                        <svg
+                            class="h-5 w-5 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"
+                            />
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4"
+                            />
+                        </svg>
 
+                        <span>ผลการแข่งขัน</span>
+                    </a>
                     <a
                         href="{{ route('competition-admin.km.submissions.index') }}"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3
