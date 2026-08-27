@@ -190,10 +190,50 @@ class JudgingRoomController extends Controller
         DB::transaction(function () use (
             $validated,
             $rubrics,
-            $assignment,
             $submissionId,
             $session
         ) {
+            $lockedSession = JudgingSession::query()
+                ->whereKey($session->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $this->ensureSessionCanBeScored($lockedSession);
+
+            abort_unless(
+                $submissionId === (int) $lockedSession->current_submission_id,
+                422,
+                'ผู้จัดเปลี่ยนผลงานที่กำลังตัดสินแล้ว กรุณารีเฟรชหน้า'
+            );
+
+            $lockedAssignment = JudgeAssignment::query()
+                ->where('competition_id', $lockedSession->competition_id)
+                ->where('judge_id', Auth::id())
+                ->where('assignment_status', 'accepted')
+                ->lockForUpdate()
+                ->first();
+
+            abort_unless(
+                $lockedAssignment,
+                403,
+                'กรุณารับงานตัดสินก่อนเข้าห้อง'
+            );
+
+            $existingScores = Score::query()
+                ->where('submission_id', $submissionId)
+                ->whereIn('rubric_id', $rubrics->modelKeys())
+                ->where('judge_assignment_id', $lockedAssignment->id)
+                ->lockForUpdate()
+                ->get();
+
+            abort_if(
+                $existingScores->contains(
+                    fn (Score $score) => $score->submitted_at !== null
+                ),
+                422,
+                'คะแนนของผลงานนี้ถูกยืนยันแล้ว ไม่สามารถแก้ไขได้'
+            );
+
             $submittedAt = now();
 
             foreach ($rubrics as $rubric) {
@@ -203,7 +243,7 @@ class JudgingRoomController extends Controller
                     [
                         'submission_id' => $submissionId,
                         'rubric_id' => $rubric->id,
-                        'judge_assignment_id' => $assignment->id,
+                        'judge_assignment_id' => $lockedAssignment->id,
                     ],
                     [
                         'score' => $input['score'],
@@ -215,7 +255,7 @@ class JudgingRoomController extends Controller
 
             $this->updateFinalScore(
                 $submissionId,
-                $session->competition_id
+                $lockedSession->competition_id
             );
         });
 
