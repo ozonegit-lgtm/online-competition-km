@@ -19,6 +19,8 @@ class CompetitionTemplateFormField extends Model
         'placeholder',
         'help_text',
         'options',
+        'accepted_file_types',
+        'max_file_size',
         'is_required',
         'sort_order',
         'is_active',
@@ -26,6 +28,7 @@ class CompetitionTemplateFormField extends Model
 
     protected $casts = [
         'options' => 'array',
+        'max_file_size' => 'integer',
         'is_required' => 'boolean',
         'is_active' => 'boolean',
         'sort_order' => 'integer',

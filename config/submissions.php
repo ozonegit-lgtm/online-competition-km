@@ -13,6 +13,11 @@ return [
         'lock_seconds' => (int) env('SUBMISSION_FORM_LOCK_SECONDS', 30),
     ],
     'uploads' => [
+        'allowed_extensions' => [
+            'jpg', 'jpeg', 'png', 'webp', 'pdf',
+            'doc', 'docx', 'ppt', 'pptx', 'zip',
+        ],
+        'max_file_megabytes' => (int) env('SUBMISSION_MAX_FILE_MEGABYTES', 10),
         'max_files' => (int) env('SUBMISSION_MAX_FILES', 5),
         'max_total_kilobytes' => (int) env('SUBMISSION_MAX_TOTAL_KILOBYTES', 20480),
     ],

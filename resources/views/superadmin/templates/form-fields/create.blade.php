@@ -187,34 +187,58 @@
         </div>
 
         {{-- ตั้งค่าไฟล์ --}}
-        <div class="file-section mt-4 hidden">
-            <div class="grid gap-4 md:grid-cols-2">
+        <div class="file-section mt-4 hidden rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div class="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                    <label class="mb-1 block text-sm font-medium text-slate-700">
-                        ประเภทไฟล์ที่อนุญาต
-                    </label>
-
-                    <input
-                        type="text"
-                        class="accepted-file-types w-full rounded-xl
-                               border border-slate-300 px-4 py-3"
-                        placeholder=".pdf,.doc,.docx,.jpg,.png"
-                    >
+                    <p class="text-sm font-medium text-slate-700">ประเภทไฟล์ที่อนุญาต</p>
+                    <p class="mt-0.5 text-xs text-slate-500">เลือกได้หลายประเภท</p>
                 </div>
+                <span class="selected-file-count text-xs font-medium text-blue-700" aria-live="polite"></span>
+            </div>
 
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-slate-700">
-                        ขนาดสูงสุด (MB)
+            <div class="file-extension-grid mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+                @foreach (config('submissions.uploads.allowed_extensions') as $extension)
+                    <label class="min-w-0 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            value="{{ $extension }}"
+                            class="file-extension-checkbox peer sr-only"
+                        >
+                        <span class="flex min-w-0 items-center justify-center gap-1.5 rounded-xl border
+                                     border-slate-300 bg-white px-2 py-2 text-xs font-semibold text-slate-700
+                                     transition hover:border-blue-300 hover:bg-blue-50
+                                     peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700
+                                     peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500 peer-focus-visible:ring-offset-2">
+                            <span class="file-extension-check text-blue-600 opacity-0" aria-hidden="true">✓</span>
+                            <span class="truncate">{{ strtoupper($extension) }}</span>
+                        </span>
                     </label>
+                @endforeach
+            </div>
 
+            <button
+                type="button"
+                class="select-default-extensions mt-3 rounded-lg border border-slate-300 bg-white px-3 py-2
+                       text-xs font-medium text-slate-700 transition hover:border-blue-300 hover:text-blue-700
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+                ใช้ค่าเริ่มต้นทั้งหมด
+            </button>
+
+            <div class="mt-4 border-t border-slate-200 pt-4">
+                <label class="block text-sm font-medium text-slate-700">ขนาดสูงสุดต่อไฟล์</label>
+                <div class="mt-2 flex items-center gap-2">
                     <input
                         type="number"
                         min="1"
-                        class="max-file-size w-full rounded-xl
-                               border border-slate-300 px-4 py-3"
+                        max="{{ config('submissions.uploads.max_file_megabytes') }}"
+                        class="max-file-size w-24 rounded-xl border border-slate-300 bg-white px-3 py-2
+                               outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                         placeholder="10"
                     >
+                    <span class="text-sm font-medium text-slate-600">MB</span>
                 </div>
+                <p class="mt-1 text-xs text-slate-500">อนุญาตตั้งแต่ 1–10 MB ต่อไฟล์</p>
             </div>
         </div>
 
@@ -242,6 +266,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const fieldsContainer = document.getElementById('fieldsContainer');
     const fieldTemplate = document.getElementById('fieldTemplate');
     const addFieldButton = document.getElementById('addFieldButton');
+    const allowedExtensions = @json(config('submissions.uploads.allowed_extensions'));
+    const defaultMaxFileSize = @json(config('submissions.uploads.max_file_megabytes'));
 
     let fields = [];
 
@@ -260,8 +286,8 @@ document.addEventListener('DOMContentLoaded', function () {
             options: [],
             required: false,
             active: true,
-            accepted_file_types: '',
-            max_file_size: null
+            accepted_file_types: @json(implode(',', config('submissions.uploads.allowed_extensions'))),
+            max_file_size: @json(config('submissions.uploads.max_file_megabytes'))
         };
     }
 
@@ -284,12 +310,11 @@ document.addEventListener('DOMContentLoaded', function () {
             card.querySelector('.field-type').value = field.type;
             card.querySelector('.field-help').value = field.help;
             card.querySelector('.field-required').checked = field.required;
-            card.querySelector('.accepted-file-types').value =
-                field.accepted_file_types ?? '';
             card.querySelector('.max-file-size').value =
                 field.max_file_size ?? '';
 
             updateConditionalSections(card, field);
+            updateFilePolicyUI(card, field);
             bindCardEvents(card, field.id);
 
             fieldsContainer.appendChild(fragment);
@@ -312,6 +337,25 @@ document.addEventListener('DOMContentLoaded', function () {
         );
 
         renderOptions(card, field);
+    }
+
+    function updateFilePolicyUI(card, field) {
+        const savedExtensions = (field.accepted_file_types ?? '')
+            .split(',')
+            .filter(extension => allowedExtensions.includes(extension));
+        const selectedExtensions = savedExtensions.length > 0
+            ? savedExtensions
+            : allowedExtensions;
+
+        card.querySelectorAll('.file-extension-checkbox').forEach(checkbox => {
+            checkbox.checked = selectedExtensions.includes(checkbox.value);
+            checkbox.closest('label')
+                .querySelector('.file-extension-check')
+                .classList.toggle('opacity-0', !checkbox.checked);
+        });
+
+        card.querySelector('.selected-file-count').textContent =
+            `เลือกแล้ว ${selectedExtensions.length} รายการ`;
     }
 
     function renderOptions(card, field) {
@@ -365,6 +409,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const field = getField();
             field.type = event.target.value;
 
+            if (field.type === 'file') {
+                field.accepted_file_types ||= allowedExtensions.join(',');
+                field.max_file_size ??= defaultMaxFileSize;
+            }
+
             if (!['select', 'radio', 'checkbox'].includes(field.type)) {
                 field.options = [];
             } else if (field.options.length === 0) {
@@ -374,8 +423,29 @@ document.addEventListener('DOMContentLoaded', function () {
             renderFields();
         });
 
-        card.querySelector('.accepted-file-types').addEventListener('input', event => {
-            getField().accepted_file_types = event.target.value;
+        card.querySelector('.file-extension-grid').addEventListener('change', event => {
+            if (!event.target.classList.contains('file-extension-checkbox')) {
+                return;
+            }
+
+            const checkedExtensions = Array.from(
+                card.querySelectorAll('.file-extension-checkbox:checked')
+            ).map(checkbox => checkbox.value);
+
+            if (checkedExtensions.length === 0) {
+                event.target.checked = true;
+                return;
+            }
+
+            getField().accepted_file_types = allowedExtensions
+                .filter(extension => checkedExtensions.includes(extension))
+                .join(',');
+            updateFilePolicyUI(card, getField());
+        });
+
+        card.querySelector('.select-default-extensions').addEventListener('click', () => {
+            getField().accepted_file_types = allowedExtensions.join(',');
+            updateFilePolicyUI(card, getField());
         });
 
         card.querySelector('.max-file-size').addEventListener('input', event => {
