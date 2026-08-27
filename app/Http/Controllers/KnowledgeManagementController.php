@@ -175,7 +175,6 @@ class KnowledgeManagementController extends Controller
                 'submissions' => function ($query) {
                     $query
                         ->where('status', '!=', 'disqualified')
-                        ->whereNotNull('final_score')
                         ->with([
                             'files' => fn ($query) => $query
                                 ->orderByDesc('is_primary')
@@ -189,6 +188,10 @@ class KnowledgeManagementController extends Controller
             ->whereNotNull('result_announcement')
             ->orderByDesc('result_announcement')
             ->get()
+            ->filter(
+                fn ($competition) =>
+                    $competition->resultReadiness()['ready']
+            )
             ->map(function ($competition) {
                 $lastScore = null;
                 $lastRank = 0;

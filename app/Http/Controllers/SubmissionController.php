@@ -119,7 +119,7 @@ class SubmissionController extends Controller
                 'contact_name' => $validated['contact_name'],
                 'contact_email' => $validated['contact_email'],
                 'contact_phone' => $validated['contact_phone'],
-                'final_score' => 0,
+                'final_score' => null,
                 'status' => 'submitted',
                 'submitted_at' => now(),
             ]);

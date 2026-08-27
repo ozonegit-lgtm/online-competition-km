@@ -70,76 +70,36 @@ class ResultController extends Controller
         $competitions
             ->getCollection()
             ->transform(function (Competition $competition) {
-                $session = $competition->judgingSession;
-
-                $sessionFinished =
-                    $session !== null &&
-                    in_array(
-                        $session->status,
-                        [
-                            'ended',
-                            'closed',
-                        ],
-                        true
-                    );
-
-                $activeRubricCount =
-                    $competition->rubrics->count();
-
-                $acceptedJudgeCount =
-                    $competition->judgeAssignments->count();
-
-                $totalSubmissions =
-                    $competition->submissions->count();
-
-                /*
-                 * final_score จะมีค่าเมื่อกรรมการ accepted
-                 * ส่งคะแนน active Rubric ครบแล้ว
-                 */
-                $completedSubmissionCount =
-                    $competition->submissions
-                        ->filter(
-                            fn ($submission) =>
-                                $submission->final_score !== null
-                        )
-                        ->count();
-
-                $isReadyForResults =
-                    $sessionFinished &&
-                    $activeRubricCount > 0 &&
-                    $acceptedJudgeCount > 0 &&
-                    $totalSubmissions > 0 &&
-                    $completedSubmissionCount ===
-                        $totalSubmissions;
+                $readiness = $competition->resultReadiness();
 
                 $competition->setAttribute(
                     'results_session_finished',
-                    $sessionFinished
+                    $readiness['session_finished']
                 );
 
                 $competition->setAttribute(
                     'results_active_rubric_count',
-                    $activeRubricCount
+                    $readiness['active_rubric_count']
                 );
 
                 $competition->setAttribute(
                     'results_accepted_judge_count',
-                    $acceptedJudgeCount
+                    $readiness['accepted_judge_count']
                 );
 
                 $competition->setAttribute(
                     'results_total_submissions',
-                    $totalSubmissions
+                    $readiness['total_submissions']
                 );
 
                 $competition->setAttribute(
                     'results_completed_submissions',
-                    $completedSubmissionCount
+                    $readiness['completed_submission_count']
                 );
 
                 $competition->setAttribute(
                     'results_ready',
-                    $isReadyForResults
+                    $readiness['ready']
                 );
 
                 return $competition;
@@ -444,54 +404,6 @@ public function unpublish(
     private function resultsArePublishable(
         Competition $competition
     ): bool {
-        $session = $competition->judgingSession()->first();
-
-        if (
-            ! $session ||
-            ! in_array($session->status, ['ended', 'closed'], true)
-        ) {
-            return false;
-        }
-
-        $rubricIds = $competition->rubrics()
-            ->where('is_active', true)
-            ->pluck('id');
-
-        $assignmentIds = $competition->judgeAssignments()
-            ->where('assignment_status', 'accepted')
-            ->pluck('id');
-
-        if ($rubricIds->isEmpty() || $assignmentIds->isEmpty()) {
-            return false;
-        }
-
-        $expectedScoreCount =
-            $rubricIds->count() * $assignmentIds->count();
-
-        $submissions = $competition->submissions()
-            ->where('status', '!=', 'disqualified')
-            ->withCount([
-                'scores as confirmed_scores_count' =>
-                    function ($query) use (
-                        $rubricIds,
-                        $assignmentIds
-                    ) {
-                        $query
-                            ->whereNotNull('submitted_at')
-                            ->whereIn('rubric_id', $rubricIds)
-                            ->whereIn(
-                                'judge_assignment_id',
-                                $assignmentIds
-                            );
-                    },
-            ])
-            ->get();
-
-        return $submissions->isNotEmpty()
-            && $submissions->every(
-                fn ($submission) =>
-                    (int) $submission->confirmed_scores_count
-                    >= $expectedScoreCount
-            );
+        return $competition->resultReadiness()['ready'];
     }
 }

@@ -207,8 +207,6 @@ class CompetitionController extends Controller
                 'judging_start' => ['required','date','after_or_equal:registration_end',], 
                 'judging_end' => ['required','date','after_or_equal:judging_start',],
                 'result_announcement' => ['required','date','after_or_equal:judging_end',],
-                'publish_scores' => ['nullable', 'boolean'],
-                'publish_km' => ['nullable', 'boolean'],
                 'status' => ['required', 'in:open,closed'],
             ], [
                 'category_id.required' => 'กรุณาเลือกหมวดหมู่การแข่งขัน',
@@ -239,8 +237,6 @@ class CompetitionController extends Controller
             ]);
 
                 // แปลงค่าจาก Checkbox เป็น true/false
-                $validated['publish_scores'] = $request->boolean('publish_scores');
-                $validated['publish_km'] = $request->boolean('publish_km');
                 // การแข่งขัน Public ไม่ต้องมีรหัสเข้าร่วม
                 if ($validated['visibility'] === 'public') {
                     $validated['access_code'] = null;

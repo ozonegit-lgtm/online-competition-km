@@ -306,29 +306,6 @@
                         @enderror
                     </div>
 
-                    <div class="space-y-3">
-                        <input type="hidden" name="publish_scores" value="0">
-                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-300 hover:bg-blue-50/40">
-                            <input type="checkbox" name="publish_scores" value="1"
-                                @checked((bool) old('publish_scores', $competition->publish_scores))
-                                class="mt-0.5 h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            <span>
-                                <span class="block text-sm font-semibold text-slate-800">แสดงคะแนนต่อสาธารณะ</span>
-                                <span class="mt-1 block text-xs leading-5 text-slate-500">อนุญาตให้ผู้เข้าชมดูผลคะแนนของการแข่งขัน</span>
-                            </span>
-                        </label>
-
-                        <input type="hidden" name="publish_km" value="0">
-                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-blue-300 hover:bg-blue-50/40">
-                            <input type="checkbox" name="publish_km" value="1"
-                                @checked((bool) old('publish_km', $competition->publish_km))
-                                class="mt-0.5 h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                            <span>
-                                <span class="block text-sm font-semibold text-slate-800">นำผลงานเข้า KM</span>
-                                <span class="mt-1 block text-xs leading-5 text-slate-500">อนุญาตให้นำผลงานที่เลือกไปเผยแพร่ในคลังความรู้</span>
-                            </span>
-                        </label>
-                    </div>
                 </div>
             </section>
 

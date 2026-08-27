@@ -147,6 +147,60 @@ class Competition extends Model
         return $this->hasOne(JudgingSession::class);
     }
 
+    public function resultReadiness(): array
+    {
+        $sessionFinished = $this->judgingSession()
+            ->whereIn('status', ['ended', 'closed'])
+            ->exists();
+
+        $rubricIds = $this->rubrics()
+            ->where('is_active', true)
+            ->pluck('id');
+
+        $assignmentIds = $this->judgeAssignments()
+            ->where('assignment_status', 'accepted')
+            ->pluck('id');
+
+        $expectedScoreCount = $rubricIds->count()
+            * $assignmentIds->count();
+
+        $submissions = $this->submissions()
+            ->where('status', '!=', 'disqualified')
+            ->withCount([
+                'scores as submitted_scores_count' => function ($query) use (
+                    $rubricIds,
+                    $assignmentIds
+                ) {
+                    $query
+                        ->whereNotNull('submitted_at')
+                        ->whereIn('rubric_id', $rubricIds)
+                        ->whereIn('judge_assignment_id', $assignmentIds);
+                },
+            ])
+            ->get();
+
+        $completedSubmissionCount = $expectedScoreCount > 0
+            ? $submissions->filter(
+                fn ($submission) =>
+                    (int) $submission->submitted_scores_count
+                    >= $expectedScoreCount
+            )->count()
+            : 0;
+
+        return [
+            'session_finished' => $sessionFinished,
+            'active_rubric_count' => $rubricIds->count(),
+            'accepted_judge_count' => $assignmentIds->count(),
+            'total_submissions' => $submissions->count(),
+            'completed_submission_count' => $completedSubmissionCount,
+            'ready' => $sessionFinished
+                && $rubricIds->isNotEmpty()
+                && $assignmentIds->isNotEmpty()
+                && $submissions->isNotEmpty()
+                && $completedSubmissionCount === $submissions->count(),
+        ];
+    }
+
     public function getDisplayStatusAttribute(): string
     {
         $now = now();
