@@ -150,12 +150,32 @@
 
             {{-- แบบฟอร์ม --}}
             <form
+                id="public-submission-form"
                 action="{{ route('competitions.submissions.store', $competition) }}"
                 method="POST"
                 enctype="multipart/form-data"
                 class="space-y-6"
             >
                 @csrf
+                <input type="hidden" name="form_guard_token" value="{{ $formGuardToken }}">
+                <div
+                    aria-hidden="true"
+                    style="position: absolute !important;
+                        left: -10000px !important;
+                        top: auto !important;
+                        width: 1px !important;
+                        height: 1px !important;
+                        overflow: hidden !important;"
+                >
+                    <label for="website">เว็บไซต์</label>
+                    <input
+                        id="website"
+                        name="website"
+                        type="text"
+                        tabindex="-1"
+                        autocomplete="off"
+                    >
+                </div>
 
                 @if ($errors->any())
                     <div class="rounded-2xl border border-red-200 bg-red-50 p-5">
@@ -647,6 +667,7 @@
                         </div>
 
                         <button
+                            id="public-submission-button"
                             type="submit"
                             style="min-height: 48px;"
                             class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 sm:w-auto sm:min-w-64"
@@ -666,7 +687,7 @@
                                 />
                             </svg>
 
-                            <span>ยืนยันและส่งผลงาน</span>
+                            <span data-submit-label>ยืนยันและส่งผลงาน</span>
                         </button>
                     </div>
                 </section>
@@ -741,6 +762,33 @@
     </footer>
 
     <script>
+        const submissionForm = document.getElementById('public-submission-form');
+        const submissionButton = document.getElementById('public-submission-button');
+
+        submissionForm?.addEventListener('submit', (event) => {
+            if (!submissionForm.checkValidity()) {
+                return;
+            }
+
+            const files = Array.from(
+                submissionForm.querySelectorAll('input[type="file"]')
+            ).flatMap((input) => Array.from(input.files ?? []));
+            const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+
+            if (files.length > 5 || totalBytes > 20 * 1024 * 1024) {
+                event.preventDefault();
+                alert(files.length > 5
+                    ? 'แนบไฟล์ได้ไม่เกิน 5 ไฟล์'
+                    : 'ขนาดไฟล์รวมต้องไม่เกิน 20 MB');
+                return;
+            }
+
+            submissionButton.disabled = true;
+            submissionButton.classList.add('cursor-wait', 'opacity-70');
+            submissionButton.querySelector('[data-submit-label]').textContent =
+                'กำลังส่งผลงาน...';
+        });
+
         document.querySelectorAll('.js-file-input').forEach((input) => {
             input.addEventListener('change', function () {
                 const file = this.files[0];

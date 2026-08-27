@@ -43,7 +43,11 @@ Route::get('/', [KnowledgeManagementController::class, 'index'])->name('home');
 | ผู้เข้าร่วมไม่ต้องเข้าสู่ระบบ
 */
 
-Route::resource('competitions.submissions',SubmissionController::class)->only(['create','store',]);
+Route::get('/competitions/{competition}/submissions/create', [SubmissionController::class, 'create'])
+    ->name('competitions.submissions.create');
+Route::post('/competitions/{competition}/submissions', [SubmissionController::class, 'store'])
+    ->middleware('throttle:public-submissions')
+    ->name('competitions.submissions.store');
 Route::get('/submissions/{submission:submission_code}/success',[SubmissionController::class, 'success'])->name('submissions.success');
 /*
 |--------------------------------------------------------------------------

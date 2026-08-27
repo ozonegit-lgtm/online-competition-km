@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Competition;
 use App\Models\CompetitionFormField;
 use App\Models\Submission;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -41,13 +45,79 @@ class SubmissionController extends Controller
         }
 
         $this->attachResolvedOptions($fields);
-        return view('submissions.create',compact('competition', 'fields'));
+        $formGuardToken = Crypt::encryptString(json_encode([
+            'competition_id' => $competition->id,
+            'issued_at' => now()->timestamp,
+            'nonce' => Str::random(40),
+        ], JSON_THROW_ON_ERROR));
+
+        return view('submissions.create', compact(
+            'competition',
+            'fields',
+            'formGuardToken'
+        ));
     }
 
     /**
      * ตรวจสอบและบันทึกผลงาน
      */
     public function store(Request $request, Competition $competition)
+    {
+        $this->ensureCompetitionIsAcceptingSubmissions($competition);
+
+        $fields = $competition->formFields()
+            ->where('is_active', true)
+            ->get();
+        $nonceKey = $this->validateSubmissionProtection(
+            $request,
+            $competition,
+            $fields
+        );
+        $lock = Cache::lock(
+            "public-submission:lock:{$nonceKey}",
+            config('submissions.form_guard.lock_seconds')
+        );
+
+        if (! $lock->get()) {
+            throw ValidationException::withMessages([
+                'form' => 'ไม่สามารถส่งผลงานซ้ำได้ กรุณารอสักครู่',
+            ]);
+        }
+
+        $usedKey = "public-submission:used:{$nonceKey}";
+
+        try {
+            if (Cache::has($usedKey)) {
+                throw ValidationException::withMessages([
+                    'form' => 'แบบฟอร์มนี้ถูกส่งเรียบร้อยแล้ว กรุณาเปิดแบบฟอร์มใหม่',
+                ]);
+            }
+
+            if (! Cache::put(
+                $usedKey,
+                true,
+                now()->addMinutes(config('submissions.form_guard.ttl_minutes'))
+            )) {
+                throw ValidationException::withMessages([
+                    'form' => 'ไม่สามารถยืนยันแบบฟอร์มได้ กรุณาลองใหม่อีกครั้ง',
+                ]);
+            }
+
+            try {
+                return $this->persistSubmission($request, $competition);
+            } catch (Throwable $exception) {
+                Cache::forget($usedKey);
+                throw $exception;
+            }
+        } finally {
+            $lock->release();
+        }
+    }
+
+    private function persistSubmission(
+        Request $request,
+        Competition $competition
+    )
     {
 
         $this->ensureCompetitionIsAcceptingSubmissions($competition);
@@ -229,6 +299,87 @@ class SubmissionController extends Controller
                 $this->resolveFieldOptions($field)
             );
         });
+    }
+
+    private function validateSubmissionProtection(
+        Request $request,
+        Competition $competition,
+        Collection $fields
+    ): string {
+        if (filled($request->input('website'))) {
+            throw ValidationException::withMessages([
+                'form' => 'ไม่สามารถส่งแบบฟอร์มได้ กรุณาตรวจสอบข้อมูลแล้วลองใหม่',
+            ]);
+        }
+
+        try {
+            $payload = json_decode(
+                Crypt::decryptString((string) $request->input('form_guard_token')),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            );
+
+            if (! is_array($payload)) {
+                throw new \JsonException('Invalid form guard payload.');
+            }
+        } catch (DecryptException|\JsonException) {
+            throw ValidationException::withMessages([
+                'form' => 'แบบฟอร์มไม่ถูกต้องหรือหมดอายุ กรุณาเปิดแบบฟอร์มใหม่',
+            ]);
+        }
+
+        $issuedAt = filter_var(
+            $payload['issued_at'] ?? null,
+            FILTER_VALIDATE_INT
+        );
+        $nonce = $payload['nonce'] ?? null;
+        $age = $issuedAt === false ? null : now()->timestamp - $issuedAt;
+
+        if (
+            (int) ($payload['competition_id'] ?? 0) !== (int) $competition->id
+            || ! is_string($nonce)
+            || $nonce === ''
+            || $age === null
+            || $age < config('submissions.form_guard.minimum_seconds')
+            || $age > config('submissions.form_guard.ttl_minutes') * 60
+        ) {
+            throw ValidationException::withMessages([
+                'form' => 'แบบฟอร์มไม่ถูกต้องหรือหมดอายุ กรุณาเปิดแบบฟอร์มใหม่',
+            ]);
+        }
+
+        $files = collect(Arr::dot($request->allFiles()))
+            ->filter(fn ($file) => $file instanceof \Illuminate\Http\UploadedFile);
+        $allowedFileInputs = $fields
+            ->where('field_type', 'file')
+            ->mapWithKeys(fn ($field) => ["fields.{$field->id}" => true]);
+
+        if ($files->keys()->contains(
+            fn ($key) => ! $allowedFileInputs->has($key)
+        )) {
+            throw ValidationException::withMessages([
+                'files' => 'พบไฟล์ในช่องที่ไม่ได้รับอนุญาต',
+            ]);
+        }
+
+        if ($files->count() > config('submissions.uploads.max_files')) {
+            throw ValidationException::withMessages([
+                'files' => 'แนบไฟล์ได้ไม่เกิน '.config('submissions.uploads.max_files').' ไฟล์',
+            ]);
+        }
+
+        $totalKilobytes = (int) ceil(
+            $files->sum(fn ($file) => max(0, (int) $file->getSize())) / 1024
+        );
+
+        if ($totalKilobytes > config('submissions.uploads.max_total_kilobytes')) {
+            throw ValidationException::withMessages([
+                'files' => 'ขนาดไฟล์รวมต้องไม่เกิน 20 MB',
+            ]);
+        }
+
+        return hash('sha256', $nonce);
     }
 
     private function buildValidationRules(
