@@ -3,7 +3,7 @@
 @section('title', 'เข้าสู่ระบบ')
 
 @section('content')
-<link rel="stylesheet" href="/build/assets/app-COHMdTRk.css">
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 <div class="w-full max-w-md">
 
     {{-- Logo --}}
