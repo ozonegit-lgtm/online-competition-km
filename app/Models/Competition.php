@@ -203,63 +203,7 @@ class Competition extends Model
 
     public function getDisplayStatusAttribute(): string
     {
-        $now = now();
-
-        if ($this->status === 'archived') {
-            return 'archived';
-        }
-
-        if (
-            $this->registration_start &&
-            $now->lt($this->registration_start)
-        ) {
-            return 'upcoming';
-        }
-
-        if (
-            $this->registration_start &&
-            $this->registration_end &&
-            $now->betweenIncluded(
-                $this->registration_start,
-                $this->registration_end
-            )
-        ) {
-            return 'open';
-        }
-
-        if (
-            $this->registration_end &&
-            $now->gt($this->registration_end)
-        ) {
-            if (
-                $this->judging_start &&
-                $this->judging_end &&
-                $now->betweenIncluded(
-                    $this->judging_start,
-                    $this->judging_end
-                )
-            ) {
-                return 'judging';
-            }
-
-            if (
-                $this->judging_end &&
-                $now->gt($this->judging_end)
-            ) {
-                if (
-                    $this->result_announcement &&
-                    $now->gte($this->result_announcement)
-                ) {
-                    return 'completed';
-                }
-
-                return 'waiting_result';
-            }
-
-            return 'closed';
-        }
-
-        return $this->status;
+        return $this->resolveStatus();
     }
 
     /**
@@ -267,26 +211,28 @@ class Competition extends Model
      */
     public function isRegistrationOpen(): bool
     {
+        return $this->resolveStatus() === 'open';
+    }
+
+    /**
+     * Resolve the effective workflow status from one authoritative policy.
+     */
+    private function resolveStatus(): string
+    {
         if ($this->status !== 'open') {
-            return false;
+            return (string) $this->status;
         }
 
         $now = now();
 
-        if (
-            $this->registration_start &&
-            $now->lt($this->registration_start)
-        ) {
-            return false;
+        if ($this->registration_start && $now->lt($this->registration_start)) {
+            return 'upcoming';
         }
 
-        if (
-            $this->registration_end &&
-            $now->gt($this->registration_end)
-        ) {
-            return false;
+        if ($this->registration_end && $now->gte($this->registration_end)) {
+            return 'closed';
         }
 
-        return true;
+        return 'open';
     }
 }
