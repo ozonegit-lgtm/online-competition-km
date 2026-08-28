@@ -40,7 +40,7 @@ class UserManagementController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'username' => ['required','string','max:255'],
+            'username' => ['required','string','max:255','unique:users,username'],
             'email' => ['required','email','max:255','unique:users,email'],
             'password' => ['required','string','min:8','confirmed'],
             'role_id' => ['required','integer','exists:roles,id'],
@@ -48,6 +48,7 @@ class UserManagementController extends Controller
         ],
          [
             'username.required' => 'กรุณากรอกชื่อผู้ใช้งาน',
+            'username.unique' => 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว',
             'email.required' => 'กรุณากรอกอีเมล',
             'email.email' => 'รูปแบบอีเมลไม่ถูกต้อง',
             'email.unique' => 'อีเมลนี้มีผู้ใช้งานแล้ว',
