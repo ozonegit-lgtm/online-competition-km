@@ -34,11 +34,14 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # <<< เพิ่มตรงนี้ >>>
 COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+COPY docker/php/entrypoint.sh /usr/local/bin/competition-km-entrypoint
+
+RUN sed -i 's/\r$//' /usr/local/bin/competition-km-entrypoint \
+    && chmod 0755 /usr/local/bin/competition-km-entrypoint
 
 WORKDIR /var/www/html
 
-RUN chown -R www-data:www-data /var/www/html
-
 EXPOSE 9000
 
+ENTRYPOINT ["/usr/local/bin/competition-km-entrypoint"]
 CMD ["php-fpm"]
