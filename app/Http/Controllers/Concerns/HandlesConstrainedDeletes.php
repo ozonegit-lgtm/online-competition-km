@@ -22,9 +22,7 @@ trait HandlesConstrainedDeletes
         }
     }
 
-    protected function isForeignKeyConstraintViolation(
-        QueryException $exception
-    ): bool {
+    protected function isForeignKeyConstraintViolation( QueryException $exception ): bool {
         $sqlState = (string) (
             $exception->errorInfo[0] ?? $exception->getCode()
         );
