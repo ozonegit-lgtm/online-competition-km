@@ -504,16 +504,21 @@
                                     @break
 
                                     @case('file')
+                                        @php
+                                            $filePolicy = $field->resolved_file_policy;
+                                        @endphp
                                         <div class="mt-3 rounded-xl border border-dashed border-slate-300 bg-white p-4">
                                             <input
                                                 id="field_{{ $field->id }}"
                                                 type="file"
                                                 name="{{ $fieldName }}"
                                                 @required($field->is_required)
-                                                accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.ppt,.pptx,.zip"
+                                                accept="{{ collect($filePolicy['extensions'])->map(fn ($extension) => '.'.$extension)->implode(',') }}"
                                                 class="js-file-input sr-only"
                                                 data-file-name-target="file_name_{{ $field->id }}"
                                                 data-file-preview-target="file_preview_{{ $field->id }}"
+                                                data-allowed-extensions="{{ implode(',', $filePolicy['extensions']) }}"
+                                                data-max-bytes="{{ $filePolicy['max_megabytes'] * 1024 * 1024 }}"
                                             >
 
                                             <div class="flex flex-col gap-4">
@@ -573,7 +578,7 @@
                                         </div>
 
                                         <p class="mt-2 text-xs leading-5 text-slate-500">
-                                            รองรับ JPG, PNG, WEBP, PDF, Word, PowerPoint และ ZIP ขนาดไม่เกิน 10 MB
+                                            รองรับ: {{ strtoupper(implode(', ', $filePolicy['extensions'])) }} • สูงสุด {{ $filePolicy['max_megabytes'] }} MB
                                         </p>
                                     @break
 
@@ -774,6 +779,20 @@
                 submissionForm.querySelectorAll('input[type="file"]')
             ).flatMap((input) => Array.from(input.files ?? []));
             const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+
+            for (const input of submissionForm.querySelectorAll('input[type="file"]')) {
+                const file = input.files?.[0];
+                if (!file) continue;
+                const extension = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : '';
+                const allowed = input.dataset.allowedExtensions.split(',');
+                if (!allowed.includes(extension) || file.size > Number(input.dataset.maxBytes)) {
+                    event.preventDefault();
+                    alert(!allowed.includes(extension)
+                        ? `ช่องนี้รองรับเฉพาะ ${allowed.join(', ').toUpperCase()}`
+                        : `ไฟล์ต้องมีขนาดไม่เกิน ${Number(input.dataset.maxBytes) / 1024 / 1024} MB`);
+                    return;
+                }
+            }
 
             if (files.length > 5 || totalBytes > 20 * 1024 * 1024) {
                 event.preventDefault();

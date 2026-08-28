@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Competition;
 use App\Models\CompetitionFormField;
 use App\Models\Submission;
+use App\Rules\SubmissionFilePolicy;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -298,6 +299,9 @@ class SubmissionController extends Controller
                 'resolved_options',
                 $this->resolveFieldOptions($field)
             );
+            if ($field->field_type === 'file') {
+                $field->setAttribute('resolved_file_policy', SubmissionFilePolicy::resolve($field));
+            }
         });
     }
 
@@ -306,6 +310,13 @@ class SubmissionController extends Controller
         Competition $competition,
         Collection $fields
     ): string {
+        $contentLength = max(0, (int) $request->server('CONTENT_LENGTH', 0));
+        if ($contentLength > config('submissions.uploads.max_request_kilobytes') * 1024) {
+            throw ValidationException::withMessages([
+                'files' => 'ข้อมูลที่ส่งทั้งหมดต้องมีขนาดไม่เกิน 25 MB',
+            ]);
+        }
+
         if (filled($request->input('website'))) {
             throw ValidationException::withMessages([
                 'form' => 'ไม่สามารถส่งแบบฟอร์มได้ กรุณาตรวจสอบข้อมูลแล้วลองใหม่',
@@ -449,8 +460,7 @@ class SubmissionController extends Controller
                 'file' => [
                     $requiredRule,
                     'file',
-                    'mimes:jpg,jpeg,png,webp,pdf,doc,docx,ppt,pptx,zip',
-                    'max:' . (($field->max_file_size ?: 10) * 1024),
+                    new SubmissionFilePolicy($field),
                 ],
                 'select', 'radio' => [
                     $requiredRule,

@@ -195,14 +195,14 @@ class PublicSubmissionProtectionTest extends TestCase
 
         $this->postSubmission($competition, [
             'project_title' => '',
-            'fields' => [$field->id => UploadedFile::fake()->create('valid.pdf', 1)],
+            'fields' => [$field->id => $this->realPdf('valid.pdf')],
         ], $token)->assertSessionHasErrors('project_title');
 
         $this->assertDatabaseCount('submissions', 0);
         $this->assertSame([], Storage::disk('public')->allFiles());
 
         $this->postSubmission($competition, [
-            'fields' => [$field->id => UploadedFile::fake()->create('valid.pdf', 1)],
+            'fields' => [$field->id => $this->realPdf('valid.pdf')],
         ], $token)->assertRedirect();
         $this->assertDatabaseCount('submissions', 1);
     }
@@ -220,6 +220,14 @@ class PublicSubmissionProtectionTest extends TestCase
                 ['form_guard_token' => $token ?? $this->tokenFor($competition)]
             )
         );
+    }
+
+    private function realPdf(string $name): UploadedFile
+    {
+        $path = tempnam(sys_get_temp_dir(), 'pdf-');
+        file_put_contents($path, "%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF");
+
+        return new UploadedFile($path, $name, null, null, true);
     }
 
     private function validPayload(): array
