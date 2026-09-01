@@ -26,10 +26,14 @@ class KnowledgeItem extends Model
      */
     protected $fillable = [
         'submission_id',
+        'created_by',
+        'category_id',
         'title',
         'summary',
         'content',
         'cover_image',
+        'attachment_path',
+        'attachment_original_name',
         'is_featured',
         'status',
         'published_at',
@@ -51,6 +55,19 @@ class KnowledgeItem extends Model
     public function submission(): BelongsTo
     {
         return $this->belongsTo(Submission::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(
+            CompetitionCategory::class,
+            'category_id'
+        );
     }
 
     /**

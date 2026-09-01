@@ -84,6 +84,14 @@ class User extends Authenticatable
         );
     }
 
+    public function knowledgeItems(): HasMany
+    {
+        return $this->hasMany(
+            KnowledgeItem::class,
+            'created_by'
+        );
+    }
+
     /**
      * User มี Activity Logs ได้หลายรายการ
      */
