@@ -29,6 +29,7 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
     {
         parent::setUp();
         Storage::fake('public');
+        Storage::fake('local');
     }
 
     protected function tearDown(): void
@@ -143,8 +144,8 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         $this->assertStringStartsWith('knowledge-items/covers/', $item->cover_image);
         $this->assertStringStartsWith('knowledge-items/attachments/', $item->attachment_path);
         $this->assertStringNotContainsString('original-cover', $item->cover_image);
-        Storage::disk('public')->assertExists($item->cover_image);
-        Storage::disk('public')->assertExists($item->attachment_path);
+        Storage::disk('local')->assertExists($item->cover_image);
+        Storage::disk('local')->assertExists($item->attachment_path);
     }
 
     public function test_forged_server_fields_are_rejected_without_storing_files(): void
@@ -170,7 +171,7 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         ]);
 
         $this->assertDatabaseCount('knowledge_items', 0);
-        $this->assertSame([], Storage::disk('public')->allFiles());
+        $this->assertSame([], Storage::disk('local')->allFiles());
     }
 
     public function test_database_failures_cleanup_new_files_and_preserve_old_files(): void
@@ -194,15 +195,15 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
             ]);
             $this->fail('Store should have thrown a database exception.');
         } catch (QueryException) {
-            $this->assertSame([], Storage::disk('public')->allFiles());
+            $this->assertSame([], Storage::disk('local')->allFiles());
         } finally {
             DB::unprepared('DROP TRIGGER IF EXISTS fail_km_insert');
         }
 
         $oldCover = 'knowledge-items/covers/original.png';
         $oldAttachment = 'knowledge-items/attachments/original.pdf';
-        Storage::disk('public')->put($oldCover, 'original cover');
-        Storage::disk('public')->put($oldAttachment, 'original attachment');
+        Storage::disk('local')->put($oldCover, 'original cover');
+        Storage::disk('local')->put($oldAttachment, 'original attachment');
         $item = $this->item($admin, $category, [
             'cover_image' => $oldCover,
             'attachment_path' => $oldAttachment,
@@ -223,11 +224,11 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
             ]);
             $this->fail('Update should have thrown a database exception.');
         } catch (QueryException) {
-            Storage::disk('public')->assertExists($oldCover);
-            Storage::disk('public')->assertExists($oldAttachment);
+            Storage::disk('local')->assertExists($oldCover);
+            Storage::disk('local')->assertExists($oldAttachment);
             $this->assertEqualsCanonicalizing(
                 [$oldCover, $oldAttachment],
-                Storage::disk('public')->allFiles()
+                Storage::disk('local')->allFiles()
             );
             $this->assertSame($oldCover, $item->fresh()->cover_image);
             $this->assertSame(
@@ -285,8 +286,8 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         $category = $this->category();
         $oldCover = 'knowledge-items/covers/old.png';
         $oldAttachment = 'knowledge-items/attachments/old.pdf';
-        Storage::disk('public')->put($oldCover, 'old cover');
-        Storage::disk('public')->put($oldAttachment, 'old attachment');
+        Storage::disk('local')->put($oldCover, 'old cover');
+        Storage::disk('local')->put($oldAttachment, 'old attachment');
         $item = $this->item($admin, $category, [
             'cover_image' => $oldCover,
             'attachment_path' => $oldAttachment,
@@ -306,10 +307,10 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         )->assertRedirect();
 
         $item->refresh();
-        Storage::disk('public')->assertMissing($oldCover);
-        Storage::disk('public')->assertMissing($oldAttachment);
-        Storage::disk('public')->assertExists($item->cover_image);
-        Storage::disk('public')->assertExists($item->attachment_path);
+        Storage::disk('local')->assertMissing($oldCover);
+        Storage::disk('local')->assertMissing($oldAttachment);
+        Storage::disk('local')->assertExists($item->cover_image);
+        Storage::disk('local')->assertExists($item->attachment_path);
         $this->assertSame('ใหม่.pdf', $item->attachment_original_name);
     }
 
@@ -320,7 +321,7 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         $submissionCover = 'submissions/source.png';
         $managedAttachment = 'knowledge-items/attachments/manual.pdf';
         Storage::disk('public')->put($submissionCover, 'source');
-        Storage::disk('public')->put($managedAttachment, 'manual');
+        Storage::disk('local')->put($managedAttachment, 'manual');
         $item = $this->item($admin, $category, [
             'cover_image' => $submissionCover,
             'attachment_path' => $managedAttachment,
@@ -342,7 +343,7 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         $this->assertNull($item->attachment_path);
         $this->assertNull($item->attachment_original_name);
         Storage::disk('public')->assertExists($submissionCover);
-        Storage::disk('public')->assertMissing($managedAttachment);
+        Storage::disk('local')->assertMissing($managedAttachment);
     }
 
     public function test_destroy_manual_item_deletes_managed_files(): void
@@ -351,8 +352,8 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         $category = $this->category();
         $cover = 'knowledge-items/covers/cover.png';
         $attachment = 'knowledge-items/attachments/file.pdf';
-        Storage::disk('public')->put($cover, 'cover');
-        Storage::disk('public')->put($attachment, 'file');
+        Storage::disk('local')->put($cover, 'cover');
+        Storage::disk('local')->put($attachment, 'file');
         $item = $this->item($admin, $category, [
             'cover_image' => $cover,
             'attachment_path' => $attachment,
@@ -363,8 +364,8 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
             ->assertRedirect(route('competition-admin.km.index'));
 
         $this->assertDatabaseMissing('knowledge_items', ['id' => $item->id]);
-        Storage::disk('public')->assertMissing($cover);
-        Storage::disk('public')->assertMissing($attachment);
+        Storage::disk('local')->assertMissing($cover);
+        Storage::disk('local')->assertMissing($attachment);
     }
 
     public function test_other_admin_cannot_access_any_item_action(): void

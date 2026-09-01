@@ -1,4 +1,6 @@
-@php($editing = isset($knowledgeItem))
+@php
+    $editing = isset($knowledgeItem);
+@endphp
 <div class="grid gap-6 lg:grid-cols-2">
     <div class="lg:col-span-2">
         <label for="title" class="block text-sm font-semibold text-slate-700">ชื่อองค์ความรู้</label>
@@ -33,8 +35,13 @@
         <p class="mt-1 text-xs text-slate-500">JPG, JPEG, PNG หรือ WEBP ไม่เกิน 10 MB</p>
         @error('cover_image') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         @if ($editing && $knowledgeItem->cover_image)
+            @php
+                $coverUrl = str_starts_with($knowledgeItem->cover_image, 'knowledge-items/covers/')
+                    ? route('knowledge-items.cover', $knowledgeItem)
+                    : Storage::disk('public')->url($knowledgeItem->cover_image);
+            @endphp
             <div class="mt-3 rounded-xl border p-3">
-                <img src="{{ Storage::disk('public')->url($knowledgeItem->cover_image) }}" alt="รูปปกปัจจุบัน" class="h-32 w-full rounded-lg object-cover">
+                <img src="{{ $coverUrl }}" alt="รูปปกปัจจุบัน" class="h-32 w-full rounded-lg object-cover">
                 <label class="mt-3 flex gap-2 text-sm"><input type="checkbox" name="remove_cover_image" value="1" @checked(old('remove_cover_image'))> ลบรูปปกปัจจุบัน</label>
             </div>
         @endif

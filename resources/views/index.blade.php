@@ -686,10 +686,13 @@
                             $imagePath = $item->cover_image
                                 ?: ($image?->file_path ?? null);
 
-                            $imageUrl = $imagePath
-                                ? \Illuminate\Support\Facades\Storage::disk('public')
-                                    ->url($imagePath)
-                                : null;
+                            $managedCover = $item->cover_image
+                                && str_starts_with($item->cover_image, 'knowledge-items/covers/');
+                            $imageUrl = $managedCover
+                                ? route('knowledge-items.cover', $item)
+                                : ($imagePath
+                                    ? \Illuminate\Support\Facades\Storage::disk('public')->url($imagePath)
+                                    : null);
                         @endphp
 
                         <article
@@ -973,10 +976,13 @@
                             $imagePath = $item->cover_image
                                 ?: ($image?->file_path ?? null);
 
-                            $imageUrl = $imagePath
-                                ? \Illuminate\Support\Facades\Storage::disk('public')
-                                    ->url($imagePath)
-                                : null;
+                            $managedCover = $item->cover_image
+                                && str_starts_with($item->cover_image, 'knowledge-items/covers/');
+                            $imageUrl = $managedCover
+                                ? route('knowledge-items.cover', $item)
+                                : ($imagePath
+                                    ? \Illuminate\Support\Facades\Storage::disk('public')->url($imagePath)
+                                    : null);
                         @endphp
 
 

@@ -312,7 +312,7 @@ class KnowledgeItemController extends Controller
         string $attribute
     ): string {
         try {
-            $path = $file->store($directory, 'public');
+            $path = $file->store($directory, 'local');
         } catch (Throwable) {
             throw ValidationException::withMessages([
                 $attribute => [$this->storageFailureMessage($attribute)],
@@ -361,6 +361,6 @@ class KnowledgeItemController extends Controller
             return;
         }
 
-        Storage::disk('public')->delete($normalized);
+        Storage::disk('local')->delete($normalized);
     }
 }

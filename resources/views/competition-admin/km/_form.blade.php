@@ -47,8 +47,13 @@
         @error('cover_image') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
 
         @if ($editing && $knowledgeItem->cover_image)
+            @php
+                $coverUrl = str_starts_with($knowledgeItem->cover_image, 'knowledge-items/covers/')
+                    ? route('knowledge-items.cover', $knowledgeItem)
+                    : Storage::disk('public')->url($knowledgeItem->cover_image);
+            @endphp
             <div class="mt-3 rounded-xl border border-slate-200 p-3">
-                <img src="{{ Storage::disk('public')->url($knowledgeItem->cover_image) }}" alt="รูปปกปัจจุบัน" class="h-32 w-full rounded-lg object-cover">
+                <img src="{{ $coverUrl }}" alt="รูปปกปัจจุบัน" class="h-32 w-full rounded-lg object-cover">
                 <label class="mt-3 flex items-center gap-2 text-sm text-slate-700">
                     <input type="checkbox" name="remove_cover_image" value="1" @checked(old('remove_cover_image'))>
                     ลบรูปปกปัจจุบัน

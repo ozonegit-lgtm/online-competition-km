@@ -25,6 +25,7 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
     {
         parent::setUp();
         Storage::fake('public');
+        Storage::fake('local');
     }
 
     protected function tearDown(): void
@@ -102,8 +103,8 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
         $this->assertFalse($item->is_featured);
         $this->assertSame('คู่มือภาษาไทย.pdf', $item->attachment_original_name);
         $this->assertNotSame('original.png', basename($item->cover_image));
-        Storage::disk('public')->assertExists($item->cover_image);
-        Storage::disk('public')->assertExists($item->attachment_path);
+        Storage::disk('local')->assertExists($item->cover_image);
+        Storage::disk('local')->assertExists($item->attachment_path);
 
         $this->actingAs($super)->post(route('superadmin.km.store'), [
             'title' => 'Forged', 'category_id' => $category->id,
@@ -149,7 +150,7 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
         $category = $this->category();
         $oldCover = 'knowledge-items/covers/old.png';
         $sourceAttachment = 'submissions/source.pdf';
-        Storage::disk('public')->put($oldCover, 'old');
+        Storage::disk('local')->put($oldCover, 'old');
         Storage::disk('public')->put($sourceAttachment, 'source');
         $item = $this->item(null, $category, ['cover_image' => $oldCover, 'attachment_path' => $sourceAttachment, 'attachment_original_name' => 'source.pdf']);
 
@@ -159,10 +160,10 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
             'remove_cover_image' => 1, 'remove_attachment' => 1,
         ])->assertRedirect();
         $item->refresh();
-        Storage::disk('public')->assertMissing($oldCover);
+        Storage::disk('local')->assertMissing($oldCover);
         Storage::disk('public')->assertExists($sourceAttachment);
-        Storage::disk('public')->assertExists($item->cover_image);
-        Storage::disk('public')->assertExists($item->attachment_path);
+        Storage::disk('local')->assertExists($item->cover_image);
+        Storage::disk('local')->assertExists($item->attachment_path);
 
         $newCover = $item->cover_image;
         $newAttachment = $item->attachment_path;
@@ -174,8 +175,8 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
         $this->assertNull($item->cover_image);
         $this->assertNull($item->attachment_path);
         $this->assertNull($item->attachment_original_name);
-        Storage::disk('public')->assertMissing($newCover);
-        Storage::disk('public')->assertMissing($newAttachment);
+        Storage::disk('local')->assertMissing($newCover);
+        Storage::disk('local')->assertMissing($newAttachment);
     }
 
     public function test_delete_items_of_any_owner_removes_only_managed_files(): void
@@ -185,11 +186,11 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
         $category = $this->category();
         foreach ([$owner->id, null] as $ownerId) {
             $cover = 'knowledge-items/covers/'.uniqid().'.png';
-            Storage::disk('public')->put($cover, 'cover');
+            Storage::disk('local')->put($cover, 'cover');
             $item = $this->item($ownerId, $category, ['cover_image' => $cover]);
             $this->actingAs($super)->delete(route('superadmin.km.destroy', $item))->assertRedirect(route('superadmin.km.index'));
             $this->assertDatabaseMissing('knowledge_items', ['id' => $item->id]);
-            Storage::disk('public')->assertMissing($cover);
+            Storage::disk('local')->assertMissing($cover);
         }
     }
 
@@ -220,21 +221,21 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
             $this->post(route('superadmin.km.store'), ['title' => 'Fail', 'category_id' => $category->id, 'cover_image' => $this->png('new.png')]);
             $this->fail('Expected database exception.');
         } catch (QueryException) {
-            $this->assertSame([], Storage::disk('public')->allFiles());
+            $this->assertSame([], Storage::disk('local')->allFiles());
         } finally {
             DB::unprepared('DROP TRIGGER IF EXISTS fail_super_km_insert');
         }
 
         $old = 'knowledge-items/covers/old.png';
-        Storage::disk('public')->put($old, 'old');
+        Storage::disk('local')->put($old, 'old');
         $item = $this->item(null, $category, ['cover_image' => $old]);
         DB::unprepared("CREATE TRIGGER fail_super_km_update BEFORE UPDATE ON knowledge_items BEGIN SELECT RAISE(ABORT, 'failure'); END");
         try {
             $this->put(route('superadmin.km.update', $item), ['title' => 'Fail', 'category_id' => $category->id, 'cover_image' => $this->png('replacement.png')]);
             $this->fail('Expected database exception.');
         } catch (QueryException) {
-            Storage::disk('public')->assertExists($old);
-            $this->assertSame([$old], Storage::disk('public')->allFiles());
+            Storage::disk('local')->assertExists($old);
+            $this->assertSame([$old], Storage::disk('local')->allFiles());
             $this->assertSame($old, $item->fresh()->cover_image);
         } finally {
             DB::unprepared('DROP TRIGGER IF EXISTS fail_super_km_update');

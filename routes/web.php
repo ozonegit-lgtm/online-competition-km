@@ -22,6 +22,7 @@ use App\Http\Controllers\Judge\JudgingRoomController;
 use App\Http\Controllers\CompetitionAdmin\JudgingSessionController;
 use App\Http\Controllers\JudgeAssignmentController;
 use App\Http\Controllers\KnowledgeManagementController;
+use App\Http\Controllers\KnowledgeItemFileController;
 use App\Http\Controllers\CompetitionAdmin\ResultController;
 use App\Http\Controllers\CompetitionAdmin\KmSubmissionController;
 use App\Http\Controllers\CompetitionAdmin\KnowledgeItemController;
@@ -38,6 +39,10 @@ use App\Http\Controllers\SuperAdmin\KnowledgeItemController
 |--------------------------------------------------------------------------
 */
 Route::get('/', [KnowledgeManagementController::class, 'index'])->name('home');
+Route::get('/knowledge-items/{knowledgeItem}/cover', [KnowledgeItemFileController::class, 'cover'])
+    ->name('knowledge-items.cover');
+Route::get('/knowledge-items/{knowledgeItem}/attachment', [KnowledgeItemFileController::class, 'attachment'])
+    ->name('knowledge-items.attachment');
 
 /*
 |--------------------------------------------------------------------------

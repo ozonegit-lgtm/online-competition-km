@@ -189,7 +189,7 @@ class KnowledgeItemStorageWriteFailureTest extends TestCase
         }
 
         $factory = Mockery::mock(FilesystemFactory::class);
-        $factory->shouldReceive('disk')->with('public')->andReturn($disk);
+        $factory->shouldReceive('disk')->with('local')->andReturn($disk);
         $this->app->instance(FilesystemFactory::class, $factory);
         $this->app->instance('filesystem', $factory);
         Storage::clearResolvedInstance('filesystem');

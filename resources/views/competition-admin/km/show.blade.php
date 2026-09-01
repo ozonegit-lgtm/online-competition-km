@@ -15,7 +15,12 @@
 @section('content')
     <article class="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         @if ($knowledgeItem->cover_image)
-            <img src="{{ Storage::disk('public')->url($knowledgeItem->cover_image) }}" alt="{{ $knowledgeItem->title }}" class="max-h-96 w-full object-cover">
+            @php
+                $coverUrl = str_starts_with($knowledgeItem->cover_image, 'knowledge-items/covers/')
+                    ? route('knowledge-items.cover', $knowledgeItem)
+                    : Storage::disk('public')->url($knowledgeItem->cover_image);
+            @endphp
+            <img src="{{ $coverUrl }}" alt="{{ $knowledgeItem->title }}" class="max-h-96 w-full object-cover">
         @else
             <div class="flex h-48 items-center justify-center bg-slate-100 text-slate-400">ไม่มีรูปปก</div>
         @endif
@@ -31,7 +36,7 @@
             @if ($knowledgeItem->summary)<section><h2 class="font-bold text-slate-900">บทสรุป</h2><p class="mt-2 whitespace-pre-line text-slate-700">{{ $knowledgeItem->summary }}</p></section>@endif
             @if ($knowledgeItem->content)<section><h2 class="font-bold text-slate-900">เนื้อหา</h2><div class="mt-2 whitespace-pre-line text-slate-700">{{ $knowledgeItem->content }}</div></section>@endif
             @if ($knowledgeItem->attachment_path)
-                <a href="{{ Storage::disk('public')->url($knowledgeItem->attachment_path) }}" class="inline-flex rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-blue-700" target="_blank" rel="noopener">{{ $knowledgeItem->attachment_original_name ?: 'ดาวน์โหลดไฟล์แนบ' }}</a>
+                <a href="{{ route('knowledge-items.attachment', $knowledgeItem) }}" class="inline-flex rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-blue-700">{{ $knowledgeItem->attachment_original_name ?: 'ดาวน์โหลดไฟล์แนบ' }}</a>
             @endif
             @if ($knowledgeItem->published_at)<p class="text-sm text-slate-500">เผยแพร่เมื่อ {{ $knowledgeItem->published_at->format('d/m/Y H:i') }}</p>@endif
             <div class="flex flex-wrap gap-2 border-t pt-5">
