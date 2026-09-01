@@ -25,6 +25,8 @@ use App\Http\Controllers\KnowledgeManagementController;
 use App\Http\Controllers\CompetitionAdmin\ResultController;
 use App\Http\Controllers\CompetitionAdmin\KmSubmissionController;
 use App\Http\Controllers\CompetitionAdmin\KnowledgeItemController;
+use App\Http\Controllers\SuperAdmin\KnowledgeItemController
+    as SuperAdminKnowledgeItemController;
 
 
 
@@ -107,6 +109,17 @@ Route::middleware('auth')->group(function () {
             Route::get('/competitions/{competition}/judges',[CompetitionJudgeController::class, 'index'])->name('competitions.judges.index');
             Route::put('/competitions/{competition}/judges',[CompetitionJudgeController::class, 'sync'])->name('competitions.judges.sync');
             Route::delete('/competitions/{competition}/judges/{judge}',[CompetitionJudgeController::class, 'destroy'])->name('competitions.judges.destroy');
+            Route::get('/km', [SuperAdminKnowledgeItemController::class, 'index'])->name('km.index');
+            Route::get('/km/create', [SuperAdminKnowledgeItemController::class, 'create'])->name('km.create');
+            Route::post('/km', [SuperAdminKnowledgeItemController::class, 'store'])->name('km.store');
+            Route::get('/km/{knowledgeItem}', [SuperAdminKnowledgeItemController::class, 'show'])->name('km.show');
+            Route::get('/km/{knowledgeItem}/edit', [SuperAdminKnowledgeItemController::class, 'edit'])->name('km.edit');
+            Route::put('/km/{knowledgeItem}', [SuperAdminKnowledgeItemController::class, 'update'])->name('km.update');
+            Route::delete('/km/{knowledgeItem}', [SuperAdminKnowledgeItemController::class, 'destroy'])->name('km.destroy');
+            Route::post('/km/{knowledgeItem}/publish', [SuperAdminKnowledgeItemController::class, 'publish'])->name('km.publish');
+            Route::delete('/km/{knowledgeItem}/publish', [SuperAdminKnowledgeItemController::class, 'unpublish'])->name('km.unpublish');
+            Route::post('/km/{knowledgeItem}/feature', [SuperAdminKnowledgeItemController::class, 'feature'])->name('km.feature');
+            Route::delete('/km/{knowledgeItem}/feature', [SuperAdminKnowledgeItemController::class, 'unfeature'])->name('km.unfeature');
 
         });
 

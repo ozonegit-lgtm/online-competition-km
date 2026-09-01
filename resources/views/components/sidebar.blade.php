@@ -105,6 +105,19 @@
 
                 <div class="space-y-1">
 
+                    <a
+                        href="{{ route('superadmin.km.index') }}"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition
+                            {{ request()->routeIs('superadmin.km.*')
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30'
+                                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
+                    >
+                        <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z" />
+                        </svg>
+                        <span>จัดการองค์ความรู้</span>
+                    </a>
+
                 <a
                     href="{{ route('superadmin.createUser') }}"
                     class="flex w-full items-center gap-3 rounded-xl px-3 py-3
