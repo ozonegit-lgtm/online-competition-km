@@ -375,7 +375,7 @@
                         <span>ผลการแข่งขัน</span>
                     </a>
                     <a
-                        href="{{ route('competition-admin.km.submissions.index') }}"
+                        href="{{ route('competition-admin.km.index') }}"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-3
                             text-sm font-medium transition
                             {{ request()->routeIs(

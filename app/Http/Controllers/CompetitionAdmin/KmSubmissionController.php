@@ -117,6 +117,16 @@ class KmSubmissionController extends Controller
             'submission_id' => $submission->id,
         ]);
 
+        if ($knowledgeItem->created_by === null) {
+            $knowledgeItem->created_by =
+                $submission->competition->created_by;
+        }
+
+        if ($knowledgeItem->category_id === null) {
+            $knowledgeItem->category_id =
+                $submission->competition->category_id;
+        }
+
         $knowledgeItem->title = $submission->project_title;
 
         if (! $knowledgeItem->summary) {

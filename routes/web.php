@@ -24,6 +24,7 @@ use App\Http\Controllers\JudgeAssignmentController;
 use App\Http\Controllers\KnowledgeManagementController;
 use App\Http\Controllers\CompetitionAdmin\ResultController;
 use App\Http\Controllers\CompetitionAdmin\KmSubmissionController;
+use App\Http\Controllers\CompetitionAdmin\KnowledgeItemController;
 
 
 
@@ -133,6 +134,15 @@ Route::prefix('competition-admin')->name('competition-admin.')->middleware(['aut
         Route::post('/competitions/{competition}/results/publish',[ResultController::class, 'publish'])->name('competitions.results.publish');
         Route::delete('/competitions/{competition}/results/publish',[ResultController::class, 'unpublish'])->name('competitions.results.unpublish');
         Route::get('/km/submissions',[KmSubmissionController::class, 'index'])->name('km.submissions.index');
+        Route::get('/km', [KnowledgeItemController::class, 'index'])->name('km.index');
+        Route::get('/km/create', [KnowledgeItemController::class, 'create'])->name('km.create');
+        Route::post('/km', [KnowledgeItemController::class, 'store'])->name('km.store');
+        Route::get('/km/{knowledgeItem}', [KnowledgeItemController::class, 'show'])->name('km.show');
+        Route::get('/km/{knowledgeItem}/edit', [KnowledgeItemController::class, 'edit'])->name('km.edit');
+        Route::put('/km/{knowledgeItem}', [KnowledgeItemController::class, 'update'])->name('km.update');
+        Route::delete('/km/{knowledgeItem}', [KnowledgeItemController::class, 'destroy'])->name('km.destroy');
+        Route::post('/km/{knowledgeItem}/publish', [KnowledgeItemController::class, 'publish'])->name('km.publish');
+        Route::delete('/km/{knowledgeItem}/publish', [KnowledgeItemController::class, 'unpublish'])->name('km.unpublish');
         Route::post('/submissions/{submission}/km/publish',[KmSubmissionController::class, 'publish'])->name('submissions.km.publish');
         Route::delete('/submissions/{submission}/km/publish',[KmSubmissionController::class, 'unpublish'])->name('submissions.km.unpublish');
 
