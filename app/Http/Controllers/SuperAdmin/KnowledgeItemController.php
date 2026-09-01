@@ -9,10 +9,12 @@ use App\Models\KnowledgeItem;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Throwable;
 
@@ -93,12 +95,18 @@ class KnowledgeItemController extends Controller
 
         try {
             if ($request->hasFile('cover_image')) {
-                $storedPaths['cover_image'] = $request->file('cover_image')
-                    ->store('knowledge-items/covers', 'public');
+                $storedPaths['cover_image'] = $this->storeManagedUpload(
+                    $request->file('cover_image'),
+                    'knowledge-items/covers',
+                    'cover_image'
+                );
             }
             if ($request->hasFile('attachment')) {
-                $storedPaths['attachment_path'] = $request->file('attachment')
-                    ->store('knowledge-items/attachments', 'public');
+                $storedPaths['attachment_path'] = $this->storeManagedUpload(
+                    $request->file('attachment'),
+                    'knowledge-items/attachments',
+                    'attachment'
+                );
             }
 
             $knowledgeItem = DB::transaction(fn () => KnowledgeItem::create([
@@ -150,10 +158,18 @@ class KnowledgeItemController extends Controller
 
         try {
             if ($request->hasFile('cover_image')) {
-                $newPaths['cover_image'] = $request->file('cover_image')->store('knowledge-items/covers', 'public');
+                $newPaths['cover_image'] = $this->storeManagedUpload(
+                    $request->file('cover_image'),
+                    'knowledge-items/covers',
+                    'cover_image'
+                );
             }
             if ($request->hasFile('attachment')) {
-                $newPaths['attachment_path'] = $request->file('attachment')->store('knowledge-items/attachments', 'public');
+                $newPaths['attachment_path'] = $this->storeManagedUpload(
+                    $request->file('attachment'),
+                    'knowledge-items/attachments',
+                    'attachment'
+                );
             }
 
             DB::transaction(function () use ($request, $validated, $knowledgeItem, $newPaths): void {
@@ -241,6 +257,35 @@ class KnowledgeItemController extends Controller
         $name = preg_replace('/[\x00-\x1F\x7F]/u', '', $name) ?? '';
         $name = mb_substr(trim($name), 0, 255);
         return $name !== '' ? $name : 'attachment';
+    }
+
+    private function storeManagedUpload(
+        UploadedFile $file,
+        string $directory,
+        string $attribute
+    ): string {
+        try {
+            $path = $file->store($directory, 'public');
+        } catch (Throwable) {
+            throw ValidationException::withMessages([
+                $attribute => [$this->storageFailureMessage($attribute)],
+            ]);
+        }
+
+        if (! is_string($path) || trim($path) === '') {
+            throw ValidationException::withMessages([
+                $attribute => [$this->storageFailureMessage($attribute)],
+            ]);
+        }
+
+        return $path;
+    }
+
+    private function storageFailureMessage(string $attribute): string
+    {
+        return $attribute === 'cover_image'
+            ? 'ไม่สามารถบันทึกรูปปกได้ กรุณาลองใหม่อีกครั้ง'
+            : 'ไม่สามารถบันทึกไฟล์แนบได้ กรุณาลองใหม่อีกครั้ง';
     }
 
     private function deleteManagedFiles(array $paths): void
