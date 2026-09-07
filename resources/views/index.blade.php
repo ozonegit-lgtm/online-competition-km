@@ -146,6 +146,7 @@
                                 name="search"
                                 value="{{ request('search') }}"
                                 placeholder="ค้นหาผลงาน หรือชื่อการแข่งขัน..."
+                                aria-label="ค้นหาผลงาน"
                                 class="h-12 w-full rounded-2xl border
                                 border-slate-200 bg-white pl-11 pr-5
                                 text-sm text-slate-700 shadow-sm
@@ -215,7 +216,7 @@
     ========================================================== --}}
     <div
         class="relative mx-auto w-full max-w-[1600px]
-            px-4 py-8 sm:px-6 lg:px-8"
+            px-4 py-7 sm:px-6 lg:px-8"
     >
         <div
             class="grid grid-cols-1 gap-6
@@ -256,7 +257,7 @@
 
 
             <div
-                class="flex gap-2 overflow-x-auto pb-2"
+                class="flex flex-wrap gap-2 pb-1"
             >
 
                 {{-- ALL --}}
@@ -264,6 +265,8 @@
                     href="{{ route('home') }}"
                     class="shrink-0 rounded-full border px-4 py-2
                     text-sm font-medium transition
+                    focus-visible:outline-none focus-visible:ring-2
+                    focus-visible:ring-emerald-500 focus-visible:ring-offset-2
                     {{ !request('category')
                         ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm'
                         : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300 hover:text-emerald-700' }}"
@@ -279,6 +282,8 @@
                         href="{{ route('home', ['category' => $category->id]) }}"
                         class="shrink-0 rounded-full border px-4 py-2
                         text-sm font-medium transition
+                        focus-visible:outline-none focus-visible:ring-2
+                        focus-visible:ring-emerald-500 focus-visible:ring-offset-2
                         {{ request('category') == $category->id
                             ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm'
                             : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300 hover:text-emerald-700' }}"
@@ -297,12 +302,12 @@
             PUBLISHED COMPETITION RESULTS (PODIUM)
         ====================================================== --}}
         @if (($publishedResults ?? collect())->isNotEmpty())
-            <section class="mt-8">
-                <div class="mb-4 flex items-center gap-3">
+            <section class="mt-7">
+                <div class="mb-4 flex items-start gap-2.5">
 
                     <div
-                        class="flex h-9 w-9 items-center
-                        justify-center rounded-xl
+                        class="mt-0.5 flex h-8 w-8 shrink-0 items-center
+                        justify-center rounded-lg
                         bg-amber-100 text-amber-600"
                     >
                         <svg
@@ -320,21 +325,21 @@
                         </svg>
                     </div>
 
-                    <div>
-                        <p class="text-xs font-medium text-amber-600">
+                    <div class="min-w-0">
+                        <p class="text-xs font-medium leading-5 text-amber-600">
                             ผลการแข่งขัน
                         </p>
 
-                        <h2 class="text-xl font-bold text-slate-900">
+                        <h2 class="text-xl font-bold leading-tight text-slate-900">
                             ผลงานที่ได้รับรางวัล
                         </h2>
+
+                        <p class="mt-1 text-sm leading-5 text-slate-500">
+                            ผลงานอันดับ 1–3 ที่ผู้จัดการแข่งขันประกาศแล้ว
+                        </p>
                     </div>
 
                 </div>
-
-                <p class="-mt-2 mb-5 text-sm text-slate-500">
-                    ผลงานอันดับ 1–3 ที่ผู้จัดการแข่งขันประกาศแล้ว
-                </p>
 
                 <div class="space-y-4">
                     @foreach ($publishedResults as $resultCompetition)
@@ -344,7 +349,7 @@
                         >
                             <div
                                 class="flex flex-col gap-1.5 border-b
-                                    border-slate-200 bg-white px-4 py-3
+                                    border-slate-200 bg-white px-4 py-2.5
                                     sm:flex-row sm:items-center sm:justify-between"
                             >
                                 <div class="min-w-0">
@@ -375,14 +380,14 @@
                             {{-- Podium --}}
                             <div
                                 class="relative overflow-hidden
-                                    bg-gradient-to-b from-emerald-50/60 via-white to-white
-                                    px-4 py-10 sm:px-8"
+                                    bg-gradient-to-b from-amber-50/40 via-white to-emerald-50/30
+                                    px-4 py-7 sm:px-7 sm:py-8"
                             >
                                 {{-- ambient glow, echoes hero background --}}
                                 <div
                                     class="pointer-events-none absolute left-1/2 top-0
-                                        h-56 w-[28rem] -translate-x-1/2 -translate-y-1/3
-                                        rounded-full bg-emerald-100/60 blur-3xl"
+                                        h-48 w-[28rem] -translate-x-1/2 -translate-y-1/3
+                                        rounded-full bg-amber-100/55 blur-3xl"
                                 ></div>
 
                                 {{-- decorative dot grid, echoes hero --}}
@@ -399,7 +404,7 @@
 
                                 <div
                                     class="relative flex flex-wrap items-end
-                                        justify-center gap-4 sm:gap-7"
+                                        justify-center gap-3 sm:gap-5"
                                 >
                                     @foreach (
                                         $resultCompetition->submissions
@@ -410,115 +415,153 @@
 
                                             $rankStyle = match ($rank) {
                                                 1 => [
-                                                    'order'    => 'order-2',
-                                                    'card'     => 'w-32 sm:w-40',
-                                                    'ring'     => 'ring-amber-200',
-                                                    'hoverRing'=> 'hover:shadow-[0_14px_30px_-12px_rgba(245,158,11,0.35)]',
-                                                    'medal'    => 'bg-gradient-to-br from-amber-200 via-amber-400 to-amber-500',
-                                                    'ribbon'   => 'bg-amber-400',
-                                                    'score'    => 'text-amber-600',
-                                                    'riserBg'  => 'bg-gradient-to-b from-amber-50 to-white',
+                                                    'order'       => 'order-2',
+                                                    'card'        => 'w-[104px] sm:w-40',
+                                                    'ring'        => 'ring-amber-200',
+                                                    'hoverRing'   => 'hover:shadow-[0_18px_38px_-16px_rgba(245,158,11,0.45)]',
+                                                    'medal'       => 'bg-gradient-to-br from-amber-200 via-amber-400 to-amber-500',
+                                                    'medalSize'   => 'h-10 w-10 sm:h-11 sm:w-11',
+                                                    'ribbon'      => 'bg-amber-400',
+                                                    'score'       => 'text-amber-600',
+                                                    'label'       => 'ชนะเลิศ',
+                                                    'labelShort'  => 'ชนะเลิศ',
+                                                    'labelClass'  => 'border-amber-200 bg-amber-50 text-amber-700',
+                                                    'riserBg'     => 'bg-gradient-to-b from-amber-50 via-amber-50/80 to-white',
                                                     'riserBorder' => 'border-amber-200',
-                                                    'riserTop' => 'bg-gradient-to-r from-amber-300 via-amber-400 to-amber-300',
-                                                    'riserNum' => 'text-amber-500',
-                                                    'riserH'   => 'h-20',
-                                                    'crown'    => true,
+                                                    'riserTop'    => 'bg-gradient-to-r from-amber-300 via-amber-500 to-amber-300',
+                                                    'riserNum'    => 'text-amber-500',
+                                                    'riserLabel'  => 'text-amber-700',
+                                                    'riserH'      => 'h-[72px]',
+                                                    'crown'       => true,
                                                 ],
 
                                                 2 => [
-                                                    'order'    => 'order-1',
-                                                    'card'     => 'w-28 sm:w-36',
-                                                    'ring'     => 'ring-slate-200',
-                                                    'hoverRing'=> 'hover:shadow-[0_14px_30px_-12px_rgba(100,116,139,0.3)]',
-                                                    'medal'    => 'bg-gradient-to-br from-slate-100 via-slate-300 to-slate-400',
-                                                    'ribbon'   => 'bg-slate-400',
-                                                    'score'    => 'text-slate-600',
-                                                    'riserBg'  => 'bg-gradient-to-b from-slate-50 to-white',
+                                                    'order'       => 'order-1',
+                                                    'card'        => 'w-[88px] sm:w-36',
+                                                    'ring'        => 'ring-slate-200',
+                                                    'hoverRing'   => 'hover:shadow-[0_16px_34px_-16px_rgba(100,116,139,0.35)]',
+                                                    'medal'       => 'bg-gradient-to-br from-slate-100 via-slate-300 to-slate-400',
+                                                    'medalSize'   => 'h-9 w-9 sm:h-10 sm:w-10',
+                                                    'ribbon'      => 'bg-slate-400',
+                                                    'score'       => 'text-slate-600',
+                                                    'label'       => 'รองชนะเลิศอันดับ 1',
+                                                    'labelShort'  => 'อันดับ 2',
+                                                    'labelClass'  => 'border-slate-200 bg-slate-50 text-slate-600',
+                                                    'riserBg'     => 'bg-gradient-to-b from-slate-50 via-slate-50/80 to-white',
                                                     'riserBorder' => 'border-slate-200',
-                                                    'riserTop' => 'bg-gradient-to-r from-slate-300 via-slate-400 to-slate-300',
-                                                    'riserNum' => 'text-slate-500',
-                                                    'riserH'   => 'h-14',
-                                                    'crown'    => false,
+                                                    'riserTop'    => 'bg-gradient-to-r from-slate-300 via-slate-400 to-slate-300',
+                                                    'riserNum'    => 'text-slate-500',
+                                                    'riserLabel'  => 'text-slate-600',
+                                                    'riserH'      => 'h-14',
+                                                    'crown'       => false,
                                                 ],
 
                                                 default => [
-                                                    'order'    => 'order-3',
-                                                    'card'     => 'w-28 sm:w-36',
-                                                    'ring'     => 'ring-orange-200',
-                                                    'hoverRing'=> 'hover:shadow-[0_14px_30px_-12px_rgba(251,146,60,0.3)]',
-                                                    'medal'    => 'bg-gradient-to-br from-orange-200 via-orange-400 to-orange-500',
-                                                    'ribbon'   => 'bg-orange-400',
-                                                    'score'    => 'text-orange-600',
-                                                    'riserBg'  => 'bg-gradient-to-b from-orange-50 to-white',
+                                                    'order'       => 'order-3',
+                                                    'card'        => 'w-[88px] sm:w-36',
+                                                    'ring'        => 'ring-orange-200',
+                                                    'hoverRing'   => 'hover:shadow-[0_16px_34px_-16px_rgba(251,146,60,0.35)]',
+                                                    'medal'       => 'bg-gradient-to-br from-orange-200 via-orange-400 to-orange-500',
+                                                    'medalSize'   => 'h-9 w-9 sm:h-10 sm:w-10',
+                                                    'ribbon'      => 'bg-orange-400',
+                                                    'score'       => 'text-orange-600',
+                                                    'label'       => 'รองชนะเลิศอันดับ 2',
+                                                    'labelShort'  => 'อันดับ 3',
+                                                    'labelClass'  => 'border-orange-200 bg-orange-50 text-orange-700',
+                                                    'riserBg'     => 'bg-gradient-to-b from-orange-50 via-orange-50/80 to-white',
                                                     'riserBorder' => 'border-orange-200',
-                                                    'riserTop' => 'bg-gradient-to-r from-orange-300 via-orange-400 to-orange-300',
-                                                    'riserNum' => 'text-orange-500',
-                                                    'riserH'   => 'h-11',
-                                                    'crown'    => false,
+                                                    'riserTop'    => 'bg-gradient-to-r from-orange-300 via-orange-500 to-orange-300',
+                                                    'riserNum'    => 'text-orange-500',
+                                                    'riserLabel'  => 'text-orange-700',
+                                                    'riserH'      => 'h-12',
+                                                    'crown'       => false,
                                                 ],
                                             };
 
                                             $image = $submission
                                                 ->files
-                                                ->first();
+                                                ->first(
+                                                    fn ($file) => str_starts_with(
+                                                        (string) $file->mime_type,
+                                                        'image/'
+                                                    )
+                                                );
 
-                                            $imageUrl = $image?->file_path
-                                                ? \Illuminate\Support\Facades\Storage
-                                                    ::disk('public')
-                                                    ->url($image->file_path)
-                                                : null;
+                                            $imageUrl = $image?->file_url;
                                         @endphp
 
                                         <div
                                             class="{{ $rankStyle['order'] }} {{ $rankStyle['card'] }}
                                                 relative flex flex-col items-center"
                                         >
-                                            {{-- ghost numeral watermark --}}
-                                            <span
-                                                class="pointer-events-none absolute -top-7 select-none
-                                                    text-[60px] font-black leading-none
-                                                    text-emerald-900/[0.05] sm:text-[76px]"
+                                            {{-- Award title --}}
+                                            <div
+                                                class="relative z-20 mb-1 inline-flex items-center gap-1
+                                                    rounded-full border px-2 py-0.5
+                                                    text-[9px] font-bold tracking-wide shadow-sm
+                                                    sm:text-[10px] {{ $rankStyle['labelClass'] }}"
                                             >
-                                                {{ $rank }}
-                                            </span>
-
-                                            {{-- hanging medal --}}
-                                            <div class="relative z-10 -mb-4 flex flex-col items-center">
                                                 @if ($rankStyle['crown'])
-                                                    <svg viewBox="0 0 24 24" class="mb-0.5 h-4 w-4 fill-amber-400 drop-shadow-sm">
+                                                    <svg viewBox="0 0 24 24" class="h-3 w-3 fill-current" aria-hidden="true">
                                                         <path d="M2 8l4 3 6-7 6 7 4-3-2 11H4L2 8Zm2 13h16v2H4v-2Z"/>
                                                     </svg>
+                                                @else
+                                                    <svg viewBox="0 0 24 24" class="h-3 w-3 fill-none stroke-current" stroke-width="2" aria-hidden="true">
+                                                        <circle cx="12" cy="8" r="5"/>
+                                                        <path d="m8.5 12-1 9 4.5-2.5L16.5 21l-1-9"/>
+                                                    </svg>
+                                                @endif
+                                                <span class="sm:hidden">{{ $rankStyle['labelShort'] }}</span>
+                                                <span class="hidden sm:inline">{{ $rankStyle['label'] }}</span>
+                                            </div>
+
+                                            {{-- medal / winner emblem --}}
+                                            <div class="relative z-20 -mb-4 flex flex-col items-center">
+                                                @if ($rankStyle['crown'])
+                                                    <div class="mb-1 flex items-center gap-1 text-amber-400" aria-hidden="true">
+                                                        <span class="h-1 w-1 rounded-full bg-amber-300"></span>
+                                                        <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current drop-shadow-sm">
+                                                            <path d="M2 8l4 3 6-7 6 7 4-3-2 11H4L2 8Zm2 13h16v2H4v-2Z"/>
+                                                        </svg>
+                                                        <span class="h-1 w-1 rounded-full bg-amber-300"></span>
+                                                    </div>
                                                 @endif
 
                                                 <div
-                                                    class="flex h-9 w-9 items-center justify-center
-                                                        rounded-full border-2 border-white
-                                                        shadow-md ring-1 ring-black/5
+                                                    class="{{ $rankStyle['medalSize'] }} flex items-center justify-center
+                                                        rounded-full border-[3px] border-white
+                                                        shadow-lg ring-1 ring-black/5
                                                         {{ $rankStyle['medal'] }}"
                                                 >
-                                                    <span class="text-xs font-black text-white drop-shadow-sm">
+                                                    <span class="text-sm font-black text-white drop-shadow-sm sm:text-base">
                                                         {{ $rank }}
                                                     </span>
                                                 </div>
 
-                                                <div class="-mt-0.5 flex gap-0.5">
-                                                    <span class="km-ribbon-l h-2 w-1.5 {{ $rankStyle['ribbon'] }}"></span>
-                                                    <span class="km-ribbon-r h-2 w-1.5 {{ $rankStyle['ribbon'] }}"></span>
+                                                <div class="-mt-0.5 flex gap-0.5" aria-hidden="true">
+                                                    <span class="km-ribbon-l h-2.5 w-2 {{ $rankStyle['ribbon'] }}"></span>
+                                                    <span class="km-ribbon-r h-2.5 w-2 {{ $rankStyle['ribbon'] }}"></span>
                                                 </div>
                                             </div>
 
-                                            {{-- Card --}}
+                                            {{-- Award card --}}
                                             <div
-                                                class="relative z-0 w-full overflow-hidden rounded-xl
+                                                class="relative z-10 w-full overflow-hidden rounded-xl
                                                     border border-slate-200 bg-white pt-4
-                                                    shadow-sm ring-1 transition-all duration-300
-                                                    hover:-translate-y-1
+                                                    shadow-sm ring-1 transition-all duration-200
+                                                    hover:-translate-y-0.5
                                                     {{ $rankStyle['ring'] }} {{ $rankStyle['hoverRing'] }}"
                                             >
                                                 <div
+                                                    class="absolute inset-x-0 top-0 h-1
+                                                        {{ $rankStyle['riserTop'] }}"
+                                                    aria-hidden="true"
+                                                ></div>
+
+                                                <div
                                                     class="relative flex aspect-square
                                                         items-center justify-center
-                                                        overflow-hidden bg-slate-50/50 p-2"
+                                                        overflow-hidden bg-slate-50/70 p-1.5"
                                                 >
                                                     @if ($imageUrl)
                                                         <img
@@ -559,13 +602,13 @@
                                                         {{ $submission->submission_code }}
                                                     </p>
 
-                                                    <div class="mt-1 flex items-center justify-between">
-                                                        <span class="text-[9px] text-slate-400">
+                                                    <div class="mt-1.5 flex items-end justify-between gap-1">
+                                                        <span class="text-[9px] font-medium leading-none text-slate-500 sm:text-[10px]">
                                                             คะแนน
                                                         </span>
 
                                                         <span
-                                                            class="text-xs font-black leading-none
+                                                            class="text-sm font-black leading-none tabular-nums
                                                                 {{ $rankStyle['score'] }}"
                                                         >
                                                             {{ number_format(
@@ -578,29 +621,52 @@
                                                 </div>
                                             </div>
 
-                                            {{-- Podium riser --}}
-                                            <div
-                                                class="relative mt-2 flex w-full items-center
-                                                    justify-center overflow-hidden rounded-t-lg
-                                                    border {{ $rankStyle['riserBorder'] }}
-                                                    {{ $rankStyle['riserBg'] }} {{ $rankStyle['riserH'] }}
-                                                    shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]"
-                                            >
+                                            {{-- Podium pedestal --}}
+                                            <div class="relative mt-1.5 w-full">
                                                 <div
-                                                    class="absolute inset-x-0 top-0 h-1
-                                                        {{ $rankStyle['riserTop'] }}"
-                                                ></div>
-
-                                                <span
-                                                    class="text-2xl font-black
-                                                        {{ $rankStyle['riserNum'] }}"
+                                                    class="relative flex w-full flex-col items-center
+                                                        justify-center overflow-hidden rounded-t-lg
+                                                        border {{ $rankStyle['riserBorder'] }}
+                                                        {{ $rankStyle['riserBg'] }} {{ $rankStyle['riserH'] }}
+                                                        shadow-[inset_0_1px_2px_rgba(255,255,255,0.9)]"
                                                 >
-                                                    {{ $rank }}
-                                                </span>
+                                                    <div
+                                                        class="absolute inset-x-0 top-0 h-1
+                                                            {{ $rankStyle['riserTop'] }}"
+                                                        aria-hidden="true"
+                                                    ></div>
+
+                                                    <span
+                                                        class="text-[9px] font-bold leading-none sm:text-[10px]
+                                                            {{ $rankStyle['riserLabel'] }}"
+                                                    >
+                                                        อันดับ
+                                                    </span>
+
+                                                    <span
+                                                        class="mt-0.5 text-2xl font-black leading-none
+                                                            {{ $rankStyle['riserNum'] }}"
+                                                    >
+                                                        {{ $rank }}
+                                                    </span>
+                                                </div>
+
+                                                <div
+                                                    class="mx-1 h-1.5 rounded-b-md border-x border-b
+                                                        {{ $rankStyle['riserBorder'] }} bg-white/90"
+                                                    aria-hidden="true"
+                                                ></div>
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
+
+                                <div
+                                    class="pointer-events-none relative mx-auto mt-0.5 h-px
+                                        w-full max-w-3xl bg-gradient-to-r
+                                        from-transparent via-slate-200 to-transparent"
+                                    aria-hidden="true"
+                                ></div>
                             </div>
                         </article>
                     @endforeach
@@ -680,19 +746,14 @@
                             $submission = $item->submission;
 
                             $image = $submission?->files
-                                ?->firstWhere('is_primary', true)
-                                ?? $submission?->files?->first();
+                                ?->first(
+                                    fn ($file) => str_starts_with(
+                                        (string) $file->mime_type,
+                                        'image/'
+                                    )
+                                );
 
-                            $imagePath = $item->cover_image
-                                ?: ($image?->file_path ?? null);
-
-                            $managedCover = $item->cover_image
-                                && str_starts_with($item->cover_image, 'knowledge-items/covers/');
-                            $imageUrl = $managedCover
-                                ? route('knowledge-items.cover', $item)
-                                : ($imagePath
-                                    ? \Illuminate\Support\Facades\Storage::disk('public')->url($imagePath)
-                                    : null);
+                            $imageUrl = $item->cover_image_url;
                         @endphp
 
                         <article
@@ -824,10 +885,10 @@
         {{-- =====================================================
             ALL WORKS
         ====================================================== --}}
-        <section class="mt-10">
+        <section class="mt-8">
 
             <div
-                class="mb-5 flex flex-col gap-3
+                class="mb-4 flex flex-col gap-3
                 sm:flex-row sm:items-end
                 sm:justify-between"
             >
@@ -862,6 +923,7 @@
                     method="GET"
                     action="{{ route('home') }}"
                     id="sort-form"
+                    class="w-full sm:w-auto sm:self-end"
                 >
 
                     @if (request('search'))
@@ -875,7 +937,12 @@
                     <input type="hidden" name="sort" id="sort-value" value="{{ request('sort', 'latest') }}">
 
                     {{-- Custom Dropdown --}}
-                    <div class="relative" id="sort-dropdown">
+                    <div class="flex items-center gap-2 sm:justify-end">
+                        <span class="shrink-0 text-xs font-medium text-slate-500">
+                            เรียงตาม
+                        </span>
+
+                        <div class="relative min-w-0 flex-1 sm:flex-none" id="sort-dropdown">
 
                         @php
                             $sortOptions = [
@@ -890,10 +957,15 @@
                         <button
                             type="button"
                             id="sort-trigger"
-                            class="flex w-44 items-center justify-between rounded-2xl
-                            bg-white px-4 py-2.5 text-sm font-bold text-slate-700
-                            shadow-md transition hover:shadow-lg
-                            focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
+                            aria-haspopup="true"
+                            aria-controls="sort-panel"
+                            aria-label="เรียงลำดับผลงาน"
+                            class="flex w-full min-w-0 items-center justify-between rounded-xl
+                            border border-slate-200 bg-white px-4 py-2.5
+                            text-sm font-bold text-slate-700 shadow-sm transition duration-200
+                            hover:border-emerald-300 hover:shadow-md sm:w-44
+                            focus-visible:outline-none focus-visible:ring-2
+                            focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                         >
                             <span id="sort-label">{{ $sortOptions[$currentSort]['label'] }}</span>
 
@@ -912,8 +984,8 @@
                         {{-- Panel --}}
                         <div
                             id="sort-panel"
-                            class="absolute right-0 z-20 mt-2 hidden w-44 overflow-hidden
-                            rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-slate-100"
+                            class="absolute right-0 z-20 mt-2 hidden w-full min-w-[11rem] overflow-hidden
+                            rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-slate-200 sm:w-44"
                         >
 
                             @foreach ($sortOptions as $value => $option)
@@ -925,6 +997,7 @@
                                     class="sort-option flex w-full items-center justify-between
                                     rounded-xl px-3 py-2.5 text-left text-sm font-semibold
                                     text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700
+                                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500
                                     {{ $currentSort === $value ? 'bg-emerald-50 text-emerald-700' : '' }}"
                                 >
                                     {{ $option['label'] }}
@@ -948,8 +1021,8 @@
                             @endforeach
 
                         </div>
-
                     </div>
+                </div>
 
                 </form>
 
@@ -970,30 +1043,30 @@
                             $submission = $item->submission;
 
                             $image = $submission?->files
-                                ?->firstWhere('is_primary', true)
-                                ?? $submission?->files?->first();
+                                ?->first(
+                                    fn ($file) => str_starts_with(
+                                        (string) $file->mime_type,
+                                        'image/'
+                                    )
+                                );
 
-                            $imagePath = $item->cover_image
-                                ?: ($image?->file_path ?? null);
-
-                            $managedCover = $item->cover_image
-                                && str_starts_with($item->cover_image, 'knowledge-items/covers/');
-                            $imageUrl = $managedCover
-                                ? route('knowledge-items.cover', $item)
-                                : ($imagePath
-                                    ? \Illuminate\Support\Facades\Storage::disk('public')->url($imagePath)
-                                    : null);
+                            $imageUrl = $item->cover_image_url;
                         @endphp
 
 
                         <article
-                            class="group overflow-hidden rounded-2xl
+                            class="group h-full overflow-hidden rounded-2xl
                             border border-slate-200 bg-white
-                            shadow-sm transition duration-300
-                            hover:-translate-y-1 hover:shadow-md"
+                            shadow-sm transition duration-200
+                            hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md"
                         >
 
-                            <a href="#" class="block">
+                            <a
+                                href="#"
+                                class="flex h-full flex-col
+                                focus-visible:outline-none focus-visible:ring-2
+                                focus-visible:ring-emerald-500 focus-visible:ring-inset"
+                            >
 
                                 <div
                                     class="aspect-[4/3] overflow-hidden
@@ -1005,9 +1078,7 @@
                                         <img
                                             src="{{ $imageUrl }}"
                                             alt="{{ $item->title }}"
-                                            class="h-full w-full object-cover
-                                            transition duration-500
-                                            group-hover:scale-105"
+                                            class="h-full w-full object-cover"
                                             loading="lazy"
                                         >
 
@@ -1026,19 +1097,19 @@
                                 </div>
 
 
-                                <div class="p-3">
+                                <div class="flex flex-1 flex-col p-4">
 
                                     <p
-                                        class="line-clamp-1 text-xs
-                                        text-emerald-600"
+                                        class="line-clamp-1 text-xs font-medium
+                                        text-emerald-700"
                                     >
                                         {{ $submission?->competition?->title ?? 'ไม่ระบุการแข่งขัน' }}
                                     </p>
 
 
                                     <h3
-                                        class="mt-1 line-clamp-2 text-sm
-                                        font-semibold text-slate-800
+                                        class="mt-1.5 line-clamp-2 text-base leading-6
+                                        font-bold text-slate-900
                                         transition
                                         group-hover:text-emerald-700"
                                     >
@@ -1060,20 +1131,20 @@
 
 
                                     <div
-                                        class="mt-3 flex items-center
-                                        justify-between"
+                                        class="mt-auto flex items-end justify-between
+                                        border-t border-slate-100 pt-3"
                                     >
 
                                         <span
-                                            class="text-xs
-                                            text-slate-400"
+                                            class="text-xs font-medium
+                                            text-slate-500"
                                         >
                                             คะแนนรวม
                                         </span>
 
                                         <span
-                                            class="text-sm font-bold
-                                            text-slate-700"
+                                            class="text-base font-extrabold
+                                            tabular-nums text-slate-800"
                                         >
                                             {{ $submission?->final_score !== null
                                                 ? number_format((float) $submission->final_score, 2)
@@ -1177,10 +1248,14 @@
     ========================================================== --}}
     <footer class="border-t border-slate-200 bg-white">
 
-        <div class="mx-auto max-w-7xl px-4 py-6
-             text-center text-sm text-slate-400
-             sm:px-6 lg:px-8">
-             คลังผลงานการประกวดและองค์ความรู้
+        <div class="mx-auto max-w-7xl px-4 py-8 text-center sm:px-6 lg:px-8">
+            <p class="text-sm font-semibold text-slate-700">
+                คลังผลงานการประกวดและองค์ความรู้
+            </p>
+
+            <p class="mx-auto mt-1 max-w-2xl text-sm leading-6 text-slate-500">
+                พื้นที่รวบรวมผลงานและองค์ความรู้จากการแข่งขัน
+            </p>
         </div>
 
     </footer>

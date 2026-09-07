@@ -36,9 +36,7 @@
         @error('cover_image') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         @if ($editing && $knowledgeItem->cover_image)
             @php
-                $coverUrl = str_starts_with($knowledgeItem->cover_image, 'knowledge-items/covers/')
-                    ? route('knowledge-items.cover', $knowledgeItem)
-                    : Storage::disk('public')->url($knowledgeItem->cover_image);
+                $coverUrl = $knowledgeItem->cover_image_url;
             @endphp
             <div class="mt-3 rounded-xl border p-3">
                 <img src="{{ $coverUrl }}" alt="รูปปกปัจจุบัน" class="h-32 w-full rounded-lg object-cover">

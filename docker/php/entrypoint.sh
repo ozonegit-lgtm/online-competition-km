@@ -2,6 +2,26 @@
 
 set -eu
 
+private_root=/var/www/html/storage/app/private
+
+# Private uploads must be owned by the same user as PHP-FPM. Never follow
+# symlinks while repairing an existing tree.
+if [ -L /var/www/html/storage ] || [ -L /var/www/html/storage/app ] || [ -L "$private_root" ]; then
+    echo 'Private storage must not be a symbolic link.' >&2
+    exit 1
+fi
+mkdir -p "$private_root"
+if [ -n "$(find "$private_root" -type l -print -quit)" ]; then
+    echo 'Private storage contains a symbolic link; refusing permission repair.' >&2
+    exit 1
+fi
+mkdir -p "$private_root/submissions" "$private_root/knowledge-items/covers" "$private_root/knowledge-items/attachments"
+if [ "$(id -u)" -eq 0 ]; then
+    chown -R www-data:www-data "$private_root"
+fi
+find "$private_root" -type d -exec chmod 0700 {} +
+find "$private_root" -type f -exec chmod 0600 {} +
+
 runtime_directories='
 /var/www/html/storage/framework/sessions
 /var/www/html/storage/framework/views

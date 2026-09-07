@@ -5,9 +5,7 @@
 <article class="mx-auto max-w-5xl overflow-hidden rounded-2xl border bg-white shadow-sm">
     @if($knowledgeItem->cover_image)
         @php
-            $coverUrl = str_starts_with($knowledgeItem->cover_image, 'knowledge-items/covers/')
-                ? route('knowledge-items.cover', $knowledgeItem)
-                : Storage::disk('public')->url($knowledgeItem->cover_image);
+            $coverUrl = $knowledgeItem->cover_image_url;
         @endphp
         <img src="{{ $coverUrl }}" alt="{{ $knowledgeItem->title }}" class="h-64 w-full object-cover">
     @else

@@ -437,7 +437,7 @@
                             {{-- Current preview --}}
                             @if ($currentFile?->file_path)
                                 @php
-                                    $previewUrl = asset('storage/' . $currentFile->file_path);
+                                    $previewUrl = $currentFile->file_url;
 
                                     $extension = strtolower(
                                         pathinfo(
@@ -619,7 +619,7 @@
 
                                     @if ($file->file_path)
                                         <a
-                                            href="{{ asset('storage/' . $file->file_path) }}"
+                                            href="{{ $file->download_url }}"
                                             target="_blank"
                                             rel="noopener"
                                             class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-white px-3.5 py-2.5

@@ -23,16 +23,14 @@ class KnowledgeManagementController extends Controller
         */
         $query = KnowledgeItem::query()
             ->with([
+                'category',
                 'submission.competition.category',
                 'submission.files',
             ])
             ->where('status', 'published')
-            ->whereHas('submission', function ($query) {
-                $query->where(
-                    'status',
-                    '!=',
-                    'disqualified'
-                );
+            ->where(function ($query) {
+                $query->whereNull('submission_id')
+                    ->orWhereHas('submission', fn ($query) => $query->where('status', '!=', 'disqualified'));
             });
 
         /*
@@ -81,15 +79,11 @@ class KnowledgeManagementController extends Controller
         |--------------------------------------------------------------------------
         */
         if ($request->filled('category')) {
-            $query->whereHas(
-                'submission.competition',
-                function ($query) use ($request) {
-                    $query->where(
-                        'category_id',
-                        $request->category
-                    );
-                }
-            );
+            $query->where(function ($query) use ($request) {
+                $query->where(function ($query) use ($request) {
+                    $query->whereNull('submission_id')->where('category_id', $request->category);
+                })->orWhereHas('submission.competition', fn ($query) => $query->where('category_id', $request->category));
+            });
         }
 
         /*
@@ -142,16 +136,14 @@ class KnowledgeManagementController extends Controller
         */
         $featuredItems = KnowledgeItem::query()
             ->with([
+                'category',
                 'submission.competition.category',
                 'submission.files',
             ])
             ->where('status', 'published')
-            ->whereHas('submission', function ($query) {
-                $query->where(
-                    'status',
-                    '!=',
-                    'disqualified'
-                );
+            ->where(function ($query) {
+                $query->whereNull('submission_id')
+                    ->orWhereHas('submission', fn ($query) => $query->where('status', '!=', 'disqualified'));
             })
             ->where('is_featured', true)
             ->orderByDesc('published_at')

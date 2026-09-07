@@ -272,7 +272,7 @@
                         <div class="relative h-52 shrink-0 overflow-hidden bg-slate-100 sm:h-auto sm:w-52">
                             @if ($hasImage)
                                 <img
-                                    src="{{ asset('storage/' . $primaryFile->file_path) }}"
+                                    src="{{ $primaryFile->file_url }}"
                                     alt="{{ $submission->project_title }}"
                                     class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
                                 >

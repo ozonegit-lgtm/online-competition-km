@@ -12,6 +12,19 @@ class KnowledgeItemFileController extends Controller
 {
     public function cover(KnowledgeItem $knowledgeItem): StreamedResponse
     {
+        $this->authorizeAccess($knowledgeItem);
+        $path = $knowledgeItem->cover_image;
+        if (! $path || str_starts_with($path, 'submissions/')) {
+            $files = $knowledgeItem->submission?->files();
+            $file = $path
+                ? $files?->where('file_path', $path)->first()
+                : $files?->where('mime_type', 'like', 'image/%')->orderBy('id')->first();
+            abort_unless($file && $file->managedPath()
+                && str_starts_with((string) $file->mime_type, 'image/'), 404);
+
+            return $this->serve($knowledgeItem, $file->managedPath(), 'submissions/', null, 'inline');
+        }
+
         return $this->serve(
             $knowledgeItem,
             $knowledgeItem->cover_image,
@@ -45,7 +58,7 @@ class KnowledgeItemFileController extends Controller
 
         abort_unless($normalized && $disk->exists($normalized), 404);
 
-        $headers = [];
+        $headers = ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff'];
         $mime = $disk->mimeType($normalized);
         if (is_string($mime) && $mime !== '') {
             $headers['Content-Type'] = $mime;
@@ -61,7 +74,9 @@ class KnowledgeItemFileController extends Controller
 
     private function authorizeAccess(KnowledgeItem $knowledgeItem): void
     {
-        if ($knowledgeItem->status === 'published') {
+        if ($knowledgeItem->status === 'published'
+            && ($knowledgeItem->submission_id === null
+                || ($knowledgeItem->submission && $knowledgeItem->submission->status !== 'disqualified'))) {
             return;
         }
 

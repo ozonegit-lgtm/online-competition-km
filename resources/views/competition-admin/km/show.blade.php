@@ -13,12 +13,10 @@
 @endsection
 
 @section('content')
-    <article class="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <article id="km-detail" class="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         @if ($knowledgeItem->cover_image)
             @php
-                $coverUrl = str_starts_with($knowledgeItem->cover_image, 'knowledge-items/covers/')
-                    ? route('knowledge-items.cover', $knowledgeItem)
-                    : Storage::disk('public')->url($knowledgeItem->cover_image);
+                $coverUrl = $knowledgeItem->cover_image_url;
             @endphp
             <img src="{{ $coverUrl }}" alt="{{ $knowledgeItem->title }}" class="max-h-96 w-full object-cover">
         @else
@@ -42,11 +40,11 @@
             <div class="flex flex-wrap gap-2 border-t pt-5">
                 @can('update', $knowledgeItem)<a href="{{ route('competition-admin.km.edit', $knowledgeItem) }}" class="rounded-xl border px-4 py-2 text-sm font-semibold">แก้ไข</a>@endcan
                 @if ($knowledgeItem->status === 'published')
-                    @can('unpublish', $knowledgeItem)<x-ajax-form :action="route('competition-admin.km.unpublish', $knowledgeItem)" method="DELETE" confirm="ยืนยันถอนเผยแพร่?" success="ถอนเผยแพร่เรียบร้อย"><button class="rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white">ถอนเผยแพร่</button></x-ajax-form>@endcan
+                    @can('unpublish', $knowledgeItem)<x-ajax-form target="#km-detail" :action="route('competition-admin.km.unpublish', $knowledgeItem)" method="DELETE" confirm="ยืนยันถอนเผยแพร่?" success="ถอนเผยแพร่เรียบร้อย"><button class="rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white">ถอนเผยแพร่</button></x-ajax-form>@endcan
                 @else
-                    @can('publish', $knowledgeItem)<x-ajax-form :action="route('competition-admin.km.publish', $knowledgeItem)" method="POST" confirm="ยืนยันเผยแพร่?" success="เผยแพร่เรียบร้อย"><button class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">เผยแพร่</button></x-ajax-form>@endcan
+                    @can('publish', $knowledgeItem)<x-ajax-form target="#km-detail" :action="route('competition-admin.km.publish', $knowledgeItem)" method="POST" confirm="ยืนยันเผยแพร่?" success="เผยแพร่เรียบร้อย"><button class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">เผยแพร่</button></x-ajax-form>@endcan
                 @endif
-                @can('delete', $knowledgeItem)<x-ajax-form :action="route('competition-admin.km.destroy', $knowledgeItem)" method="DELETE" confirm="ยืนยันลบองค์ความรู้นี้?" success="ลบเรียบร้อย"><button class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white">ลบ</button></x-ajax-form>@endcan
+                @can('delete', $knowledgeItem)<x-ajax-form :redirect="route('competition-admin.km.index')" :action="route('competition-admin.km.destroy', $knowledgeItem)" method="DELETE" confirm="ยืนยันลบองค์ความรู้นี้?" success="ลบเรียบร้อย"><button class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white">ลบ</button></x-ajax-form>@endcan
             </div>
         </div>
     </article>

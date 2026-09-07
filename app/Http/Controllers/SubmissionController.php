@@ -209,7 +209,7 @@ class SubmissionController extends Controller
 
                     $storedPath = $uploadedFile->store(
                         "submissions/{$competition->id}/{$submission->submission_code}",
-                        'public'
+                        'local'
                     );
 
                     $storedPaths[] = $storedPath;
@@ -256,7 +256,7 @@ class SubmissionController extends Controller
             DB::rollBack();
 
             foreach ($storedPaths as $storedPath) {
-                Storage::disk('public')->delete($storedPath);
+                Storage::disk('local')->delete($storedPath);
             }
 
             throw $exception;

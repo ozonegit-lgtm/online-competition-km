@@ -57,6 +57,29 @@ class SubmissionFile extends Model
      */
     public function getFileUrlAttribute(): string
     {
-        return asset('storage/' . $this->file_path);
+        return route('submission-files.show', $this);
+    }
+
+    public function getDownloadUrlAttribute(): string
+    {
+        return route('submission-files.download', $this);
+    }
+
+    public function managedPath(): ?string
+    {
+        $path = $this->file_path;
+        if (! is_string($path) || str_contains($path, "\0")
+            || str_contains($path, '\\') || in_array('..', explode('/', $path), true)) {
+            return null;
+        }
+
+        $submission = $this->submission;
+        if (! $submission) {
+            return null;
+        }
+
+        $directory = "submissions/{$submission->competition_id}/{$submission->submission_code}/";
+
+        return str_starts_with($path, $directory) ? $path : null;
     }
 }

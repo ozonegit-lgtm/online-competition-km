@@ -85,7 +85,7 @@
 
         $filePath = $displayFile?->file_path;
         $fileUrl = $filePath
-            ? asset('storage/' . $filePath)
+            ? $displayFile->file_url
             : null;
 
         $extension = strtolower(
@@ -1119,7 +1119,7 @@
                                             @if ($file->file_path)
 
                                                 <a
-                                                    href="{{ asset('storage/' . $file->file_path) }}"
+                                                    href="{{ $file->download_url }}"
                                                     target="_blank"
                                                     rel="noopener"
                                                     class="mt-3 inline-flex w-full items-center justify-center gap-2

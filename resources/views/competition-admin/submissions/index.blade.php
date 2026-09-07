@@ -25,13 +25,15 @@
     <div class="aspect-video overflow-hidden bg-slate-100">
 
         @php
-            $file = $submission->files->first();
+            $file = $submission->files->first(
+                fn ($file) => str_starts_with((string) $file->mime_type, 'image/')
+            );
         @endphp
 
         @if($file)
 
             <img
-                src="{{ Storage::disk('public')->url($file->file_path) }}"
+                src="{{ $file->file_url }}"
                 alt="{{ $submission->project_title }}"
                 class="h-full w-full object-cover">
 

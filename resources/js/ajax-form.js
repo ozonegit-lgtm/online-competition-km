@@ -93,14 +93,14 @@ function replaceTarget(responseText, targetSelector) {
         responseText,
         'text/html'
     );
-    const currentTarget = document.querySelector(targetSelector);
-    const nextTarget = responseDocument.querySelector(targetSelector);
+    const currentTargets = [...document.querySelectorAll(targetSelector)];
+    const nextTargets = [...responseDocument.querySelectorAll(targetSelector)];
 
-    if (!currentTarget || !nextTarget) {
+    if (!currentTargets.length || currentTargets.length !== nextTargets.length) {
         throw new Error('บันทึกสำเร็จ แต่ไม่พบส่วนข้อมูลที่ต้องอัปเดต');
     }
 
-    currentTarget.replaceWith(nextTarget);
+    currentTargets.forEach((target, index) => target.replaceWith(nextTargets[index]));
 }
 
 document.addEventListener('submit', async (event) => {
@@ -158,6 +158,11 @@ document.addEventListener('submit', async (event) => {
             throw new Error(
                 extractErrorMessage(responseText, contentType)
             );
+        }
+
+        if (form.dataset.ajaxRedirect) {
+            window.location.assign(form.dataset.ajaxRedirect);
+            return;
         }
 
         replaceTarget(responseText, form.dataset.ajaxTarget);

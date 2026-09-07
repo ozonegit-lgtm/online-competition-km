@@ -88,11 +88,16 @@ class KnowledgeItem extends Model
      */
     public function getCoverImageUrlAttribute(): ?string
     {
-        if (!$this->cover_image) {
-            return null;
+        $path = $this->cover_image;
+        if ($path && (str_starts_with($path, 'knowledge-items/covers/')
+            || str_starts_with($path, 'submissions/'))) {
+            return route('knowledge-items.cover', $this);
         }
 
-        return asset('storage/' . $this->cover_image);
+        return ! $path && $this->submission?->files
+            ->contains(fn ($file) => str_starts_with((string) $file->mime_type, 'image/'))
+            ? route('knowledge-items.cover', $this)
+            : null;
     }
 
     /**

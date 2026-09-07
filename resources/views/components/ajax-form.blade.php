@@ -5,6 +5,7 @@
     'success' => 'บันทึกข้อมูลเรียบร้อยแล้ว',
     'loading' => 'กำลังบันทึก...',
     'target' => null,
+    'redirect' => null,
 ])
 
 @php
@@ -23,6 +24,9 @@
     @endif
     @if ($target)
         data-ajax-target="{{ $target }}"
+    @endif
+    @if ($redirect)
+        data-ajax-redirect="{{ $redirect }}"
     @endif
     {{ $attributes }}
 >

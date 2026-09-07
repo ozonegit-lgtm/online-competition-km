@@ -214,6 +214,57 @@ class KnowledgeManagementPublicationTest extends TestCase
         $this->assertDatabaseCount('knowledge_items', 0);
     }
 
+    public function test_published_manual_km_appears_in_list_featured_search_and_category(): void
+    {
+        $context = $this->context();
+        $item = KnowledgeItem::create([
+            'category_id' => $context['competition']->category_id,
+            'created_by' => $context['owner']->id,
+            'title' => 'Manual public knowledge',
+            'cover_image' => 'knowledge-items/covers/manual.png',
+            'status' => 'published',
+            'is_featured' => true,
+            'published_at' => now(),
+        ]);
+        foreach ([[], ['search' => 'Manual public'], ['category' => $item->category_id]] as $filters) {
+            $this->get(route('home', $filters))->assertOk()
+                ->assertViewHas('knowledgeItems', fn ($items) => $items->contains('id', $item->id))
+                ->assertViewHas('featuredItems', fn ($items) => $items->contains('id', $item->id))
+                ->assertSee('src="'.$item->cover_image_url.'"', false);
+        }
+        $item->update(['status' => 'draft']);
+        $this->get(route('home'))->assertOk()
+            ->assertViewHas('knowledgeItems', fn ($items) => ! $items->contains('id', $item->id))
+            ->assertViewHas('featuredItems', fn ($items) => ! $items->contains('id', $item->id));
+    }
+
+    public function test_result_image_access_tracks_publication_and_judging_views_use_routes(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+        $context = $this->context();
+        $submission = $context['submission'];
+        $path = "submissions/{$context['competition']->id}/{$submission->submission_code}/cover.png";
+        $file = $submission->files()->create([
+            'original_name' => 'cover.png', 'stored_name' => 'cover.png', 'file_path' => $path,
+            'file_extension' => 'png', 'mime_type' => 'image/png', 'file_size' => 5, 'is_primary' => true,
+        ]);
+        \Illuminate\Support\Facades\Storage::disk('local')->put($path, 'image');
+        $this->get($file->file_url)->assertNotFound();
+        $context['competition']->update(['publish_scores' => true, 'result_announcement' => now()]);
+        $this->get($file->file_url)->assertOk();
+        $this->get(route('home'))->assertOk()->assertSee('src="'.$file->file_url.'"', false);
+        $context['session']->update(['current_submission_id' => $submission->id, 'current_file_id' => $file->id]);
+        $this->actingAs($context['owner'])->get(route('competition-admin.competitions.judging-room.show', $context['competition']))
+            ->assertOk()->assertSee($file->file_url, false)->assertDontSee('/storage/submissions/', false);
+        $this->get(route('competition-admin.competitions.results.index', $context['competition']))
+            ->assertOk()->assertSee($file->file_url, false);
+        $this->actingAs($context['judge'])->get(route('judge.judging-rooms.show', $context['session']))
+            ->assertOk()->assertSee($file->file_url, false)->assertDontSee('/storage/submissions/', false);
+        auth()->logout();
+        $context['competition']->update(['publish_scores' => false]);
+        $this->get($file->file_url)->assertNotFound();
+    }
+
     private function publish(array $context)
     {
         return $this->actingAs($context['owner'])->post(

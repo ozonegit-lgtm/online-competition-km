@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\CompetitionAdmin;
+namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\KnowledgeItem;
 use App\Models\Submission;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
@@ -14,22 +13,14 @@ use Throwable;
 class KmSubmissionController extends Controller
 {
     /**
-     * หน้าเก่าของผลงานการแข่งขัน
-     * รวมการจัดการไว้ที่หน้า KM หลักแล้ว
-     */
-    public function index(): RedirectResponse
-    {
-        return redirect()->route('competition-admin.km.index');
-    }
-
-    /**
-     * เผยแพร่ผลงานเข้า KM
+     * เผยแพร่ผลงานจากการแข่งขันเข้า KM
      */
     public function publish(Submission $submission): RedirectResponse
     {
-        $this->ensureSubmissionOwner($submission);
         $this->ensureCompetitionFinished($submission);
         $this->ensureSubmissionCanBePublished($submission);
+
+        $submission->loadMissing('competition');
 
         $primaryFile = $submission->files()
             ->where('is_primary', true)
@@ -86,12 +77,10 @@ class KmSubmissionController extends Controller
     }
 
     /**
-     * ถอนผลงานออกจาก KM
+     * ถอนผลงานการแข่งขันออกจาก KM
      */
     public function unpublish(Submission $submission): RedirectResponse
     {
-        $this->ensureSubmissionOwner($submission);
-
         $knowledgeItem = $submission->knowledgeItem;
 
         if ($knowledgeItem) {
@@ -102,20 +91,6 @@ class KmSubmissionController extends Controller
         }
 
         return back()->with('success', 'ถอนผลงานออกจาก KM เรียบร้อยแล้ว');
-    }
-
-    /**
-     * ตรวจว่า Submission อยู่ในการแข่งขันของ Admin คนนี้
-     */
-    private function ensureSubmissionOwner(Submission $submission): void
-    {
-        $submission->loadMissing('competition');
-
-        abort_unless(
-            (int) $submission->competition?->created_by === (int) Auth::id(),
-            403,
-            'คุณไม่มีสิทธิ์จัดการผลงานนี้'
-        );
     }
 
     /**
