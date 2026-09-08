@@ -54,11 +54,11 @@
                 </div>
 
                 <div class="min-w-0">
-                    <h1 class="break-words text-xl font-bold leading-tight text-slate-800 sm:text-2xl">
+                    <h1 class="break-words leading-tight text-slate-800 text-xl font-bold">
                         {{ $competition->title }}
                     </h1>
 
-                    <p class="mt-1 text-xs text-slate-500 sm:text-sm">
+                    <p class="mt-1 text-slate-500 text-xs">
                         ห้องตัดสินสำหรับกรรมการ
                     </p>
                 </div>
@@ -67,9 +67,7 @@
 
         <span
             id="room-status"
-            class="inline-flex w-fit shrink-0 items-center gap-2 rounded-full px-3 py-2
-                   text-xs font-semibold ring-1 sm:px-4 sm:text-sm
-                   {{ $statusConfig['class'] }}"
+            class="inline-flex w-fit shrink-0 items-center gap-2 rounded-full font-semibold ring-1 sm:px-4 sm:text-sm {{ $statusConfig['class'] }} text-xs px-2.5 py-1"
         >
             <span class="h-2.5 w-2.5 shrink-0 rounded-full {{ $statusConfig['dot'] }}"></span>
             {{ $statusConfig['label'] }}
@@ -137,12 +135,12 @@
             filled($submitterPhone);
     @endphp
 
-    <div class="mx-auto w-full max-w-7xl space-y-4 sm:space-y-6">
+    <div class="mx-auto w-full max-w-7xl space-y-4 sm:space-y-4">
 
         {{-- Room notice --}}
         @if ($session->isWaiting())
-            <div class="overflow-hidden rounded-2xl border border-amber-200 bg-amber-50">
-                <div class="flex gap-3 p-4 sm:p-5">
+            <div class="overflow-hidden rounded-xl border border-amber-200 bg-amber-50">
+                <div class="flex gap-3 p-4 sm:p-4">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="9"/>
@@ -163,8 +161,8 @@
             </div>
 
         @elseif ($session->isPaused())
-            <div class="overflow-hidden rounded-2xl border border-orange-200 bg-orange-50">
-                <div class="flex gap-3 p-4 sm:p-5">
+            <div class="overflow-hidden rounded-xl border border-orange-200 bg-orange-50">
+                <div class="flex gap-3 p-4 sm:p-4">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M8 5v14M16 5v14"/>
@@ -184,8 +182,8 @@
             </div>
 
         @elseif ($session->isEnded() || $session->isClosed())
-            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-                <div class="flex gap-3 p-4 sm:p-5">
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                <div class="flex gap-3 p-4 sm:p-4">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-200 text-slate-500">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="m8 12 2.5 2.5L16 9"/>
@@ -198,7 +196,7 @@
                             ห้องนี้จบการตัดสินแล้ว
                         </p>
 
-                        <p class="mt-1 text-xs text-slate-500 sm:text-sm">
+                        <p class="mt-1 text-slate-500 text-xs">
                             ไม่สามารถแก้ไขหรือส่งคะแนนเพิ่มเติมได้
                         </p>
                     </div>
@@ -207,18 +205,18 @@
         @endif
 
         {{-- Main content --}}
-        <div class="grid min-w-0 grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-5">
+        <div class="grid min-w-0 grid-cols-1 gap-4 sm:gap-4 xl:grid-cols-5">
 
             {{-- =========================================================
                  LEFT / SUBMISSION
                  ========================================================= --}}
-            <section class="min-w-0 space-y-4 sm:space-y-6 xl:col-span-3">
+            <section class="min-w-0 space-y-4 sm:space-y-4 xl:col-span-3">
 
                 {{-- Submission information --}}
-                <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
                     {{-- Header --}}
-                    <div class="border-b border-slate-100 px-4 py-4 sm:px-6 sm:py-5">
+                    <div class="border-b border-slate-100 px-4 py-4 sm:px-4 sm:py-4">
                         <div class="flex items-start justify-between gap-3">
 
                             <div class="flex min-w-0 items-center gap-3">
@@ -235,7 +233,7 @@
                                         ผลงานที่กำลังตัดสิน
                                     </p>
 
-                                    <p class="mt-0.5 text-xs text-slate-400">
+                                    <p class="mt-0.5 text-slate-400 text-xs">
                                         ตรวจสอบข้อมูลและผลงานก่อนให้คะแนน
                                     </p>
                                 </div>
@@ -251,11 +249,11 @@
 
                     @if ($submission)
 
-                        <div class="p-4 sm:p-6">
+                        <div class="p-4 sm:p-4">
 
                             {{-- Project title --}}
                             <div>
-                                <h2 class="break-words text-xl font-bold leading-tight text-slate-800 sm:text-2xl">
+                                <h2 class="break-words leading-tight text-slate-800 text-base font-semibold">
                                     {{ $submission->project_title }}
                                 </h2>
 
@@ -283,9 +281,9 @@
                             </div>
 
                             {{-- Submitter information --}}
-                            <div class="mt-6 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/80 to-white">
+                            <div class="mt-4 overflow-hidden rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50/80 to-white">
 
-                                <div class="border-b border-blue-100 px-4 py-4 sm:px-5">
+                                <div class="border-b border-blue-100 px-4 py-4 sm:px-4">
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
                                             <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -295,11 +293,11 @@
                                         </div>
 
                                         <div>
-                                            <h3 class="text-sm font-bold text-slate-800">
+                                            <h3 class="text-slate-800 text-base font-semibold">
                                                 ข้อมูลผู้ส่งงาน
                                             </h3>
 
-                                            <p class="mt-0.5 text-xs text-slate-500">
+                                            <p class="mt-0.5 text-slate-500 text-xs">
                                                 ข้อมูลสำหรับกรรมการประกอบการพิจารณาผลงาน
                                             </p>
                                         </div>
@@ -312,7 +310,7 @@
                                         {{-- Name --}}
                                         @if (filled($submitterName))
                                             <div class="bg-white p-4">
-                                                <p class="text-[11px] font-medium text-slate-400">
+                                                <p class="font-medium text-slate-400 text-xs">
                                                     ชื่อผู้ส่งงาน
                                                 </p>
 
@@ -325,7 +323,7 @@
                                         {{-- Phone --}}
                                         @if (filled($submitterPhone))
                                             <div class="bg-white p-4">
-                                                <p class="text-[11px] font-medium text-slate-400">
+                                                <p class="font-medium text-slate-400 text-xs">
                                                     เบอร์โทรศัพท์
                                                 </p>
 
@@ -344,7 +342,7 @@
                                         {{-- Email --}}
                                         @if (filled($submitterEmail))
                                             <div class="bg-white p-4">
-                                                <p class="text-[11px] font-medium text-slate-400">
+                                                <p class="font-medium text-slate-400 text-xs">
                                                     อีเมล
                                                 </p>
 
@@ -364,7 +362,7 @@
                                         {{-- LINE --}}
                                         @if (filled($submitterLine))
                                             <div class="bg-white p-4">
-                                                <p class="text-[11px] font-medium text-slate-400">
+                                                <p class="font-medium text-slate-400 text-xs">
                                                     LINE ID
                                                 </p>
 
@@ -377,7 +375,7 @@
                                         {{-- Workplace --}}
                                         @if (filled($submitterWorkplace))
                                             <div class="bg-white p-4 sm:col-span-2">
-                                                <p class="text-[11px] font-medium text-slate-400">
+                                                <p class="font-medium text-slate-400 text-xs">
                                                     หน่วยงาน / สถานที่ทำงาน
                                                 </p>
 
@@ -389,7 +387,7 @@
 
                                     </div>
                                 @else
-                                    <div class="p-5">
+                                    <div class="p-4">
                                         <div class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
                                             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
                                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -414,7 +412,7 @@
 
                             {{-- Project description --}}
                             @if ($submission->project_description)
-                                <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+                                <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-4">
                                     <div class="flex items-center gap-2">
                                         <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-slate-500 ring-1 ring-slate-200">
                                             <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -453,9 +451,9 @@
                                     );
                                 @endphp
 
-                                <div class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                                <div class="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
 
-                                    <div class="flex min-w-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3.5 sm:px-5">
+                                    <div class="flex min-w-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3.5 sm:px-4">
                                         <div class="min-w-0">
                                             <div class="flex items-center gap-2">
                                                 <span class="h-2 w-2 rounded-full bg-blue-600"></span>
@@ -479,7 +477,7 @@
 
                                     @if ($isImage)
 
-                                        <div class="flex min-h-[240px] max-h-[65vh] items-center justify-center overflow-hidden bg-slate-100 p-3 sm:min-h-[360px] sm:p-5">
+                                        <div class="flex min-h-[240px] max-h-[65vh] items-center justify-center overflow-hidden bg-slate-100 p-3 sm:min-h-[360px] sm:p-4">
                                             <img
                                                 src="{{ $previewUrl }}"
                                                 alt="{{ $submission->project_title }}"
@@ -489,8 +487,8 @@
 
                                     @else
 
-                                        <div class="p-8 text-center sm:p-10">
-                                            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-400 shadow-sm ring-1 ring-slate-200">
+                                        <div class="p-4 text-center sm:p-4">
+                                            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm ring-1 ring-slate-200 border border-slate-200">
                                                 <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                                                     <path d="M14 2v6h6"/>
@@ -502,7 +500,7 @@
                                                 ไฟล์นี้ไม่สามารถแสดงตัวอย่างได้
                                             </p>
 
-                                            <p class="mt-1 text-xs text-slate-400">
+                                            <p class="mt-1 text-slate-400 text-xs">
                                                 เปิดไฟล์เพื่อดูผลงานฉบับเต็ม
                                             </p>
 
@@ -510,9 +508,7 @@
                                                 href="{{ $previewUrl }}"
                                                 target="_blank"
                                                 rel="noopener"
-                                                class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3
-                                                       text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700
-                                                       sm:w-auto"
+                                                class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:w-auto h-9 px-3"
                                             >
                                                 เปิดผลงาน
 
@@ -530,8 +526,8 @@
 
                         @else
 
-                            <div class="rounded-2xl border-2 border-dashed border-slate-200 px-4 py-16 text-center">
-                                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                            <div class="rounded-xl border-2 border-dashed border-slate-200 px-4 py-4 text-center">
+                                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
                                     <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                         <path d="M4 7h16M4 12h16M4 17h10"/>
                                     </svg>
@@ -541,7 +537,7 @@
                                     ยังไม่ได้เลือกผลงาน
                                 </p>
 
-                                <p class="mt-1 text-xs leading-5 text-slate-400">
+                                <p class="mt-1 leading-5 text-slate-400 text-xs">
                                     กรุณารอผู้จัดเลือกผลงานสำหรับการตัดสิน
                                 </p>
                             </div>
@@ -552,9 +548,9 @@
 
                 {{-- Files --}}
                 @if ($submission)
-                    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
-                        <div class="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6 sm:py-5">
+                        <div class="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-4 sm:py-4">
                             <div class="flex items-center gap-3">
                                 <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
                                     <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -564,11 +560,11 @@
                                 </div>
 
                                 <div>
-                                    <h2 class="text-sm font-bold text-slate-800 sm:text-base">
+                                    <h2 class="text-slate-800 text-base font-semibold">
                                         ไฟล์ผลงาน
                                     </h2>
 
-                                    <p class="mt-0.5 text-xs text-slate-400">
+                                    <p class="mt-0.5 text-slate-400 text-xs">
                                         ไฟล์ประกอบการตัดสินทั้งหมด
                                     </p>
                                 </div>
@@ -583,15 +579,13 @@
                             @forelse ($submission->files as $file)
 
                                 <div
-                                    class="flex min-w-0 flex-col gap-3 rounded-xl border p-3 transition sm:flex-row sm:items-center sm:justify-between sm:p-4
-                                           {{ $currentFile?->id === $file->id
+                                    class="flex min-w-0 flex-col gap-3 rounded-xl border p-3 transition sm:flex-row sm:items-center sm:justify-between sm:p-4 {{ $currentFile?->id === $file->id
                                                 ? 'border-blue-300 bg-blue-50/70'
                                                 : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50' }}"
                                 >
                                     <div class="flex min-w-0 items-start gap-3">
                                         <div
-                                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl
-                                            {{ $currentFile?->id === $file->id
+                                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl {{ $currentFile?->id === $file->id
                                                 ? 'bg-blue-100 text-blue-600'
                                                 : 'bg-slate-100 text-slate-500' }}"
                                         >
@@ -622,9 +616,7 @@
                                             href="{{ $file->download_url }}"
                                             target="_blank"
                                             rel="noopener"
-                                            class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-white px-3.5 py-2.5
-                                                   text-xs font-semibold text-blue-600 ring-1 ring-blue-200
-                                                   transition hover:bg-blue-50 sm:w-auto"
+                                            class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-white text-xs font-semibold text-blue-600 ring-1 ring-blue-200 transition hover:bg-blue-50 sm:w-auto h-9 px-3"
                                         >
                                             เปิดไฟล์
 
@@ -639,7 +631,7 @@
 
                             @empty
 
-                                <div class="py-8 text-center text-sm text-slate-400">
+                                <div class="py-4 text-center text-sm text-slate-400">
                                     ไม่มีไฟล์แนบ
                                 </div>
 
@@ -655,10 +647,10 @@
                  ========================================================= --}}
             <section class="min-w-0 xl:col-span-2">
 
-                <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
                     {{-- Scoring header --}}
-                    <div class="border-b border-slate-200 bg-white p-4 sm:p-5">
+                    <div class="border-b border-slate-200 bg-white p-4 sm:p-4">
 
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-center gap-3">
@@ -670,23 +662,23 @@
                                 </div>
 
                                 <div>
-                                    <h2 class="text-base font-bold text-slate-800">
+                                    <h2 class="text-slate-800 text-base font-semibold">
                                         ให้คะแนน
                                     </h2>
 
-                                    <p class="text-xs text-slate-500">
+                                    <p class="text-slate-500 text-xs">
                                         ประเมินผลงานตามเกณฑ์
                                     </p>
                                 </div>
                             </div>
 
                             @if ($isSubmitted)
-                                <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                                <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 font-semibold text-emerald-700 ring-1 ring-emerald-200 text-xs px-2.5 py-1">
                                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                                     ส่งแล้ว
                                 </span>
                             @elseif ($isLive)
-                                <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                                <span class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 font-semibold text-emerald-700 ring-1 ring-emerald-200 text-xs px-2.5 py-1">
                                     <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500"></span>
                                     Live
                                 </span>
@@ -694,7 +686,7 @@
                         </div>
 
                         @if ($submission && $rubrics->isNotEmpty())
-                            <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
 
                                 <div class="flex items-center justify-between gap-3">
                                     <div>
@@ -702,7 +694,7 @@
                                             ความคืบหน้าการให้คะแนน
                                         </p>
 
-                                        <p class="mt-0.5 text-[11px] text-slate-400">
+                                        <p class="mt-0.5 text-slate-400 text-xs">
                                             {{ $completedRubrics }} จาก {{ $totalRubrics }} เกณฑ์
                                         </p>
                                     </div>
@@ -720,8 +712,8 @@
                                 </div>
 
                                 <div class="mt-4 grid grid-cols-2 gap-2.5">
-                                    <div class="rounded-xl bg-white px-3.5 py-3 ring-1 ring-slate-200">
-                                        <p class="text-[10px] font-medium text-slate-400">
+                                    <div class="rounded-xl bg-white px-3.5 py-3 ring-1 ring-slate-200 border border-slate-200 shadow-sm">
+                                        <p class="font-medium text-slate-400 text-xs">
                                             คะแนนปัจจุบัน
                                         </p>
 
@@ -734,8 +726,8 @@
                                         </p>
                                     </div>
 
-                                    <div class="rounded-xl bg-white px-3.5 py-3 ring-1 ring-slate-200">
-                                        <p class="text-[10px] font-medium text-slate-400">
+                                    <div class="rounded-xl bg-white px-3.5 py-3 ring-1 ring-slate-200 border border-slate-200 shadow-sm">
+                                        <p class="font-medium text-slate-400 text-xs">
                                             เหลือ
                                         </p>
 
@@ -754,7 +746,7 @@
 
                     @if (!$submission)
 
-                        <div class="p-8 text-center">
+                        <div class="p-4 text-center">
                             <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
                                 <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                     <circle cx="12" cy="12" r="9"/>
@@ -766,14 +758,14 @@
                                 รอผู้จัดเลือกผลงาน
                             </p>
 
-                            <p class="mt-1 text-xs leading-5 text-slate-400">
+                            <p class="mt-1 leading-5 text-slate-400 text-xs">
                                 เมื่อมีผลงาน ระบบจะแสดงแบบให้คะแนนที่นี่
                             </p>
                         </div>
 
                     @elseif ($rubrics->isEmpty())
 
-                        <div class="p-8 text-center">
+                        <div class="p-4 text-center">
                             <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500">
                                 <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                                     <circle cx="12" cy="12" r="9"/>
@@ -785,7 +777,7 @@
                                 ยังไม่มีเกณฑ์การให้คะแนน
                             </p>
 
-                            <p class="mt-1 text-xs leading-5 text-slate-400">
+                            <p class="mt-1 leading-5 text-slate-400 text-xs">
                                 กรุณาติดต่อผู้จัดการแข่งขัน
                             </p>
                         </div>
@@ -817,13 +809,12 @@
                                         $scoreSubmitted = $existingScore?->submitted_at !== null;
                                     @endphp
 
-                                    <div class="p-4 sm:p-5">
+                                    <div class="p-4 sm:p-4">
 
                                         <div class="flex items-start gap-3">
 
                                             <div
-                                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg
-                                                {{ $hasScore
+                                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg {{ $hasScore
                                                     ? 'bg-emerald-100 text-emerald-700'
                                                     : 'bg-slate-100 text-slate-500' }}"
                                             >
@@ -850,7 +841,7 @@
                                                         </label>
 
                                                         @if ($rubric->description)
-                                                            <p class="mt-1 break-words text-xs leading-5 text-slate-500">
+                                                            <p class="mt-1 break-words leading-5 text-slate-500 text-xs">
                                                                 {{ $rubric->description }}
                                                             </p>
                                                         @endif
@@ -888,15 +879,7 @@
                                                     inputmode="decimal"
                                                     required
                                                     @disabled(!$isLive || $isSubmitted)
-                                                    class="w-full rounded-xl border border-slate-300
-                                                           bg-slate-50 px-4 py-3.5 pr-20 text-xl
-                                                           font-bold text-slate-800 outline-none
-                                                           transition placeholder:text-slate-300
-                                                           focus:border-blue-500 focus:bg-white
-                                                           focus:ring-4 focus:ring-blue-100
-                                                           disabled:cursor-not-allowed
-                                                           disabled:bg-slate-100
-                                                           disabled:opacity-70"
+                                                    class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3.5 font-bold text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-70 text-sm h-10 px-3 pr-20"
                                                     placeholder="0"
                                                 >
 
@@ -931,15 +914,7 @@
                                                 rows="3"
                                                 placeholder="เขียนความคิดเห็นเพิ่มเติมเกี่ยวกับเกณฑ์นี้..."
                                                 @disabled(!$isLive || $isSubmitted)
-                                                class="w-full resize-y rounded-xl border border-slate-300
-                                                       bg-slate-50 px-4 py-3 text-sm leading-6
-                                                       text-slate-700 outline-none transition
-                                                       placeholder:text-slate-300
-                                                       focus:border-blue-500 focus:bg-white
-                                                       focus:ring-4 focus:ring-blue-100
-                                                       disabled:cursor-not-allowed
-                                                       disabled:bg-slate-100
-                                                       disabled:opacity-70"
+                                                class="w-full resize-y rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700 outline-none transition placeholder:text-slate-300 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-70"
                                             >{{ old(
                                                 "scores.{$rubric->id}.comment",
                                                 $existingScore?->comment
@@ -952,7 +927,7 @@
                             </div>
 
                             {{-- Action area --}}
-                            <div class="border-t border-slate-200 bg-slate-50 p-4 sm:p-5">
+                            <div class="border-t border-slate-200 bg-slate-50 p-4 sm:p-4">
 
                                 @if ($isSubmitted)
 
@@ -980,9 +955,7 @@
 
                                     <button
                                         type="submit"
-                                        class="flex w-full items-center justify-center gap-2 rounded-xl border border-blue-200
-                                               bg-white px-4 py-3.5 text-sm font-bold text-blue-600
-                                               shadow-sm transition hover:bg-blue-50 active:bg-blue-100"
+                                        class="flex w-full items-center justify-center gap-2 rounded-xl border border-blue-200 bg-white text-sm font-bold text-blue-600 shadow-sm transition hover:bg-blue-50 active:bg-blue-100 h-9 px-3"
                                     >
                                         <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/>
@@ -994,12 +967,12 @@
 
                                 @else
 
-                                    <div class="rounded-xl border border-slate-200 bg-white p-4 text-center">
+                                    <div class="rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
                                         <p class="text-sm font-semibold text-slate-600">
                                             ยังไม่สามารถให้คะแนนได้
                                         </p>
 
-                                        <p class="mt-1 text-xs leading-5 text-slate-400">
+                                        <p class="mt-1 leading-5 text-slate-400 text-xs">
                                             ระบบจะเปิดให้บันทึกคะแนนเมื่อห้องกำลัง Live
                                         </p>
                                     </div>
@@ -1018,10 +991,7 @@
         <div class="pt-1">
             <a
                 href="{{ route('judge.judging-rooms.index') }}"
-                class="inline-flex w-full items-center justify-center gap-2 rounded-xl
-                       border border-slate-300 bg-white px-5 py-3 text-sm font-semibold
-                       text-slate-600 transition hover:bg-slate-50 active:bg-slate-100
-                       sm:w-auto sm:py-2.5"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-600 transition hover:bg-slate-50 active:bg-slate-100 sm:w-auto h-9 px-3"
             >
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="m15 18-6-6 6-6"/>

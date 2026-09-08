@@ -9,7 +9,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="min-h-screen bg-slate-100 text-slate-800">
+<body class="min-h-screen bg-slate-100 text-slate-800 text-sm">
     @php
         $coverImage = $competition->cover_image ?: $competition->template?->cover_image;
         $coverUrl = null;
@@ -56,27 +56,26 @@
     @endphp
 
     <header class="border-b border-slate-200 bg-white">
-        <div class="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+        <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-4">
             <div>
                 <p class="font-bold text-slate-900">Online Competition &amp; KM</p>
-                <p class="mt-0.5 text-xs text-slate-500">ระบบส่งผลงานเข้าประกวดออนไลน์</p>
+                <p class="mt-0.5 text-slate-500 text-xs">ระบบส่งผลงานเข้าประกวดออนไลน์</p>
             </div>
 
             <span
-                class="rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset
-                    {{ $isRegistrationOpen
+                class="rounded-full font-semibold ring-1 ring-inset {{ $isRegistrationOpen
                         ? 'bg-blue-50 text-blue-700 ring-blue-200'
-                        : 'bg-red-50 text-red-700 ring-red-200' }}"
+                        : 'bg-red-50 text-red-700 ring-red-200' }} text-xs px-2.5 py-1"
             >
                 {{ $statusLabel }}
             </span>
         </div>
     </header>
 
-    <main class="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
+    <main class="mx-auto w-full max-w-7xl space-y-4 px-4 py-4 sm:px-4 sm:py-4">
 
         {{-- ข้อมูลการแข่งขัน --}}
-        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
             {{-- ล็อกความสูงภาพปกให้เท่ากันทุกการแข่งขัน และครอบภาพให้อยู่ในแนวนอน --}}
             <div class="relative h-40 w-full overflow-hidden bg-slate-200 sm:h-44 lg:h-48">
@@ -93,26 +92,26 @@
                 @endif
             </div>
 
-            <div class="p-6 sm:p-8">
+            <div class="p-4 sm:p-4">
                 <div class="flex flex-wrap items-center gap-2">
 
                     @if ($competition->category)
-                        <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                        <span class="rounded-full bg-blue-50 font-semibold text-blue-700 text-xs px-2.5 py-1">
                             {{ $competition->category->category_name }}
                         </span>
                     @endif
 
-                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                    <span class="rounded-full bg-slate-100 font-semibold text-slate-600 text-xs px-2.5 py-1">
                         {{ $competition->competition_type === 'team' ? 'ประเภททีม' : 'ประเภทบุคคล' }}
                     </span>
 
-                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                    <span class="rounded-full bg-slate-100 font-semibold text-slate-600 text-xs px-2.5 py-1">
                         {{ $competition->visibility === 'private' ? 'ใช้รหัสเข้าร่วม' : 'สาธารณะ' }}
                     </span>
 
                 </div>
 
-                <h1 class="mt-4 text-2xl font-bold text-slate-900 sm:text-3xl">
+                <h1 class="mt-4 text-slate-900 text-xl font-bold">
                     {{ $competition->title }}
                 </h1>
 
@@ -122,9 +121,9 @@
                     </p>
                 @endif
 
-                <div class="mt-6 grid gap-3 sm:grid-cols-2">
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
                     <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                        <p class="text-xs font-medium text-slate-500">
+                        <p class="font-medium text-slate-500 text-xs">
                             เปิดรับผลงาน
                         </p>
 
@@ -134,7 +133,7 @@
                     </div>
 
                     <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                        <p class="text-xs font-medium text-slate-500">
+                        <p class="font-medium text-slate-500 text-xs">
                             ปิดรับผลงาน
                         </p>
 
@@ -154,7 +153,7 @@
                 action="{{ route('competitions.submissions.store', $competition) }}"
                 method="POST"
                 enctype="multipart/form-data"
-                class="space-y-6"
+                class="space-y-4"
             >
                 @csrf
                 <input type="hidden" name="form_guard_token" value="{{ $formGuardToken }}">
@@ -178,7 +177,7 @@
                 </div>
 
                 @if ($errors->any())
-                    <div class="rounded-2xl border border-red-200 bg-red-50 p-5">
+                    <div class="rounded-xl border border-red-200 bg-red-50 p-4">
                         <p class="font-semibold text-red-800">
                             กรุณาตรวจสอบข้อมูลอีกครั้ง
                         </p>
@@ -192,7 +191,7 @@
                 @endif
 
                 @if ($competition->visibility === 'private')
-                    <section class="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+                    <section class="rounded-xl border border-amber-200 bg-amber-50 p-4">
                         <label
                             for="access_code"
                             class="block text-sm font-semibold text-slate-800"
@@ -210,7 +209,7 @@
                             maxlength="100"
                             autocomplete="off"
                             placeholder="กรอกรหัสที่ได้รับจากผู้จัดการแข่งขัน"
-                            class="{{ $inputClass }}"
+                            class="{{ $inputClass }} text-sm border py-2! h-10 px-3!"
                         >
 
                         @error('access_code')
@@ -222,18 +221,18 @@
                 @endif
 
                 {{-- ข้อมูลผู้ส่งผลงาน --}}
-                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-4">
                     <div>
-                        <h2 class="text-xl font-bold text-slate-900">
+                        <h2 class="text-slate-900 text-base font-semibold">
                             ข้อมูลผู้ส่งผลงาน
                         </h2>
 
-                        <p class="mt-1 text-sm text-slate-500">
+                        <p class="mt-1 text-slate-500 text-xs">
                             กรุณากรอกข้อมูลสำหรับติดต่อเกี่ยวกับผลงานที่ส่งเข้าประกวด
                         </p>
                     </div>
 
-                    <div class="mt-6 grid gap-5 sm:grid-cols-2">
+                    <div class="mt-4 grid gap-4 sm:grid-cols-2">
                         {{-- ชื่อผู้ส่ง --}}
                         <div class="sm:col-span-2">
                             <label
@@ -253,7 +252,7 @@
                                 maxlength="150"
                                 autocomplete="name"
                                 placeholder="กรอกชื่อ-นามสกุล"
-                                class="{{ $inputClass }}"
+                                class="{{ $inputClass }} text-sm border py-2! h-10 px-3!"
                             >
 
                             @error('contact_name')
@@ -282,7 +281,7 @@
                                 maxlength="150"
                                 autocomplete="email"
                                 placeholder="example@email.com"
-                                class="{{ $inputClass }}"
+                                class="{{ $inputClass }} text-sm border py-2! h-10 px-3!"
                             >
 
                             @error('contact_email')
@@ -311,7 +310,7 @@
                                 maxlength="20"
                                 autocomplete="tel"
                                 placeholder="08xxxxxxxx"
-                                class="{{ $inputClass }}"
+                                class="{{ $inputClass }} text-sm border py-2! h-10 px-3!"
                             >
 
                             @error('contact_phone')
@@ -324,12 +323,12 @@
                 </section>
 
                 @if ($competition->competition_type === 'team')
-                    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-                        <h2 class="text-lg font-bold text-slate-900">
+                    <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-4">
+                        <h2 class="text-slate-900 text-base font-semibold">
                             ข้อมูลทีม
                         </h2>
 
-                        <div class="mt-5">
+                        <div class="mt-4">
                             <label
                                 for="team_name"
                                 class="block text-sm font-semibold text-slate-700"
@@ -346,7 +345,7 @@
                                 required
                                 maxlength="255"
                                 placeholder="กรอกชื่อทีม"
-                                class="{{ $inputClass }}"
+                                class="{{ $inputClass }} text-sm border py-2! h-10 px-3!"
                             >
 
                             @error('team_name')
@@ -358,25 +357,25 @@
                     </section>
                 @endif
 
-                <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-4">
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                            <h2 class="text-xl font-bold text-slate-900">
+                            <h2 class="text-slate-900 text-base font-semibold">
                                 กรอกข้อมูลผลงาน
                             </h2>
 
-                            <p class="mt-1 text-sm text-slate-500">
+                            <p class="mt-1 text-slate-500 text-xs">
                                 กรุณากรอกข้อมูลให้ครบถ้วนก่อนส่งผลงาน
                             </p>
                         </div>
 
-                        <span class="w-fit rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600">
+                        <span class="w-fit rounded-full bg-slate-100 font-semibold text-slate-600 text-xs px-2.5 py-1">
                             {{ $fields->count() }} ช่อง
                         </span>
                     </div>
 
                     {{-- ชื่อผลงาน --}}
-                    <div class="mt-7">
+                    <div class="mt-4">
                         <label
                             for="project_title"
                             class="block text-sm font-semibold text-slate-700"
@@ -393,7 +392,7 @@
                             required
                             maxlength="255"
                             placeholder="กรอกชื่อผลงาน"
-                            class="{{ $inputClass }}"
+                            class="{{ $inputClass }} text-sm border py-2! h-10 px-3!"
                         >
 
                         @error('project_title')
@@ -404,7 +403,7 @@
                     </div>
 
                     {{-- คำถามจาก Template Form --}}
-                    <div class="mt-7 space-y-6">
+                    <div class="mt-4 space-y-4">
                         @foreach ($fields as $field)
                             @php
                                 $fieldKey = "fields.{$field->id}";
@@ -413,7 +412,7 @@
                                 $oldValue = old($fieldKey);
                             @endphp
 
-                            <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-5">
+                            <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
                                 <div class="flex flex-wrap items-start justify-between gap-3">
                                     <label
                                         for="field_{{ $field->id }}"
@@ -426,7 +425,7 @@
                                         @endif
                                     </label>
 
-                                    <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                                    <span class="rounded-full bg-blue-50 font-semibold text-blue-700 text-xs px-2.5 py-1">
                                         {{ $typeLabels[$field->field_type] ?? $field->field_type }}
                                     </span>
                                 </div>
@@ -440,7 +439,7 @@
                                             rows="4"
                                             @required($field->is_required)
                                             placeholder="{{ $field->placeholder }}"
-                                            class="{{ $inputClass }}"
+                                            class="{{ $inputClass }} text-sm border px-3! py-2!"
                                         >{{ $oldValue }}</textarea>
                                     @break
 
@@ -449,7 +448,7 @@
                                             id="field_{{ $field->id }}"
                                             name="{{ $fieldName }}"
                                             @required($field->is_required)
-                                            class="{{ $inputClass }}"
+                                            class="{{ $inputClass }} text-sm border py-2! h-10 px-3!"
                                         >
                                             <option value="">
                                                 {{ $field->placeholder ?: '-- กรุณาเลือก --' }}
@@ -507,7 +506,7 @@
                                         @php
                                             $filePolicy = $field->resolved_file_policy;
                                         @endphp
-                                        <div class="mt-3 rounded-xl border border-dashed border-slate-300 bg-white p-4">
+                                        <div class="mt-3 rounded-xl border border-dashed border-slate-300 bg-white p-4 shadow-sm">
                                             <input
                                                 id="field_{{ $field->id }}"
                                                 type="file"
@@ -548,7 +547,7 @@
 
                                                             <p
                                                                 id="file_name_{{ $field->id }}"
-                                                                class="mt-0.5 truncate text-xs text-slate-500"
+                                                                class="mt-0.5 truncate text-slate-500 text-xs"
                                                             >
                                                                 ยังไม่ได้เลือกไฟล์
                                                             </p>
@@ -577,7 +576,7 @@
                                             </div>
                                         </div>
 
-                                        <p class="mt-2 text-xs leading-5 text-slate-500">
+                                        <p class="mt-2 leading-5 text-slate-500 text-xs">
                                             รองรับ: {{ strtoupper(implode(', ', $filePolicy['extensions'])) }} • สูงสุด {{ $filePolicy['max_megabytes'] }} MB
                                         </p>
                                     @break
@@ -598,12 +597,12 @@
                                             value="{{ $oldValue }}"
                                             @required($field->is_required)
                                             placeholder="{{ $field->placeholder }}"
-                                            class="{{ $inputClass }}"
+                                            class="{{ $inputClass }} text-sm border py-2! h-10 px-3!"
                                         >
                                 @endswitch
 
                                 @if ($field->help_text && $field->field_type !== 'file')
-                                    <p class="mt-2 text-xs leading-5 text-slate-500">
+                                    <p class="mt-2 leading-5 text-slate-500 text-xs">
                                         {{ $field->help_text }}
                                     </p>
                                 @endif
@@ -618,8 +617,8 @@
                     </div>
                 </section>
 
-                <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-4">
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-4">
                         <label class="flex cursor-pointer items-start gap-3">
                             <input
                                 type="checkbox"
@@ -642,13 +641,13 @@
                         </label>
 
                         @error('terms')
-                            <p class="mt-3 pl-8 text-sm text-red-600">
+                            <p class="mt-3 text-sm text-red-600 pl-8">
                                 {{ $message }}
                             </p>
                         @enderror
                     </div>
 
-                    <div class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex items-start gap-2 text-xs leading-5 text-slate-500">
                             <svg
                                 class="mt-0.5 h-4 w-4 shrink-0 text-slate-400"
@@ -675,7 +674,7 @@
                             id="public-submission-button"
                             type="submit"
                             style="min-height: 48px;"
-                            class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 sm:w-auto sm:min-w-64"
+                            class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 sm:w-auto sm:min-w-64 h-9 px-3"
                         >
                             <svg
                                 class="h-5 w-5"
@@ -701,7 +700,7 @@
         @else
 
             {{-- ไม่เปิดรับผลงาน --}}
-            <section class="rounded-2xl border border-red-200 bg-red-50 p-6 shadow-sm sm:p-8">
+            <section class="rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm sm:p-4">
                 <div class="flex flex-col items-center text-center">
 
                     <div class="flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-red-600">
@@ -721,7 +720,7 @@
                         </svg>
                     </div>
 
-                    <h2 class="mt-4 text-xl font-bold text-slate-900">
+                    <h2 class="mt-4 text-slate-900 text-base font-semibold">
                         {{ $statusLabel }}
                     </h2>
 
@@ -762,7 +761,7 @@
 
     </main>
 
-    <footer class="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
+    <footer class="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
         Online Competition &amp; Knowledge Management Platform
     </footer>
 

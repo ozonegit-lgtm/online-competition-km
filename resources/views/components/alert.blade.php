@@ -44,8 +44,7 @@
 
 @if (count($alerts))
     <div
-        class="pointer-events-none fixed bottom-5 left-0 right-0 z-[100]
-               flex flex-col items-center gap-3 px-4 lg:left-80"
+        class="pointer-events-none fixed bottom-5 left-0 right-0 z-[100] flex flex-col items-center gap-3 px-4 lg:left-80"
         aria-live="polite"
         aria-atomic="true"
     >
@@ -74,16 +73,11 @@
             <div
                 data-app-toast
                 role="alert"
-                class="pointer-events-auto relative flex w-full max-w-[380px]
-                       translate-y-6 items-start gap-3 overflow-hidden
-                       rounded-2xl border border-slate-200 bg-white p-4
-                       opacity-0 shadow-[0_12px_35px_rgba(15,23,42,0.14)]
-                       transition-all duration-300"
+                class="pointer-events-auto relative flex w-full max-w-[380px] translate-y-6 items-start gap-3 overflow-hidden rounded-xl border border-slate-200 bg-white p-4 opacity-0 shadow-[0_12px_35px_rgba(15,23,42,0.14)] transition-all duration-300 shadow-sm"
             >
                 {{-- Icon --}}
                 <div
-                    class="flex h-10 w-10 shrink-0 items-center justify-center
-                           rounded-xl ring-1 {{ $styles['iconBox'] }}"
+                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 {{ $styles['iconBox'] }}"
                 >
                     @if ($alert['type'] === 'success')
                         <svg
@@ -155,7 +149,7 @@
                         {{ $alert['title'] }}
                     </p>
 
-                    <p class="mt-1 break-words text-sm leading-5 text-slate-500">
+                    <p class="mt-1 break-words leading-5 text-slate-500 text-xs">
                         {{ $alert['message'] }}
                     </p>
                 </div>
@@ -164,9 +158,7 @@
                 <button
                     type="button"
                     data-toast-close
-                    class="shrink-0 rounded-lg p-1.5 text-slate-400
-                           transition hover:bg-slate-100 hover:text-slate-700
-                           focus:outline-none focus:ring-2 focus:ring-slate-200"
+                    class="shrink-0 rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200 inline-flex items-center justify-center text-sm h-9 px-3"
                     aria-label="ปิดข้อความแจ้งเตือน"
                 >
                     <svg
@@ -186,8 +178,7 @@
                 {{-- Progress --}}
                 <div
                     data-toast-progress
-                    class="absolute bottom-0 left-0 h-0.5 w-full
-                           origin-left {{ $styles['dot'] }}"
+                    class="absolute bottom-0 left-0 h-0.5 w-full origin-left {{ $styles['dot'] }}"
                 ></div>
             </div>
         @endforeach

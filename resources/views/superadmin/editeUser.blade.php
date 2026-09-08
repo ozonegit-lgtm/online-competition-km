@@ -4,11 +4,11 @@
 
 @section('header')
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">
+        <h1 class="text-slate-800 text-xl font-bold">
             แก้ไขผู้ใช้งาน
         </h1>
 
-        <p class="mt-1 text-sm text-slate-500">
+        <p class="mt-1 text-slate-500 text-xs">
             แก้ไขข้อมูลบัญชี บทบาท และสถานะผู้ใช้งาน
         </p>
     </div>
@@ -21,13 +21,13 @@
         enctype="multipart/form-data"
         method="POST"
         autocomplete="off"
-        class="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        class="mt-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
 
         @csrf
         @method('PUT')
         {{-- หัวข้อฟอร์ม --}}
-        <div class="flex items-center gap-3 border-b border-slate-200 pb-5">
-            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
+        <div class="flex items-center gap-3 border-b border-slate-200 pb-4">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -46,17 +46,17 @@
             </div>
 
             <div>
-                <h2 class="text-xl font-bold text-slate-800">
+                <h2 class="text-slate-800 text-base font-semibold">
                     ข้อมูลบัญชี
                 </h2>
 
-                <p class="text-sm text-slate-500">
+                <p class="text-slate-500 text-xs">
                     กรอกข้อมูลสำหรับใช้เข้าสู่ระบบ
                 </p>
             </div>
         </div>
         {{-- ข้อมูลบัญชี --}}
-        <div class="mt-6 grid gap-6 md:grid-cols-2">
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
             {{-- Username --}}
             <div>
                 <label
@@ -73,10 +73,7 @@
                         placeholder="เช่น admin_jade"
                         autocomplete="off"
                         required
-                        class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 pr-11
-                               text-slate-800 outline-none transition
-                               placeholder:text-slate-400
-                               focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100">
+                        class="w-full rounded-xl border border-slate-300 bg-slate-50 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 text-sm py-2 h-10 px-3 pr-11">
                     <svg
                         width="20"
                         height="20"
@@ -91,7 +88,7 @@
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0ZM4 21a8 8 0 0116 0"/>
                     </svg>
                 </div>
-                <p class="mt-1.5 text-xs text-slate-500">
+                <p class="mt-1.5 text-slate-500 text-xs">
                     ต้องไม่ซ้ำกับบัญชีอื่นและควรมีอย่างน้อย 6 ตัวอักษร
                 </p>
                 @error('username')
@@ -114,10 +111,7 @@
                         placeholder="admin@university.ac.th"
                         autocomplete="off"
                         required
-                        class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 pr-11
-                               text-slate-800 outline-none transition
-                               placeholder:text-slate-400
-                               focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100">
+                        class="w-full rounded-xl border border-slate-300 bg-slate-50 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 text-sm py-2 h-10 px-3 pr-11">
                     <svg
                         width="20"
                         height="20"
@@ -153,14 +147,11 @@
                         name="password"
                         placeholder="เว้นว่างไว้ หากไม่ต้องการเปลี่ยนรหัสผ่าน"
                         autocomplete="new-password"
-                        class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 pr-12
-                            text-slate-800 outline-none transition
-                            placeholder:text-slate-400
-                            focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100">
+                        class="w-full rounded-xl border border-slate-300 bg-slate-50 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 text-sm py-2 h-10 px-3 pr-12">
                     <button
                         type="button"
                         onclick="togglePassword('password', this)"
-                        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700 inline-flex items-center justify-center text-sm h-9 px-3"
                         aria-label="แสดงหรือซ่อนรหัสผ่าน">
                         <svg
                             width="20"
@@ -182,7 +173,7 @@
                         </svg>
                     </button>
                 </div>
-                <p class="mt-1.5 text-xs text-slate-500">
+                <p class="mt-1.5 text-slate-500 text-xs">
                     เว้นว่างไว้เพื่อใช้รหัสผ่านเดิม หากต้องการเปลี่ยน รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร
                 </p>
                 @error('password')
@@ -213,14 +204,11 @@
                         name="password_confirmation"
                         placeholder="ยืนยันรหัสผ่านใหม่"
                         autocomplete="new-password"
-                        class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 pr-12
-                            text-slate-800 outline-none transition
-                            placeholder:text-slate-400
-                            focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100">
+                        class="w-full rounded-xl border border-slate-300 bg-slate-50 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 text-sm py-2 h-10 px-3 pr-12">
                     <button
                         type="button"
                         onclick="togglePassword('password_confirmation', this)"
-                        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 inline-flex items-center justify-center text-sm h-9 px-3"
                         aria-label="แสดงหรือซ่อนรหัสผ่าน">
                         <svg
                             width="20"
@@ -250,9 +238,7 @@
                     id="role_id"
                     name="role_id"
                     required
-                    class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3
-                           text-slate-800 outline-none transition
-                           focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100">
+                    class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 text-slate-800 outline-none transition focus:border-green-600 focus:bg-white focus:ring-4 focus:ring-green-100 text-sm py-2 h-10 px-3">
                     <option value="">เลือกบทบาท</option>
                     @foreach ($roles as $role)
                         <option value="{{ $role->id }}"
@@ -267,11 +253,11 @@
             </div>
         </div>
         {{-- สถานะบัญชี --}}
-        <div class="mt-8">
+        <div class="mt-4">
             <p class="text-sm font-medium text-slate-700">
                 สถานะบัญชี <span class="text-red-500">*</span>
             </p>
-            <div class="mt-3 flex flex-wrap gap-6">
+            <div class="mt-3 flex flex-wrap gap-4">
                 <label class="flex cursor-pointer items-center gap-3">
                     <input
                         type="radio"
@@ -300,11 +286,10 @@
             @enderror
         </div>
         {{-- ปุ่ม --}}
-        <div class="mt-8 flex flex-wrap items-center justify-end gap-3 border-t border-slate-200 pt-6">
+        <div class="mt-4 flex flex-wrap items-center justify-end gap-3 border-t border-slate-200 pt-4">
             <a
                 href="{{ route('superadmin.showUser', ['id' => $user->id]) }}"
-                class="rounded-xl border border-slate-300 px-5 py-2.5 font-medium text-slate-600
-                       transition hover:bg-slate-100">
+                class="rounded-xl border border-slate-300 font-medium text-slate-600 transition hover:bg-slate-100 inline-flex items-center justify-center text-sm h-9 px-3">
                 ย้อนกลับ
             </a>
             {{-- <button
@@ -314,7 +299,7 @@
                 เพิ่มข้อมูลผู้ใช้
             </button> --}}
             <button type="submit"
-                    class="rounded-xl bg-green-700 px-6 py-2.5 font-medium text-white shadow-sm transition hover:bg-green-800 focus:ring-4 focus:ring-green-200">
+                    class="rounded-xl bg-green-700 font-medium text-white shadow-sm transition hover:bg-green-800 focus:ring-4 focus:ring-green-200 inline-flex items-center justify-center text-sm h-9 px-3">
                     บันทึกการแก้ไข
             </button>
         </div>

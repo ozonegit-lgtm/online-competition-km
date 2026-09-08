@@ -4,11 +4,11 @@
 
 @section('header')
     <div>
-        <h1 class="text-2xl font-bold text-slate-900">
+        <h1 class="text-slate-900 text-xl font-bold">
             โปรไฟล์ของฉัน
         </h1>
 
-        <p class="mt-1 text-sm text-slate-500">
+        <p class="mt-1 text-slate-500 text-xs">
             จัดการข้อมูลส่วนตัว รูปโปรไฟล์ และข้อมูลการติดต่อ
         </p>
     </div>
@@ -44,31 +44,27 @@
         method="POST"
         action="{{ route('profile.update') }}"
         enctype="multipart/form-data"
-        class="mx-auto max-w-4xl"
+        class="mx-auto max-w-7xl"
     >
         @csrf
         @method('PUT')
 
-        <div class="space-y-6">
+        <div class="space-y-4">
 
             {{-- การ์ดรูปโปรไฟล์ --}}
-            <section class="overflow-hidden rounded-2xl border border-slate-200
-                            bg-white shadow-sm">
+            <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
                 <div class="h-24 bg-gradient-to-r from-blue-600 to-sky-500"></div>
 
-                <div class="px-6 pb-6 sm:px-8">
+                <div class="px-4 pb-4 sm:px-4">
 
                     {{-- รูปโปรไฟล์ --}}
                     <div class="-mt-16 flex justify-center">
-                        <div class="rounded-full bg-white p-1.5 shadow-md">
+                        <div class="rounded-full bg-white p-1.5 shadow-sm">
 
                             <div
                                 id="profileImageFallback"
-                                class="{{ $profileImageUrl ? 'hidden' : 'flex' }}
-                                       h-32 w-32 items-center justify-center
-                                       overflow-hidden rounded-full bg-blue-100
-                                       text-4xl font-bold text-blue-700"
+                                class="{{ $profileImageUrl ? 'hidden' : 'flex' }} h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-blue-100 text-xl font-bold text-blue-700"
                             >
                                 {{ $initial }}
                             </div>
@@ -77,27 +73,24 @@
                                 id="profileImagePreview"
                                 src="{{ $profileImageUrl ?? '' }}"
                                 alt="รูปโปรไฟล์ของ {{ $displayName }}"
-                                class="{{ $profileImageUrl ? 'block' : 'hidden' }}
-                                       h-32 w-32 rounded-full object-cover"
+                                class="{{ $profileImageUrl ? 'block' : 'hidden' }} h-32 w-32 rounded-full object-cover"
                             >
                         </div>
                     </div>
 
                     {{-- ชื่อและบทบาท --}}
                     <div class="mt-4 text-center">
-                        <h2 class="text-xl font-bold text-slate-900">
+                        <h2 class="text-slate-900 text-base font-semibold">
                             {{ $displayName }}
                         </h2>
 
                         <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
-                            <span class="rounded-full border border-blue-200 bg-blue-50
-                                         px-3 py-1 text-xs font-semibold text-blue-700">
+                            <span class="rounded-full border border-blue-200 bg-blue-50 font-semibold text-blue-700 text-xs px-2.5 py-1">
                                 {{ $user->role?->display_name ?? 'ไม่ระบุบทบาท' }}
                             </span>
 
                             @if ($profile?->position)
-                                <span class="rounded-full border border-slate-200 bg-slate-50
-                                             px-3 py-1 text-xs text-slate-600">
+                                <span class="rounded-full border border-slate-200 bg-slate-50 text-slate-600 text-xs px-2.5 py-1">
                                     {{ $profile->position }}
                                 </span>
                             @endif
@@ -105,24 +98,19 @@
                     </div>
 
                     {{-- อัปโหลดรูป --}}
-                    <div class="mx-auto mt-6 max-w-xl border-t border-slate-200 pt-5">
+                    <div class="mx-auto mt-4 max-w-xl border-t border-slate-200 pt-4">
 
                         <input
                             type="file"
                             id="profile_image"
                             name="profile_image"
                             accept=".jpg,.jpeg,.png,.webp"
-                            class="hidden"
+                            class="hidden text-sm h-10"
                         >
 
                         <label
                             for="profile_image"
-                            class="flex w-full cursor-pointer items-center
-                                   justify-center gap-2 rounded-xl border
-                                   border-blue-200 bg-blue-50 px-4 py-3
-                                   text-sm font-semibold text-blue-700
-                                   transition hover:border-blue-300
-                                   hover:bg-blue-100"
+                            class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100"
                         >
                             <svg
                                 class="h-5 w-5"
@@ -142,20 +130,18 @@
 
                         <p
                             id="selectedFileName"
-                            class="mt-3 truncate text-center text-xs
-                                   font-medium text-slate-500"
+                            class="mt-3 truncate text-center font-medium text-slate-500 text-xs"
                         >
                             ยังไม่ได้เลือกไฟล์ใหม่
                         </p>
 
-                        <p class="mt-2 text-center text-xs leading-5 text-slate-400">
+                        <p class="mt-2 text-center leading-5 text-slate-400 text-xs">
                             รองรับ JPG, JPEG, PNG และ WEBP
                             ขนาดไฟล์ไม่เกิน 5 MB
                         </p>
 
                         @error('profile_image')
-                            <p class="mt-3 rounded-lg bg-red-50 px-3 py-2
-                                      text-center text-sm text-red-600">
+                            <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-center text-sm text-red-600">
                                 {{ $message }}
                             </p>
                         @enderror
@@ -164,15 +150,12 @@
             </section>
 
             {{-- การ์ดข้อมูลบัญชี --}}
-            <section class="overflow-hidden rounded-2xl border border-slate-200
-                            bg-white shadow-sm">
+            <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
-                <div class="border-b border-slate-200 px-6 py-5 sm:px-8">
+                <div class="border-b border-slate-200 px-4 py-4 sm:px-4">
                     <div class="flex items-center gap-3">
 
-                        <div class="flex h-10 w-10 shrink-0 items-center
-                                    justify-center rounded-xl bg-slate-100
-                                    text-slate-600">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
                             <svg
                                 class="h-5 w-5"
                                 viewBox="0 0 24 24"
@@ -187,18 +170,18 @@
                         </div>
 
                         <div>
-                            <h2 class="text-lg font-bold text-slate-900">
+                            <h2 class="text-slate-900 text-base font-semibold">
                                 ข้อมูลบัญชี
                             </h2>
 
-                            <p class="text-sm text-slate-500">
+                            <p class="text-slate-500 text-xs">
                                 ชื่อผู้ใช้งานและอีเมลสำหรับเข้าสู่ระบบ
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-5 p-6 sm:p-8">
+                <div class="space-y-4 p-4 sm:p-4">
 
                     {{-- ชื่อผู้ใช้งาน --}}
                     <div>
@@ -214,12 +197,10 @@
                             id="username"
                             value="{{ $user->username }}"
                             disabled
-                            class="mt-2 w-full cursor-not-allowed rounded-xl
-                                   border border-slate-200 bg-slate-100
-                                   px-4 py-3 text-sm text-slate-500"
+                            class="mt-2 w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 text-sm text-slate-500 py-2 h-10 px-3"
                         >
 
-                        <p class="mt-2 text-xs text-slate-400">
+                        <p class="mt-2 text-slate-400 text-xs">
                             ไม่สามารถแก้ไขชื่อผู้ใช้งานจากหน้านี้ได้
                         </p>
                     </div>
@@ -238,12 +219,10 @@
                             id="account_email"
                             value="{{ $user->email }}"
                             disabled
-                            class="mt-2 w-full cursor-not-allowed rounded-xl
-                                   border border-slate-200 bg-slate-100
-                                   px-4 py-3 text-sm text-slate-500"
+                            class="mt-2 w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 text-sm text-slate-500 py-2 h-10 px-3"
                         >
 
-                        <p class="mt-2 text-xs text-slate-400">
+                        <p class="mt-2 text-slate-400 text-xs">
                             ไม่สามารถแก้ไขอีเมลจากหน้านี้ได้
                         </p>
                     </div>
@@ -251,15 +230,12 @@
             </section>
 
             {{-- การ์ดข้อมูลส่วนตัว --}}
-            <section class="overflow-hidden rounded-2xl border border-slate-200
-                            bg-white shadow-sm">
+            <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
-                <div class="border-b border-slate-200 px-6 py-5 sm:px-8">
+                <div class="border-b border-slate-200 px-4 py-4 sm:px-4">
                     <div class="flex items-center gap-3">
 
-                        <div class="flex h-10 w-10 shrink-0 items-center
-                                    justify-center rounded-xl bg-blue-100
-                                    text-blue-700">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
                             <svg
                                 class="h-5 w-5"
                                 viewBox="0 0 24 24"
@@ -273,18 +249,18 @@
                         </div>
 
                         <div>
-                            <h2 class="text-lg font-bold text-slate-900">
+                            <h2 class="text-slate-900 text-base font-semibold">
                                 ข้อมูลส่วนตัวและการติดต่อ
                             </h2>
 
-                            <p class="text-sm text-slate-500">
+                            <p class="text-slate-500 text-xs">
                                 ข้อมูลนี้ใช้แสดงตัวตนภายในระบบ
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-5 p-6 sm:p-8">
+                <div class="space-y-4 p-4 sm:p-4">
 
                     {{-- ชื่อ --}}
                     <div>
@@ -303,10 +279,7 @@
                             value="{{ old('first_name', $profile?->first_name) }}"
                             placeholder="กรอกชื่อ"
                             required
-                            class="mt-2 w-full rounded-xl border border-slate-300
-                                   px-4 py-3 text-sm outline-none transition
-                                   focus:border-blue-500 focus:ring-4
-                                   focus:ring-blue-100"
+                            class="mt-2 w-full rounded-xl border border-slate-300 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-2 h-10 px-3"
                         >
 
                         @error('first_name')
@@ -333,10 +306,7 @@
                             value="{{ old('last_name', $profile?->last_name) }}"
                             placeholder="กรอกนามสกุล"
                             required
-                            class="mt-2 w-full rounded-xl border border-slate-300
-                                   px-4 py-3 text-sm outline-none transition
-                                   focus:border-blue-500 focus:ring-4
-                                   focus:ring-blue-100"
+                            class="mt-2 w-full rounded-xl border border-slate-300 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-2 h-10 px-3"
                         >
 
                         @error('last_name')
@@ -361,10 +331,7 @@
                             name="phone"
                             value="{{ old('phone', $profile?->phone) }}"
                             placeholder="เช่น 0812345678"
-                            class="mt-2 w-full rounded-xl border border-slate-300
-                                   px-4 py-3 text-sm outline-none transition
-                                   focus:border-blue-500 focus:ring-4
-                                   focus:ring-blue-100"
+                            class="mt-2 w-full rounded-xl border border-slate-300 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-2 h-10 px-3"
                         >
 
                         @error('phone')
@@ -389,10 +356,7 @@
                             name="position"
                             value="{{ old('position', $profile?->position) }}"
                             placeholder="เช่น นักวิชาการคอมพิวเตอร์"
-                            class="mt-2 w-full rounded-xl border border-slate-300
-                                   px-4 py-3 text-sm outline-none transition
-                                   focus:border-blue-500 focus:ring-4
-                                   focus:ring-blue-100"
+                            class="mt-2 w-full rounded-xl border border-slate-300 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-2 h-10 px-3"
                         >
 
                         @error('position')
@@ -417,10 +381,7 @@
                             name="organization"
                             value="{{ old('organization', $profile?->organization) }}"
                             placeholder="เช่น สำนักวิทยบริการและเทคโนโลยีสารสนเทศ"
-                            class="mt-2 w-full rounded-xl border border-slate-300
-                                   px-4 py-3 text-sm outline-none transition
-                                   focus:border-blue-500 focus:ring-4
-                                   focus:ring-blue-100"
+                            class="mt-2 w-full rounded-xl border border-slate-300 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-2 h-10 px-3"
                         >
 
                         @error('organization')
@@ -432,22 +393,16 @@
                 </div>
 
                 {{-- ปุ่มบันทึก --}}
-                <div class="flex flex-col-reverse gap-3 border-t border-slate-200
-                            bg-slate-50 px-6 py-5 sm:flex-row sm:items-center
-                            sm:justify-between sm:px-8">
+                <div class="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-4">
 
-                    <p class="text-xs text-slate-500">
+                    <p class="text-slate-500 text-xs">
                         <span class="text-red-500">*</span>
                         จำเป็นต้องกรอก
                     </p>
 
                     <button
                         type="submit"
-                        class="inline-flex items-center justify-center gap-2
-                               rounded-xl bg-blue-600 px-6 py-3 text-sm
-                               font-semibold text-white shadow-sm transition
-                               hover:bg-blue-700 focus:outline-none
-                               focus:ring-4 focus:ring-blue-200"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 h-9 px-3"
                     >
                         <svg
                             class="h-5 w-5"

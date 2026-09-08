@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Competition;
 use App\Models\CompetitionCategory;
+use App\Models\JudgingSession;
 use App\Models\KnowledgeItem;
 use App\Models\Submission;
 use App\Models\SubmissionFile;
@@ -59,19 +60,28 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
         $summary = $this->item($other->id, $catB, ['title' => 'Other', 'summary' => 'Unique summary', 'status' => 'published']);
         $orphan = $this->item(null, $catA, ['title' => 'Orphan']);
         $competition = $this->competition($owner, $catB, 'Unique competition');
-        $competitionItem = $this->item($owner->id, $catB, ['submission_id' => $this->submission($competition)->id]);
+        $submission = $this->submission($competition);
+        $competitionItem = $this->item($owner->id, $catB, ['submission_id' => $submission->id]);
 
-        $this->assertIndex($super, [], [$title, $summary, $orphan, $competitionItem]);
-        $this->assertIndex($super, ['search' => 'Unique title'], [$title], [$summary]);
-        $this->assertIndex($super, ['search' => 'Unique summary'], [$summary], [$title]);
-        $this->assertIndex($super, ['search' => $owner->username], [$title, $competitionItem], [$summary]);
-        $this->assertIndex($super, ['search' => 'Unique competition'], [$competitionItem], [$title]);
-        $this->assertIndex($super, ['category_id' => $catA->id], [$title, $orphan], [$summary]);
-        $this->assertIndex($super, ['status' => 'published'], [$summary], [$title]);
-        $this->assertIndex($super, ['source' => 'manual'], [$title, $orphan], [$competitionItem]);
-        $this->assertIndex($super, ['source' => 'competition'], [$competitionItem], [$title]);
-        $this->assertIndex($super, ['owner' => $owner->id], [$title, $competitionItem], [$summary, $orphan]);
-        $this->assertIndex($super, ['owner' => 'unassigned'], [$orphan], [$title]);
+        JudgingSession::create([
+            'competition_id' => $competition->id,
+            'controller_user_id' => $owner->id,
+            'status' => 'ended',
+            'started_at' => now()->subHour(),
+            'ended_at' => now(),
+        ]);
+
+        $this->assertIndex($super, [], [$title, $summary, $orphan], [$competitionItem], [$submission]);
+        $this->assertIndex($super, ['search' => 'Unique title'], [$title], [$summary, $competitionItem], [], [$submission]);
+        $this->assertIndex($super, ['search' => 'Unique summary'], [$summary], [$title, $competitionItem], [], [$submission]);
+        $this->assertIndex($super, ['search' => $owner->username], [$title], [$summary, $competitionItem], [], [$submission]);
+        $this->assertIndex($super, ['search' => 'Unique competition'], [], [$title, $summary, $orphan, $competitionItem], [$submission]);
+        $this->assertIndex($super, ['category_id' => $catA->id], [$title, $orphan], [$summary, $competitionItem], [], [$submission]);
+        $this->assertIndex($super, ['status' => 'published'], [$summary], [$title, $orphan, $competitionItem], [], [$submission]);
+        $this->assertIndex($super, ['source' => 'manual'], [$title, $summary, $orphan], [$competitionItem], [], [$submission]);
+        $this->assertIndex($super, ['source' => 'competition'], [], [$title, $summary, $orphan, $competitionItem], [$submission]);
+        $this->assertIndex($super, ['owner' => $owner->id], [$title], [$summary, $orphan, $competitionItem], [$submission]);
+        $this->assertIndex($super, ['owner' => 'unassigned'], [$orphan], [$title, $summary, $competitionItem], [], [$submission]);
         $this->actingAs($super)->get(route('superadmin.km.index', ['owner' => 'invalid']))->assertOk();
     }
 
@@ -242,11 +252,43 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
         }
     }
 
-    private function assertIndex(User $user, array $query, array $included, array $excluded = []): void
-    {
-        $this->actingAs($user)->get(route('superadmin.km.index', $query))->assertOk()->assertViewHas('knowledgeItems', function ($items) use ($included, $excluded) {
-            foreach ($included as $item) if (! $items->contains('id', $item->id)) return false;
-            foreach ($excluded as $item) if ($items->contains('id', $item->id)) return false;
+    private function assertIndex(
+        User $user,
+        array $query,
+        array $knowledgeIncluded = [],
+        array $knowledgeExcluded = [],
+        array $submissionIncluded = [],
+        array $submissionExcluded = []
+    ): void {
+        $response = $this->actingAs($user)
+            ->get(route('superadmin.km.index', $query))
+            ->assertOk();
+
+        $response->assertViewHas('knowledgeItems', function ($items) use ($knowledgeIncluded, $knowledgeExcluded) {
+            foreach ($knowledgeIncluded as $item) {
+                if (! $items->contains('id', $item->id)) {
+                    return false;
+                }
+            }
+            foreach ($knowledgeExcluded as $item) {
+                if ($items->contains('id', $item->id)) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        $response->assertViewHas('submissions', function ($items) use ($submissionIncluded, $submissionExcluded) {
+            foreach ($submissionIncluded as $submission) {
+                if (! $items->contains('id', $submission->id)) {
+                    return false;
+                }
+            }
+            foreach ($submissionExcluded as $submission) {
+                if ($items->contains('id', $submission->id)) {
+                    return false;
+                }
+            }
             return true;
         });
     }

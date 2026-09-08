@@ -22,7 +22,7 @@ class KnowledgeManagementPublicationTest extends TestCase
     {
         $context = $this->context();
 
-        $this->actingAs($context['owner'])->get(route('competition-admin.km.submissions.index'))
+        $this->actingAs($context['owner'])->get(route('competition-admin.km.index', ['source' => 'competition']))
             ->assertOk()
             ->assertViewHas('submissions', fn ($items) => $items->contains('id', $context['submission']->id));
     }
@@ -31,7 +31,7 @@ class KnowledgeManagementPublicationTest extends TestCase
     {
         $context = $this->context(['submission_status' => 'disqualified']);
 
-        $this->actingAs($context['owner'])->get(route('competition-admin.km.submissions.index'))
+        $this->actingAs($context['owner'])->get(route('competition-admin.km.index', ['source' => 'competition']))
             ->assertOk()
             ->assertViewHas('submissions', fn ($items) => ! $items->contains('id', $context['submission']->id));
     }

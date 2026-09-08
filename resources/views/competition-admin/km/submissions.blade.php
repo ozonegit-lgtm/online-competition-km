@@ -5,11 +5,11 @@
 @section('header')
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h1 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+            <h1 class="tracking-tight text-slate-900 text-xl font-bold">
                 ผลงานสำหรับ Knowledge Management
             </h1>
 
-            <p class="mt-1 text-sm text-slate-500">
+            <p class="mt-1 text-slate-500 text-xs">
                 เลือกผลงานจากการแข่งขันที่ตัดสินเสร็จแล้วเพื่อเผยแพร่สู่ KM
             </p>
         </div>
@@ -22,11 +22,11 @@
 @endsection
 
 @section('content')
-    <div class="mx-auto w-full max-w-7xl space-y-6">
+    <div class="mx-auto w-full max-w-7xl space-y-4">
 
         {{-- Filter --}}
-        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div class="border-b border-slate-100 bg-slate-50/70 px-5 py-4 sm:px-6">
+        <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-100 bg-slate-50/70 px-4 py-4 sm:px-4">
                 <div class="flex items-center gap-3">
                     <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
                         <svg
@@ -42,11 +42,11 @@
                     </div>
 
                     <div>
-                        <h2 class="text-sm font-bold text-slate-900">
+                        <h2 class="text-slate-900 text-base font-semibold">
                             ค้นหาและกรองผลงาน
                         </h2>
 
-                        <p class="mt-0.5 text-xs text-slate-500">
+                        <p class="mt-0.5 text-slate-500 text-xs">
                             ค้นหาจากชื่อผลงาน รหัสผลงาน หรือเลือกการแข่งขันและสถานะ KM
                         </p>
                     </div>
@@ -56,7 +56,7 @@
             <form
                 action="{{ route('competition-admin.km.submissions.index') }}"
                 method="GET"
-                class="grid gap-4 p-5 sm:p-6 lg:grid-cols-12"
+                class="grid gap-4 p-4 sm:p-4 lg:grid-cols-12"
             >
                 {{-- Search --}}
                 <div class="lg:col-span-5">
@@ -68,7 +68,7 @@
                     </label>
 
                     <div class="relative mt-2">
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center text-slate-400 pl-3.5">
                             <svg
                                 class="h-4.5 w-4.5"
                                 viewBox="0 0 24 24"
@@ -88,7 +88,7 @@
                             name="search"
                             value="{{ request('search') }}"
                             placeholder="ชื่อผลงาน รหัสผลงาน หรือชื่อการแข่งขัน"
-                            class="h-11 w-full rounded-xl border border-slate-300 bg-white pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                            class="w-full rounded-xl border border-slate-300 bg-white text-sm text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-2 h-10 px-3 pl-10 pr-4"
                         >
                     </div>
                 </div>
@@ -105,7 +105,7 @@
                     <select
                         id="competition_id"
                         name="competition_id"
-                        class="mt-2 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-900 outline-none transition hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        class="mt-2 w-full rounded-xl border border-slate-300 bg-white text-sm text-slate-900 outline-none transition hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-2 h-10 px-3"
                     >
                         <option value="">
                             ทุกการแข่งขัน
@@ -137,7 +137,7 @@
                     <select
                         id="km_status"
                         name="km_status"
-                        class="mt-2 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-900 outline-none transition hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        class="mt-2 w-full rounded-xl border border-slate-300 bg-white text-sm text-slate-900 outline-none transition hover:border-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 py-2 h-10 px-3"
                     >
                         <option value="">
                             ทั้งหมด
@@ -163,7 +163,7 @@
                 <div class="flex items-end gap-2 lg:col-span-2">
                     <button
                         type="submit"
-                        class="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100"
+                        class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 h-9 px-3"
                     >
                         <svg
                             class="h-4 w-4"
@@ -187,7 +187,7 @@
                     )
                         <a
                             href="{{ route('competition-admin.km.submissions.index') }}"
-                            class="inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+                            class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 h-9 px-3"
                             title="ล้างตัวกรอง"
                         >
                             <svg
@@ -210,16 +210,16 @@
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <h2 class="text-lg font-bold text-slate-900 sm:text-xl">
+                    <h2 class="text-slate-900 text-base font-semibold">
                         ผลงานที่ผ่านการแข่งขัน
                     </h2>
 
-                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                    <span class="inline-flex items-center rounded-full bg-slate-100 font-semibold text-slate-600 text-xs px-2.5 py-1">
                         {{ number_format($submissions->total()) }} รายการ
                     </span>
                 </div>
 
-                <p class="mt-1 text-sm text-slate-500">
+                <p class="mt-1 text-slate-500 text-xs">
                     จัดการสถานะการเผยแพร่ผลงานเข้าสู่ Knowledge Management
                 </p>
             </div>
@@ -240,7 +240,7 @@
         </div>
 
         {{-- Submission Cards --}}
-        <div class="grid gap-5 xl:grid-cols-2">
+        <div class="grid gap-4 xl:grid-cols-2">
             @forelse ($submissions as $submission)
                 @php
                     $knowledgeItem = $submission->knowledgeItem;
@@ -264,7 +264,7 @@
 
                 <article
                     id="km-submission-{{ $submission->id }}"
-                    class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                    class="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm"
                 >
                     <div class="flex h-full flex-col sm:flex-row">
 
@@ -277,9 +277,9 @@
                                     class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
                                 >
                             @else
-                                <div class="flex h-full min-h-52 items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-6 text-center">
+                                <div class="flex h-full min-h-52 items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4 text-center">
                                     <div>
-                                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-400 shadow-sm">
+                                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm">
                                             <svg
                                                 class="h-7 w-7"
                                                 viewBox="0 0 24 24"
@@ -293,7 +293,7 @@
                                             </svg>
                                         </div>
 
-                                        <p class="mt-3 text-xs font-medium text-slate-400">
+                                        <p class="mt-3 font-medium text-slate-400 text-xs">
                                             ไม่มีรูปตัวอย่าง
                                         </p>
                                     </div>
@@ -322,7 +322,7 @@
                         </div>
 
                         {{-- Content --}}
-                        <div class="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
+                        <div class="flex min-w-0 flex-1 flex-col p-4 sm:p-4">
 
                             <div class="flex min-w-0 items-start justify-between gap-3">
                                 <div class="min-w-0">
@@ -330,7 +330,7 @@
                                         {{ $submission->competition->title }}
                                     </p>
 
-                                    <h3 class="mt-2 line-clamp-2 text-lg font-bold leading-snug text-slate-900">
+                                    <h3 class="mt-2 line-clamp-2 leading-snug text-slate-900 text-base font-semibold">
                                         {{ $submission->project_title }}
                                     </h3>
 
@@ -365,12 +365,12 @@
                             </div>
 
                             @if ($submission->project_description)
-                                <p class="mt-4 line-clamp-2 text-sm leading-6 text-slate-500">
+                                <p class="mt-4 line-clamp-2 leading-6 text-slate-500 text-xs">
                                     {{ $submission->project_description }}
                                 </p>
                             @endif
 
-                            <div class="mt-5 flex flex-wrap items-center gap-2">
+                            <div class="mt-4 flex flex-wrap items-center gap-2">
                                 <span
                                     data-km-state-pill
                                     class="{{ $isPublished
@@ -408,11 +408,11 @@
                             </div>
 
                             {{-- Action --}}
-                            <div class="mt-auto pt-5">
+                            <div class="mt-auto pt-4">
                                 <div class="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
                                     <p
                                         data-km-help
-                                        class="max-w-sm text-xs leading-5 text-slate-400"
+                                        class="max-w-sm leading-5 text-slate-400 text-xs"
                                     >
                                         {{ $isPublished
                                             ? 'ผลงานนี้กำลังแสดงอยู่ใน Knowledge Management'
@@ -438,7 +438,7 @@
                                             type="submit"
                                             class="{{ $isPublished
                                                 ? 'inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-4 focus:ring-red-100'
-                                                : 'inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-100' }}"
+                                                : 'inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-100' }} inline-flex items-center justify-center text-sm h-9 px-3"
                                         >
                                             @if ($isPublished)
                                                 <svg
@@ -481,8 +481,8 @@
                 </article>
 
             @empty
-                <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center shadow-sm xl:col-span-2">
-                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                <div class="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-4 text-center shadow-sm xl:col-span-2">
+                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
                         <svg
                             class="h-8 w-8"
                             viewBox="0 0 24 24"
@@ -496,11 +496,11 @@
                         </svg>
                     </div>
 
-                    <h3 class="mt-4 text-base font-bold text-slate-800">
+                    <h3 class="mt-4 text-slate-800 text-base font-semibold">
                         ไม่พบผลงาน
                     </h3>
 
-                    <p class="mx-auto mt-1 max-w-md text-sm leading-6 text-slate-500">
+                    <p class="mx-auto mt-1 max-w-md leading-6 text-slate-500 text-xs">
                         ยังไม่มีผลงานที่ตรงกับเงื่อนไขที่เลือก ลองเปลี่ยนคำค้นหา ตัวกรอง หรือรอให้การแข่งขันสิ้นสุดการตัดสินก่อน
                     </p>
 
@@ -511,7 +511,7 @@
                     )
                         <a
                             href="{{ route('competition-admin.km.submissions.index') }}"
-                            class="mt-5 inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                            class="mt-4 inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-50 h-9 px-3"
                         >
                             ล้างตัวกรองทั้งหมด
                         </a>
@@ -522,7 +522,7 @@
 
         {{-- Pagination --}}
         @if ($submissions->hasPages())
-            <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+            <div class="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
                 {{ $submissions->links() }}
             </div>
         @endif

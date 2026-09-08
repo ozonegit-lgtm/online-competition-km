@@ -13,14 +13,14 @@
                 <span class="truncate">{{ $competition->title }}</span>
             </div>
 
-            <h1 class="mt-1 text-xl font-bold text-slate-900">
+            <h1 class="mt-1 text-slate-900 text-xl font-bold">
                 ผลการแข่งขัน
             </h1>
         </div>
 
         <a
             href="{{ route('competition-admin.results.index') }}"
-            class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 h-9 px-3"
         >
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
@@ -96,13 +96,13 @@
         };
     @endphp
 
-    <div class="mx-auto w-full max-w-6xl space-y-4">
+    <div class="mx-auto w-full max-w-7xl space-y-4">
         {{-- Competition overview --}}
         <section
             id="result-publication-panel"
-            class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+            class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
         >
-            <div class="relative overflow-hidden bg-gradient-to-r from-[#071a3d] via-[#0b2b63] to-[#0b4f6c] px-5 py-5 text-white sm:px-6">
+            <div class="relative overflow-hidden bg-gradient-to-r from-[#071a3d] via-[#0b2b63] to-[#0b4f6c] px-4 py-4 text-white sm:px-4">
                 <div class="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-white/5"></div>
                 <div class="pointer-events-none absolute -bottom-20 right-24 h-44 w-44 rounded-full border border-white/10"></div>
 
@@ -118,7 +118,7 @@
                             <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-200">
                                 Competition Results
                             </p>
-                            <h2 class="mt-1 truncate text-lg font-bold sm:text-xl">
+                            <h2 class="mt-1 truncate text-base font-semibold">
                                 {{ $competition->title }}
                             </h2>
                             <p class="mt-1 text-xs text-slate-300">
@@ -129,13 +129,13 @@
 
                     <div class="flex flex-col items-start gap-2 lg:items-end">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 {{ $sessionConfig['class'] }}">
+                            <span class="inline-flex items-center gap-2 rounded-full font-semibold ring-1 {{ $sessionConfig['class'] }} text-xs px-2.5 py-1">
                                 <span class="h-1.5 w-1.5 rounded-full {{ $sessionConfig['dot'] }}"></span>
                                 {{ $sessionConfig['label'] }}
                             </span>
 
                             @if ($resultsPublished)
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/15 px-3 py-1.5 text-xs font-semibold text-emerald-100 ring-1 ring-emerald-300/20">
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/15 font-semibold text-emerald-100 ring-1 ring-emerald-300/20 text-xs px-2.5 py-1">
                                     <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
                                         <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.18A10.01 10.01 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.38.147.8 0 1.18A10.01 10.01 0 0 1 10 17C5.743 17 2.107 14.34.664 10.59ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
@@ -160,7 +160,7 @@
                                     <button
                                         type="submit"
                                         @disabled(! $unpublishRouteReady)
-                                        class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 text-xs font-bold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
+                                        class="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 text-xs font-bold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 h-9 px-3"
                                     >
                                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m3.98 8.223 2.806 2.806M21 21 3 3m9.753 9.752a3 3 0 0 1-4.506-4.504M9.88 4.24A9.72 9.72 0 0 1 12 4c4.257 0 7.893 2.66 9.336 6.41a1.65 1.65 0 0 1 0 1.18 10.01 10.01 0 0 1-2.091 3.368M6.228 6.228a10.04 10.04 0 0 0-3.564 4.182 1.65 1.65 0 0 0 0 1.18A10.01 10.01 0 0 0 12 18c.757 0 1.494-.084 2.203-.242" />
@@ -184,7 +184,7 @@
                                     <button
                                         type="submit"
                                         @disabled(! $publishRouteReady)
-                                        class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-emerald-400 px-3.5 text-xs font-bold text-emerald-950 shadow-sm transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:text-white"
+                                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-400 text-xs font-bold text-emerald-950 shadow-sm transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:bg-slate-400 disabled:text-white h-9 px-3"
                                     >
                                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
@@ -207,7 +207,7 @@
 
             <div class="grid grid-cols-2 divide-x divide-y divide-slate-100 sm:grid-cols-4 sm:divide-y-0">
                 <div class="px-4 py-3">
-                    <p class="text-[11px] font-medium text-slate-500">ผลงานทั้งหมด</p>
+                    <p class="font-medium text-slate-500 text-xs">ผลงานทั้งหมด</p>
                     <div class="mt-1 flex items-baseline gap-1">
                         <span class="text-lg font-black text-slate-900">{{ $totalSubmissions }}</span>
                         <span class="text-[11px] text-slate-400">ผลงาน</span>
@@ -215,7 +215,7 @@
                 </div>
 
                 <div class="px-4 py-3">
-                    <p class="text-[11px] font-medium text-slate-500">คะแนนครบแล้ว</p>
+                    <p class="font-medium text-slate-500 text-xs">คะแนนครบแล้ว</p>
                     <div class="mt-1 flex items-baseline gap-1">
                         <span class="text-lg font-black text-emerald-600">{{ $completedSubmissionCount }}</span>
                         <span class="text-[11px] text-slate-400">/ {{ $totalSubmissions }}</span>
@@ -223,7 +223,7 @@
                 </div>
 
                 <div class="px-4 py-3">
-                    <p class="text-[11px] font-medium text-slate-500">เกณฑ์ที่ใช้งาน</p>
+                    <p class="font-medium text-slate-500 text-xs">เกณฑ์ที่ใช้งาน</p>
                     <div class="mt-1 flex items-baseline gap-1">
                         <span class="text-lg font-black text-slate-900">{{ $activeRubricCount }}</span>
                         <span class="text-[11px] text-slate-400">เกณฑ์</span>
@@ -231,7 +231,7 @@
                 </div>
 
                 <div class="px-4 py-3">
-                    <p class="text-[11px] font-medium text-slate-500">กรรมการตอบรับ</p>
+                    <p class="font-medium text-slate-500 text-xs">กรรมการตอบรับ</p>
                     <div class="mt-1 flex items-baseline gap-1">
                         <span class="text-lg font-black text-slate-900">{{ $acceptedJudgeCount }}</span>
                         <span class="text-[11px] text-slate-400">คน</span>
@@ -242,8 +242,8 @@
 
         @if ($isReadyForResults)
             {{-- Ranking podium --}}
-            <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div class="flex flex-col gap-2 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                <div class="flex flex-col gap-2 border-b border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-600 ring-1 ring-amber-200">
@@ -251,24 +251,24 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.504-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497M5.25 4.236a6.003 6.003 0 0 0 2.48 5.492M18.75 4.236a6.003 6.003 0 0 1-2.481 5.492M12 2.25c-1.58 0-3.12.13-4.625.379A11.953 11.953 0 0 0 12 11.25a11.953 11.953 0 0 0 4.625-8.621A28.423 28.423 0 0 0 12 2.25Z" />
                                 </svg>
                             </span>
-                            <h2 class="font-bold text-slate-900">ผลงานอันดับ 1–3</h2>
+                            <h2 class="text-slate-900 text-base font-semibold">ผลงานอันดับ 1–3</h2>
                         </div>
-                        <p class="mt-1 pl-9 text-xs text-slate-500">
+                        <p class="mt-1 text-slate-500 text-xs pl-9">
                             คะแนนที่ยืนยันครบจากกรรมการที่ตอบรับเท่านั้น
                         </p>
                     </div>
 
                     @if ($hasSharedRank)
-                        <span class="inline-flex w-fit items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200">
+                        <span class="inline-flex w-fit items-center rounded-full bg-amber-50 font-semibold text-amber-700 ring-1 ring-amber-200 text-xs px-2.5 py-1">
                             มีอันดับร่วม
                         </span>
                     @endif
                 </div>
 
-                <div class="relative overflow-hidden bg-slate-50/80 px-4 pb-5 pt-8 sm:px-6 sm:pb-6 sm:pt-10">
+                <div class="relative overflow-hidden bg-slate-50/80 px-4 pb-4 pt-4 sm:px-4 sm:pb-4 sm:pt-4">
                     <div class="pointer-events-none absolute left-1/2 top-6 h-40 w-40 -translate-x-1/2 rounded-full bg-amber-200/20 blur-3xl"></div>
 
-                    <div class="relative mx-auto grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:items-end">
+                    <div class="relative mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:items-end">
                         @forelse ($topSubmissions as $submission)
                             @php
                                 $rank = (int) $submission->rank;
@@ -324,7 +324,7 @@
                                     );
                             @endphp
 
-                            <article class="{{ $orderClass }} group overflow-hidden rounded-2xl border {{ $rankConfig['border'] }} bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+                            <article class="{{ $orderClass }} group overflow-hidden rounded-xl border {{ $rankConfig['border'] }} bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-sm border-slate-200">
                                 <div class="h-1.5 bg-gradient-to-r {{ $rankConfig['accent'] }}"></div>
 
                                 <div class="relative flex h-36 items-center justify-center overflow-hidden bg-white p-3">
@@ -345,12 +345,12 @@
                                         </div>
                                     @endif
 
-                                    <span class="absolute left-3 top-3 flex h-9 min-w-9 items-center justify-center rounded-full px-2 text-sm font-black shadow-sm ring-4 {{ $rankConfig['number'] }}">
+                                    <span class="absolute left-3 top-3 flex h-9 min-w-9 items-center justify-center rounded-full font-black shadow-sm ring-4 {{ $rankConfig['number'] }} text-xs px-2.5 py-1">
                                         {{ $rank }}
                                     </span>
 
                                     @if ($isShared)
-                                        <span class="absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold {{ $rankConfig['soft'] }}">
+                                        <span class="absolute right-3 top-3 rounded-full font-bold {{ $rankConfig['soft'] }} text-xs px-2.5 py-1">
                                             อันดับร่วม
                                         </span>
                                     @endif
@@ -362,18 +362,18 @@
                                             <p class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                                                 {{ $submission->submission_code }}
                                             </p>
-                                            <h3 class="mt-1 line-clamp-2 text-sm font-bold leading-5 text-slate-900">
+                                            <h3 class="mt-1 line-clamp-2 leading-5 text-slate-900 text-base font-semibold">
                                                 {{ $submission->project_title }}
                                             </h3>
                                             @if ($submission->team_name)
-                                                <p class="mt-1 truncate text-[11px] text-slate-500">
+                                                <p class="mt-1 truncate text-slate-500 text-xs">
                                                     ทีม {{ $submission->team_name }}
                                                 </p>
                                             @endif
                                         </div>
 
                                         <div class="shrink-0 text-right">
-                                            <p class="text-[10px] text-slate-400">คะแนน</p>
+                                            <p class="text-slate-400 text-xs">คะแนน</p>
                                             <p class="text-xl font-black {{ $rankConfig['score'] }}">
                                                 {{ number_format((float) $submission->final_score, 2) }}
                                             </p>
@@ -382,26 +382,26 @@
                                 </div>
                             </article>
                         @empty
-                            <div class="col-span-full rounded-xl border border-dashed border-slate-300 bg-white px-5 py-10 text-center">
+                            <div class="col-span-full rounded-xl border border-dashed border-slate-300 bg-white px-4 py-4 text-center shadow-sm">
                                 <p class="text-sm font-semibold text-slate-700">ยังไม่มีผลงานที่พร้อมจัดอันดับ</p>
-                                <p class="mt-1 text-xs text-slate-500">ตรวจสอบว่ากรรมการส่งคะแนนครบทุกเกณฑ์แล้ว</p>
+                                <p class="mt-1 text-slate-500 text-xs">ตรวจสอบว่ากรรมการส่งคะแนนครบทุกเกณฑ์แล้ว</p>
                             </div>
                         @endforelse
                     </div>
                 </div>
             </section>
         @else
-            <section class="overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-sm">
-                <div class="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center">
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-200">
+            <section class="overflow-hidden rounded-xl border border-amber-200 bg-white shadow-sm">
+                <div class="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-200">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9.303 3.376c.866 1.5-.217 3.374-1.948 3.374H4.645c-1.73 0-2.813-1.874-1.948-3.374L10.052 3.38c.866-1.5 3.03-1.5 3.896 0l7.355 12.748ZM12 15.75h.008v.008H12v-.008Z" />
                         </svg>
                     </div>
 
                     <div class="min-w-0 flex-1">
-                        <h2 class="font-bold text-slate-900">ผลการแข่งขันยังไม่พร้อม</h2>
-                        <p class="mt-1 text-xs leading-5 text-slate-500">
+                        <h2 class="text-slate-900 text-base font-semibold">ผลการแข่งขันยังไม่พร้อม</h2>
+                        <p class="mt-1 leading-5 text-slate-500 text-xs">
                             ต้องจบห้องตัดสิน และกรรมการที่ตอบรับต้องส่งคะแนนตามเกณฑ์ที่ใช้งานครบทุกผลงาน
                         </p>
                     </div>

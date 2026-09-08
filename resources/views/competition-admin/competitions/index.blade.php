@@ -4,18 +4,18 @@
 
 @section('header')
     <div>
-        <h1 class="text-xl font-bold text-slate-800">สร้างการแข่งขัน</h1>
-        <p class="mt-0.5 text-xs text-slate-500">เลือกการแข่งขันเดิมหรือสร้างการแข่งขันใหม่</p>
+        <h1 class="text-slate-800 text-xl font-bold">สร้างการแข่งขัน</h1>
+        <p class="mt-0.5 text-slate-500 text-xs">เลือกการแข่งขันเดิมหรือสร้างการแข่งขันใหม่</p>
     </div>
 @endsection
 
 @section('content')
-    <div class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-7xl">
 
         {{-- ปุ่มสร้าง --}}
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
             <a href="{{ route('competition-admin.competitions.create') }}"
-                class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100">
+                class="inline-flex items-center justify-center rounded-lg bg-blue-600 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 h-9 px-3">
                 + สร้างการแข่งขันใหม่
             </a>
         </div>
@@ -29,12 +29,12 @@
                     name="q"
                     value="{{ request('q') }}"
                     placeholder="ค้นหาชื่อการแข่งขัน..."
-                    class="min-w-0 flex-1 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                    class="min-w-0 flex-1 rounded-lg border border-slate-300 bg-slate-50 py-2 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 text-sm h-10 px-3"
                 >
 
                 <button
                     type="submit"
-                    class="rounded-lg bg-slate-800 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
+                    class="rounded-lg bg-slate-800 text-xs font-semibold text-white transition hover:bg-slate-700 inline-flex items-center justify-center h-9 px-3"
                 >
                     ค้นหา
                 </button>
@@ -42,7 +42,7 @@
                 @if (request()->filled('q'))
                     <a
                         href="{{ route('competition-admin.competitions.index') }}"
-                        class="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+                        class="inline-flex items-center justify-center rounded-lg border border-slate-300 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 h-9 px-3"
                     >
                         ล้างการค้นหา
                     </a>
@@ -82,7 +82,7 @@
                 @endphp
 
                 <article
-                    class="flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                    class="flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-sm"
                 >
 
                     {{-- รูปปก --}}
@@ -109,7 +109,7 @@
                         <div class="absolute right-2 top-2 flex items-center gap-1">
 
                             <span
-                                class="rounded-full px-2 py-0.5 text-[9px] font-bold shadow-sm {{ $statusClasses[$status] ?? 'bg-slate-100 text-slate-600' }}"
+                                class="rounded-full font-bold shadow-sm {{ $statusClasses[$status] ?? 'bg-slate-100 text-slate-600' }} text-xs px-2.5 py-1"
                             >
                                 {{ $statusLabels[$status] ?? $status }}
                             </span>
@@ -117,7 +117,7 @@
                             @if ($competition->visibility === 'public')
 
                                 <span
-                                    class="rounded-full bg-blue-600 px-2 py-0.5 text-[9px] font-bold text-white shadow-sm"
+                                    class="rounded-full bg-blue-600 font-bold text-white shadow-sm text-xs px-2.5 py-1"
                                 >
                                     🌐 Public
                                 </span>
@@ -125,7 +125,7 @@
                             @else
 
                                 <span
-                                    class="rounded-full bg-red-600 px-2 py-0.5 text-[9px] font-bold text-white shadow-sm"
+                                    class="rounded-full bg-red-600 font-bold text-white shadow-sm text-xs px-2.5 py-1"
                                 >
                                     🔒 Private
                                 </span>
@@ -140,11 +140,11 @@
 
                         <div class="flex-1">
 
-                            <h3 class="line-clamp-2 text-sm font-bold leading-4 text-slate-800">
+                            <h3 class="line-clamp-2 leading-4 text-slate-800 text-base font-semibold">
                                 {{ $competition->title }}
                             </h3>
 
-                            <p class="mt-1 line-clamp-2 min-h-8 text-[11px] leading-4 text-slate-500">
+                            <p class="mt-1 line-clamp-2 min-h-8 leading-4 text-slate-500 text-xs">
                                 {{ $competition->description ?: 'ไม่มีรายละเอียดการแข่งขัน' }}
                             </p>
 
@@ -178,14 +178,14 @@
 
                             <a
                                 href="{{ route('competition-admin.competitions.show', $competition) }}"
-                                class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-2 py-1.5 text-[11px] font-semibold text-white transition hover:bg-blue-700"
+                                class="inline-flex items-center justify-center rounded-lg bg-blue-600 text-[11px] font-semibold text-white transition hover:bg-blue-700 text-sm h-9 px-3"
                             >
                                 ดูรายละเอียด
                             </a>
 
                             <a
                                 href="{{ route('competition-admin.competitions.edit', $competition) }}"
-                                class="inline-flex items-center justify-center rounded-lg border border-blue-200 bg-white px-2 py-1.5 text-[11px] font-semibold text-blue-600 transition hover:bg-blue-50"
+                                class="inline-flex items-center justify-center rounded-lg border border-blue-200 bg-white text-[11px] font-semibold text-blue-600 transition hover:bg-blue-50 text-sm h-9 px-3"
                             >
                                 แก้ไข
                             </a>
@@ -203,7 +203,7 @@
 
                             <button
                                 type="submit"
-                                class="w-full rounded-lg bg-rose-50 px-2 py-1.5 text-[11px] font-semibold text-rose-600 transition hover:bg-rose-100"
+                                class="w-full rounded-lg bg-rose-50 text-[11px] font-semibold text-rose-600 transition hover:bg-rose-100 inline-flex items-center justify-center text-sm h-9 px-3"
                             >
                                 ลบการแข่งขัน
                             </button>
@@ -215,13 +215,13 @@
             @empty
 
                 <div
-                    class="flex min-h-64 flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm sm:col-span-2 xl:col-span-2"
+                    class="flex min-h-64 flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm sm:col-span-2 xl:col-span-2"
                 >
-                    <h3 class="text-sm font-bold text-slate-800">
+                    <h3 class="text-slate-800 text-base font-semibold">
                         {{ request()->filled('q') ? 'ไม่พบการแข่งขันที่ค้นหา' : 'ยังไม่มีการแข่งขัน' }}
                     </h3>
 
-                    <p class="mt-1.5 max-w-md text-xs leading-5 text-slate-500">
+                    <p class="mt-1.5 max-w-md leading-5 text-slate-500 text-xs">
                         {{ request()->filled('q')
                             ? 'ลองเปลี่ยนคำค้นหา หรือล้างการค้นหาเพื่อดูการแข่งขันทั้งหมด'
                             : 'เริ่มต้นสร้างการแข่งขันและเลือก Template สำหรับรับผลงานประกวด' }}
@@ -233,10 +233,10 @@
             {{-- สร้างการแข่งขันใหม่ --}}
             <a
                 href="{{ route('competition-admin.competitions.create') }}"
-                class="group flex min-h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/40 p-5 text-center transition hover:border-blue-500 hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-100"
+                class="group flex min-h-64 flex-col items-center justify-center rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/40 p-4 text-center transition hover:border-blue-500 hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-100"
             >
                 <span
-                    class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-500 bg-white text-2xl font-light text-blue-600 transition group-hover:scale-105"
+                    class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-blue-500 bg-white text-xl font-light text-blue-600 transition group-hover:scale-105"
                 >
                     +
                 </span>
@@ -254,7 +254,7 @@
 
         {{-- Pagination --}}
         @if (method_exists($competitions, 'links') && $competitions->hasPages())
-            <div class="mt-6">
+            <div class="mt-4">
                 {{ $competitions->withQueryString()->links() }}
             </div>
         @endif

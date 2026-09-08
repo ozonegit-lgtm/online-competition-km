@@ -4,24 +4,24 @@
 
 @section('header')
     <div>
-        <h1 class="text-xl font-bold text-slate-800">
+        <h1 class="text-slate-800 text-xl font-bold">
             ห้องตัดสิน
         </h1>
 
-        <p class="mt-1 text-sm text-slate-500">
+        <p class="mt-1 text-slate-500 text-xs">
             เลือกการแข่งขันเพื่อเปิดและควบคุมการตัดสินแบบ Live
         </p>
     </div>
 @endsection
 
 @section('content')
-    <div class="mx-auto w-full max-w-6xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-7xl space-y-4">
 
         {{-- Summary --}}
-        <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                    <p class="text-xs text-slate-500">
+                    <p class="text-slate-500 text-xs">
                         การแข่งขันที่คุณดูแล
                     </p>
 
@@ -94,7 +94,7 @@
                     };
                 @endphp
 
-                <article class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <article class="flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-sm">
                     {{-- Competition header image --}}
                     <div class="h-24 overflow-hidden bg-slate-100">
                         @if ($coverUrl)
@@ -127,23 +127,21 @@
                     <div class="flex flex-1 flex-col p-3">
                         <div class="flex items-start justify-between gap-2">
                             <div class="min-w-0">
-                                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                                <p class="font-medium uppercase tracking-wide text-slate-400 text-xs">
                                     การแข่งขัน
                                 </p>
 
-                                <h2 class="mt-0.5 line-clamp-2 text-sm font-bold text-slate-800">
+                                <h2 class="mt-0.5 line-clamp-2 text-slate-800 text-base font-semibold">
                                     {{ $competition->title }}
                                 </h2>
 
-                                <p class="mt-0.5 line-clamp-1 text-[11px] text-slate-500">
+                                <p class="mt-0.5 line-clamp-1 text-slate-500 text-xs">
                                     แบบฟอร์ม: {{ $templateTitle }}
                                 </p>
                             </div>
 
                         <span
-                            class="inline-flex shrink-0 items-center gap-1 rounded-full
-                                   px-2 py-0.5 text-[10px] font-semibold ring-1
-                                   {{ $statusConfig['class'] }}"
+                            class="inline-flex shrink-0 items-center gap-1 rounded-full font-semibold ring-1 {{ $statusConfig['class'] }} text-xs px-2.5 py-1"
                         >
                             <span class="h-1.5 w-1.5 rounded-full {{ $statusConfig['dot'] }}"></span>
 
@@ -158,7 +156,7 @@
                                 {{ $competition->submissions_count }}
                             </p>
 
-                            <p class="mt-0.5 text-[10px] text-slate-500">
+                            <p class="mt-0.5 text-slate-500 text-xs">
                                 ผลงาน
                             </p>
                         </div>
@@ -168,7 +166,7 @@
                                 {{ $competition->rubrics_count }}
                             </p>
 
-                            <p class="mt-0.5 text-[10px] text-slate-500">
+                            <p class="mt-0.5 text-slate-500 text-xs">
                                 เกณฑ์
                             </p>
                         </div>
@@ -178,7 +176,7 @@
                                 {{ $competition->judge_assignments_count }}
                             </p>
 
-                            <p class="mt-0.5 text-[10px] text-slate-500">
+                            <p class="mt-0.5 text-slate-500 text-xs">
                                 กรรมการ
                             </p>
                         </div>
@@ -237,10 +235,7 @@
                                 'competition-admin.competitions.judging-room.show',
                                 $competition
                             ) }}"
-                            class="flex w-full items-center justify-center gap-1.5 rounded-lg
-                                   bg-blue-600 px-3 py-2 text-xs font-semibold text-white
-                                   shadow-sm transition hover:bg-blue-700
-                                   focus:outline-none focus:ring-4 focus:ring-blue-100">
+                            class="flex w-full items-center justify-center gap-1.5 rounded-lg bg-blue-600 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 h-9 px-3">
                             <svg
                                 class="h-3.5 w-3.5"
                                 viewBox="0 0 24 24"
@@ -269,8 +264,8 @@
                     </div>
                 </article>
             @empty
-                <div class="col-span-full rounded-2xl border-2 border-dashed border-slate-200 bg-white py-12 text-center">
-                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                <div class="col-span-full rounded-xl border-2 border-dashed border-slate-200 bg-white py-4 text-center shadow-sm">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
                         <svg
                             class="h-6 w-6"
                             viewBox="0 0 24 24"
@@ -285,11 +280,11 @@
                         </svg>
                     </div>
 
-                    <h2 class="mt-3 text-sm font-semibold text-slate-700">
+                    <h2 class="mt-3 text-slate-700 text-base font-semibold">
                         ยังไม่มีการแข่งขัน
                     </h2>
 
-                    <p class="mt-1 text-sm text-slate-500">
+                    <p class="mt-1 text-slate-500 text-xs">
                         สร้างการแข่งขันก่อนเปิดห้องตัดสิน
                     </p>
                 </div>

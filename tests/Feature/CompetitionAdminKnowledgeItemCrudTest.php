@@ -43,7 +43,7 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_admin_can_open_index_create_and_legacy_submission_page(): void
+    public function test_admin_can_open_index_create_and_legacy_submission_page_redirects_to_index(): void
     {
         $admin = $this->user('admin', 'Competition Admin');
 
@@ -56,9 +56,8 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
             ->assertOk()
             ->assertViewIs('competition-admin.km.create');
         $this->actingAs($admin)
-            ->get('/competition-admin/km/submissions')
-            ->assertOk()
-            ->assertViewIs('competition-admin.km.submissions');
+            ->get(route('competition-admin.km.submissions.index'))
+            ->assertRedirect(route('competition-admin.km.index'));
     }
 
     public function test_judge_cannot_open_competition_admin_km(): void
@@ -79,6 +78,14 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         $competition = $this->competition($admin, $category, 'Search Competition');
         $submission = $this->submission($competition);
 
+        JudgingSession::create([
+            'competition_id' => $competition->id,
+            'controller_user_id' => $admin->id,
+            'status' => 'ended',
+            'started_at' => now()->subHour(),
+            'ended_at' => now(),
+        ]);
+
         $manual = $this->item($admin, $category, [
             'title' => 'Search Manual',
             'status' => 'draft',
@@ -92,12 +99,50 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
         $otherCategoryItem = $this->item($admin, $otherCategory);
         $foreign = $this->item($other, $category, ['title' => 'Foreign Item']);
 
-        $this->assertIndexContains($admin, [], [$manual, $competitionItem, $otherCategoryItem], [$foreign]);
-        $this->assertIndexContains($admin, ['search' => 'Search Competition'], [$competitionItem], [$manual]);
-        $this->assertIndexContains($admin, ['category_id' => $otherCategory->id], [$otherCategoryItem], [$manual]);
-        $this->assertIndexContains($admin, ['status' => 'published'], [$competitionItem], [$manual]);
-        $this->assertIndexContains($admin, ['source' => 'manual'], [$manual, $otherCategoryItem], [$competitionItem]);
-        $this->assertIndexContains($admin, ['source' => 'competition'], [$competitionItem], [$manual]);
+        $this->assertIndexContains(
+            $admin,
+            [],
+            [$manual, $otherCategoryItem],
+            [$competitionItem, $foreign],
+            [$submission]
+        );
+        $this->assertIndexContains(
+            $admin,
+            ['search' => 'Search Competition'],
+            [],
+            [$manual, $otherCategoryItem, $competitionItem],
+            [$submission]
+        );
+        $this->assertIndexContains(
+            $admin,
+            ['category_id' => $otherCategory->id],
+            [$otherCategoryItem],
+            [$manual, $competitionItem],
+            [],
+            [$submission]
+        );
+        $this->assertIndexContains(
+            $admin,
+            ['status' => 'published'],
+            [],
+            [$manual, $otherCategoryItem, $competitionItem],
+            [$submission]
+        );
+        $this->assertIndexContains(
+            $admin,
+            ['source' => 'manual'],
+            [$manual, $otherCategoryItem],
+            [$competitionItem],
+            [],
+            [$submission]
+        );
+        $this->assertIndexContains(
+            $admin,
+            ['source' => 'competition'],
+            [],
+            [$manual, $otherCategoryItem, $competitionItem],
+            [$submission]
+        );
     }
 
     public function test_index_paginates_fifteen_items(): void
@@ -464,25 +509,42 @@ class CompetitionAdminKnowledgeItemCrudTest extends TestCase
     private function assertIndexContains(
         User $admin,
         array $query,
-        array $included,
-        array $excluded
+        array $knowledgeIncluded = [],
+        array $knowledgeExcluded = [],
+        array $submissionIncluded = [],
+        array $submissionExcluded = []
     ): void {
-        $this->actingAs($admin)
+        $response = $this->actingAs($admin)
             ->get(route('competition-admin.km.index', $query))
-            ->assertOk()
-            ->assertViewHas('knowledgeItems', function ($items) use ($included, $excluded) {
-                foreach ($included as $item) {
-                    if (! $items->contains('id', $item->id)) {
-                        return false;
-                    }
+            ->assertOk();
+
+        $response->assertViewHas('knowledgeItems', function ($items) use ($knowledgeIncluded, $knowledgeExcluded) {
+            foreach ($knowledgeIncluded as $item) {
+                if (! $items->contains('id', $item->id)) {
+                    return false;
                 }
-                foreach ($excluded as $item) {
-                    if ($items->contains('id', $item->id)) {
-                        return false;
-                    }
+            }
+            foreach ($knowledgeExcluded as $item) {
+                if ($items->contains('id', $item->id)) {
+                    return false;
                 }
-                return true;
-            });
+            }
+            return true;
+        });
+
+        $response->assertViewHas('submissions', function ($items) use ($submissionIncluded, $submissionExcluded) {
+            foreach ($submissionIncluded as $submission) {
+                if (! $items->contains('id', $submission->id)) {
+                    return false;
+                }
+            }
+            foreach ($submissionExcluded as $submission) {
+                if ($items->contains('id', $submission->id)) {
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 
     private function user(string $prefix, string $roleName): User

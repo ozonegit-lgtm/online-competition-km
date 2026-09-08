@@ -4,18 +4,18 @@
 
 @section('header')
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">
+        <h1 class="text-slate-800 text-xl font-bold">
             ห้องตัดสิน
         </h1>
 
-        <p class="mt-1 text-sm text-slate-500">
+        <p class="mt-1 text-slate-500 text-xs">
             ห้องตัดสินที่คุณได้รับมอบหมาย
         </p>
     </div>
 @endsection
 
 @section('content')
-    <div class="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+    <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
         @forelse ($rooms as $room)
             @php
                 $competition = $room->competition;
@@ -39,7 +39,7 @@
                     ?? 'ไม่ได้ระบุแบบฟอร์ม';
             @endphp
 
-            <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-sm">
                 {{-- Competition header image --}}
                 <div class="h-44 overflow-hidden bg-slate-100">
                     @if ($coverUrl)
@@ -69,37 +69,37 @@
                     @endif
                 </div>
 
-                <div class="p-5">
+                <div class="p-4">
                     <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0">
-                            <h2 class="line-clamp-2 font-semibold text-slate-800">
+                            <h2 class="line-clamp-2 text-slate-800 text-base font-semibold">
                                 {{ $competition->title }}
                             </h2>
 
-                            <p class="mt-1 line-clamp-1 text-sm text-slate-500">
+                            <p class="mt-1 line-clamp-1 text-slate-500 text-xs">
                                 แบบฟอร์ม: {{ $templateTitle }}
                             </p>
 
-                            <p class="mt-1 text-sm text-slate-500">
+                            <p class="mt-1 text-slate-500 text-xs">
                                 สถานะห้อง: {{ $room->status }}
                             </p>
                         </div>
 
-                        <span class="shrink-0 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                        <span class="shrink-0 rounded-full bg-blue-50 font-medium text-blue-700 text-xs px-2.5 py-1">
                             {{ $assignment?->assignment_status ?? 'ไม่ทราบสถานะ' }}
                         </span>
                     </div>
 
                     <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
                         <div class="rounded-xl bg-slate-50 p-3">
-                            <p class="text-slate-400">ผลงาน</p>
+                            <p class="text-slate-400 text-xs">ผลงาน</p>
                             <p class="mt-1 font-semibold text-slate-700">
                                 {{ $competition->submissions_count }}
                             </p>
                         </div>
 
                         <div class="rounded-xl bg-slate-50 p-3">
-                            <p class="text-slate-400">เกณฑ์</p>
+                            <p class="text-slate-400 text-xs">เกณฑ์</p>
                             <p class="mt-1 font-semibold text-slate-700">
                                 {{ $competition->rubrics_count }}
                             </p>
@@ -108,7 +108,7 @@
 
                     {{-- Assignment actions --}}
                     @if ($assignment?->assignment_status === 'pending')
-                        <div class="mt-5 grid grid-cols-2 gap-3">
+                        <div class="mt-4 grid grid-cols-2 gap-3">
                             <form
                                 action="{{ route('judge.assignments.accept', $assignment) }}"
                                 method="POST"
@@ -117,7 +117,7 @@
 
                                 <button
                                     type="submit"
-                                    class="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                                    class="w-full rounded-xl bg-emerald-600 text-sm font-semibold text-white transition hover:bg-emerald-700 h-9 px-3 inline-flex items-center justify-center"
                                 >
                                     รับงาน
                                 </button>
@@ -132,7 +132,7 @@
 
                                 <button
                                     type="submit"
-                                    class="w-full rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                                    class="w-full rounded-xl border border-red-200 bg-white text-sm font-semibold text-red-600 transition hover:bg-red-50 h-9 px-3 inline-flex items-center justify-center"
                                 >
                                     ปฏิเสธ
                                 </button>
@@ -142,33 +142,33 @@
                         @if ($room->status === 'live')
                             <a
                                 href="{{ route('judge.judging-rooms.show', $room) }}"
-                                class="mt-5 flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                                class="mt-4 flex w-full items-center justify-center rounded-xl bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 h-9 px-3"
                             >
                                 เข้าห้องตัดสิน
                             </a>
                         @elseif ($room->status === 'ended')
-                            <div class="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-center text-sm text-slate-500">
+                            <div class="mt-4 rounded-xl bg-slate-100 px-4 py-3 text-center text-sm text-slate-500">
                                 ห้องตัดสินสิ้นสุดแล้ว
                             </div>
                         @else
-                            <div class="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-center text-sm text-amber-700">
+                            <div class="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-center text-sm text-amber-700">
                                 ห้องตัดสินยังไม่เปิด
                             </div>
                         @endif
                     @elseif ($assignment?->assignment_status === 'declined')
-                        <div class="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-center text-sm text-slate-500">
+                        <div class="mt-4 rounded-xl bg-slate-100 px-4 py-3 text-center text-sm text-slate-500">
                             คุณปฏิเสธงานตัดสินนี้แล้ว
                         </div>
                     @endif
                 </div>
             </article>
         @empty
-            <div class="col-span-full rounded-2xl border-2 border-dashed border-slate-200 bg-white py-16 text-center">
+            <div class="col-span-full rounded-xl border-2 border-dashed border-slate-200 bg-white py-4 text-center shadow-sm">
                 <p class="font-medium text-slate-600">
                     ยังไม่มีห้องตัดสิน
                 </p>
 
-                <p class="mt-1 text-sm text-slate-400">
+                <p class="mt-1 text-slate-400 text-xs">
                     ห้องจะแสดงเมื่อผู้จัดเปิดห้องและมอบหมายคุณเป็นกรรมการ
                 </p>
             </div>
@@ -176,7 +176,7 @@
     </div>
 
     @if ($rooms->hasPages())
-        <div class="mt-6">
+        <div class="mt-4">
             {{ $rooms->links() }}
         </div>
     @endif

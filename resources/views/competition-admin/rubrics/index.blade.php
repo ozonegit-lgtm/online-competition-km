@@ -4,21 +4,21 @@
 
 @section('header')
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">
+        <h1 class="text-slate-800 text-xl font-bold">
             จัดการเกณฑ์การให้คะแนน
         </h1>
 
-        <p class="mt-1 text-sm text-slate-500">
+        <p class="mt-1 text-slate-500 text-xs">
             การแข่งขัน: {{ $competition->title }}
         </p>
     </div>
 @endsection
 
 @section('content')
-    <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mx-auto w-full max-w-7xl">
 
     @error('rubric')
-        <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4">
+        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
             <p class="text-sm font-semibold text-red-700">
                 {{ $message }}
             </p>
@@ -26,7 +26,7 @@
     @enderror
 
     @if ($rubricsLocked)
-        <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+        <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
             <p class="text-sm font-bold text-amber-800">
                 เกณฑ์การให้คะแนนถูกล็อกแล้ว
             </p>
@@ -39,42 +39,39 @@
     @endif
 
         {{-- สรุปคะแนน --}}
-        <div class="mb-6 grid gap-4 sm:grid-cols-3">
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <p class="text-sm text-slate-500">
+        <div class="mb-4 grid gap-4 sm:grid-cols-3">
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <p class="text-slate-500 text-xs">
                     จำนวนเกณฑ์ทั้งหมด
                 </p>
 
-                <p class="mt-2 text-3xl font-bold text-slate-800">
+                <p class="mt-2 text-xl font-bold text-slate-800">
                     {{ $rubrics->count() }}
                 </p>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <p class="text-sm text-slate-500">
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <p class="text-slate-500 text-xs">
                     เกณฑ์ที่เปิดใช้งาน
                 </p>
 
-                <p class="mt-2 text-3xl font-bold text-green-600">
+                <p class="mt-2 text-xl font-bold text-green-600">
                     {{ $rubrics->where('is_active', true)->count() }}
                 </p>
             </div>
 
-            <div class="rounded-2xl border p-5 shadow-sm
-                {{ $totalMaxScore == 100
+            <div class="rounded-xl border p-4 shadow-sm {{ $totalMaxScore == 100
                     ? 'border-green-200 bg-green-50'
                     : 'border-amber-200 bg-amber-50' }}">
 
-                <p class="text-sm
-                    {{ $totalMaxScore == 100
+                <p class="text-sm {{ $totalMaxScore == 100
                         ? 'text-green-700'
                         : 'text-amber-700' }}">
                     คะแนนรวม
                 </p>
 
                 <div class="mt-2 flex items-end gap-2">
-                    <p class="text-3xl font-bold
-                        {{ $totalMaxScore == 100
+                    <p class="text-xl font-bold {{ $totalMaxScore == 100
                             ? 'text-green-700'
                             : 'text-amber-700' }}">
                         {{ number_format($totalMaxScore, 2) }}
@@ -87,16 +84,16 @@
             </div>
         </div>
 
-        <div class="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+        <div class="grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
 
             {{-- ฟอร์มเพิ่มเกณฑ์ --}}
-            <section class="h-fit rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div class="border-b border-slate-200 px-6 py-5">
-                    <h2 class="text-lg font-bold text-slate-800">
+            <section class="h-fit rounded-xl border border-slate-200 bg-white shadow-sm">
+                <div class="border-b border-slate-200 px-4 py-4">
+                    <h2 class="text-slate-800 text-base font-semibold">
                         เพิ่มเกณฑ์ใหม่
                     </h2>
 
-                    <p class="mt-1 text-sm text-slate-500">
+                    <p class="mt-1 text-slate-500 text-xs">
                         กำหนดหัวข้อและคะแนนเต็ม
                     </p>
                 </div>
@@ -109,7 +106,7 @@
                     'competition-admin.competitions.rubrics.store',
                     $competition
                 ) }}"
-                class="space-y-5 p-6">
+                class="space-y-4 p-4">
 
                 @csrf
 
@@ -128,7 +125,7 @@
                             value="{{ old('criteria_name') }}"
                             placeholder="เช่น ความคิดสร้างสรรค์"
                             required
-                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                            class="mt-2 w-full rounded-xl border border-slate-300 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 h-10 px-3">
                     </div>
 
                     <div>
@@ -164,9 +161,9 @@
                             step="0.01"
                             placeholder="เช่น 30"
                             required
-                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                            class="mt-2 w-full rounded-xl border border-slate-300 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 h-10 px-3">
 
-                        <p class="mt-2 text-xs text-slate-500">
+                        <p class="mt-2 text-slate-500 text-xs">
                             คะแนนรวมทุกเกณฑ์ต้องไม่เกิน 100 คะแนน
                         </p>
                     </div>
@@ -186,12 +183,12 @@
 
                     <button
                         type="submit"
-                        class="w-full rounded-xl bg-green-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-200">
+                        class="w-full rounded-xl bg-green-600 text-sm font-semibold text-white transition hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-200 h-9 px-3 inline-flex items-center justify-center">
                         + เพิ่มเกณฑ์
                     </button>
                     </form>
                     @else
-                        <div class="p-6">
+                        <div class="p-4">
                             <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
                                 <p class="text-sm font-semibold text-amber-800">
                                     ไม่สามารถเพิ่มเกณฑ์ได้
@@ -207,35 +204,35 @@
                     </section>
 
             {{-- รายการเกณฑ์ --}}
-            <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div class="border-b border-slate-200 px-6 py-5">
-                    <h2 class="text-lg font-bold text-slate-800">
+            <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                <div class="border-b border-slate-200 px-4 py-4">
+                    <h2 class="text-slate-800 text-base font-semibold">
                         เกณฑ์การให้คะแนน
                     </h2>
 
-                    <p class="mt-1 text-sm text-slate-500">
+                    <p class="mt-1 text-slate-500 text-xs">
                         จัดการเกณฑ์ทั้งหมดของการแข่งขันนี้
                     </p>
                 </div>
 
                 @if ($rubrics->isEmpty())
-                    <div class="px-6 py-16 text-center">
-                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-2xl">
+                    <div class="px-4 py-4 text-center">
+                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-xl">
                             📋
                         </div>
 
-                        <h3 class="mt-4 font-semibold text-slate-700">
+                        <h3 class="mt-4 text-slate-700 text-base font-semibold">
                             ยังไม่มีเกณฑ์การให้คะแนน
                         </h3>
 
-                        <p class="mt-2 text-sm text-slate-500">
+                        <p class="mt-2 text-slate-500 text-xs">
                             เพิ่มเกณฑ์แรกจากแบบฟอร์มด้านซ้าย
                         </p>
                     </div>
                 @else
                     <div class="divide-y divide-slate-200">
                         @foreach ($rubrics as $index => $rubric)
-                            <article class="p-6">
+                            <article class="p-4">
                                 <div class="flex items-start justify-between gap-4">
                                     <div class="min-w-0">
                                         <div class="flex flex-wrap items-center gap-2">
@@ -243,14 +240,13 @@
                                                 {{ $index + 1 }}
                                             </span>
 
-                                            <h3 class="font-bold text-slate-800">
+                                            <h3 class="text-slate-800 text-base font-semibold">
                                                 {{ $rubric->criteria_name }}
                                             </h3>
 
-                                            <span class="rounded-full px-2.5 py-1 text-xs font-semibold
-                                                {{ $rubric->is_active
+                                            <span class="rounded-full font-semibold {{ $rubric->is_active
                                                     ? 'bg-green-50 text-green-700'
-                                                    : 'bg-slate-100 text-slate-500' }}">
+                                                    : 'bg-slate-100 text-slate-500' }} text-xs px-2.5 py-1">
                                                 {{ $rubric->is_active
                                                     ? 'เปิดใช้งาน'
                                                     : 'ปิดใช้งาน' }}
@@ -258,18 +254,18 @@
                                         </div>
 
                                         @if ($rubric->description)
-                                            <p class="mt-3 text-sm leading-6 text-slate-500">
+                                            <p class="mt-3 leading-6 text-slate-500 text-xs">
                                                 {{ $rubric->description }}
                                             </p>
                                         @endif
                                     </div>
 
                                     <div class="shrink-0 text-right">
-                                        <p class="text-2xl font-bold text-blue-600">
+                                        <p class="text-xl font-bold text-blue-600">
                                             {{ number_format($rubric->max_score, 2) }}
                                         </p>
 
-                                        <p class="text-xs text-slate-500">
+                                        <p class="text-slate-500 text-xs">
                                             คะแนน
                                         </p>
                                     </div>
@@ -277,7 +273,7 @@
 
                                 @if (! $rubricsLocked)
 
-                                <details class="mt-5 rounded-xl border border-slate-200 bg-slate-50">
+                                <details class="mt-4 rounded-xl border border-slate-200 bg-slate-50">
                                     <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-700">
                                         แก้ไขเกณฑ์
                                     </summary>
@@ -302,7 +298,7 @@
                                                 name="criteria_name"
                                                 value="{{ $rubric->criteria_name }}"
                                                 required
-                                                class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                                                class="mt-2 w-full rounded-xl border border-slate-300 bg-white text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 h-10 px-3">
                                         </div>
 
                                         <div>
@@ -329,7 +325,7 @@
                                                 max="100"
                                                 step="0.01"
                                                 required
-                                                class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+                                                class="mt-2 w-full rounded-xl border border-slate-300 bg-white text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 h-10 px-3">
                                         </div>
 
                                         <label class="flex items-center gap-3">
@@ -347,7 +343,7 @@
 
                                         <button
                                             type="submit"
-                                            class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
+                                            class="rounded-xl bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 h-9 px-3 inline-flex items-center justify-center">
                                             บันทึกการแก้ไข
                                         </button>
                                     </form>
@@ -367,13 +363,13 @@
 
                                     <button
                                         type="submit"
-                                        class="rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50">
+                                        class="rounded-lg border border-red-200 bg-white text-sm font-semibold text-red-600 transition hover:bg-red-50 h-9 px-3 inline-flex items-center justify-center">
                                         ลบเกณฑ์
                                     </button>
                                 </form>
                         @else
-                            <div class="mt-5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                                <p class="text-xs font-medium text-slate-500">
+                            <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                <p class="font-medium text-slate-500 text-xs">
                                     เกณฑ์นี้อยู่ในโหมดอ่านอย่างเดียว
                                     เนื่องจากเริ่มการตัดสินแล้ว
                                 </p>
@@ -386,13 +382,13 @@
             </section>
         </div>
 
-        <div class="mt-6">
+        <div class="mt-4">
             <a
                 href="{{ route(
                     'competition-admin.competitions.show',
                     $competition
                 ) }}"
-                class="inline-flex items-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+                class="inline-flex items-center rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-100 h-9 px-3 justify-center">
                 ← กลับหน้ารายละเอียดการแข่งขัน
             </a>
         </div>

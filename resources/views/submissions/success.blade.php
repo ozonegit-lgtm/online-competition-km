@@ -9,8 +9,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-10 text-slate-800">
-    <main class="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm sm:p-10">
+<body class="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-4 text-slate-800 text-sm">
+    <main class="w-full max-w-xl rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm sm:p-4">
         <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-700">
             <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -18,21 +18,21 @@
             </svg>
         </div>
 
-        <h1 class="mt-5 text-2xl font-bold text-slate-900">ส่งผลงานสำเร็จ</h1>
-        <p class="mt-2 text-sm leading-6 text-slate-500">
+        <h1 class="mt-4 text-slate-900 text-xl font-bold">ส่งผลงานสำเร็จ</h1>
+        <p class="mt-2 leading-6 text-slate-500 text-xs">
             ระบบได้รับผลงานของคุณสำหรับการแข่งขัน
             <span class="font-semibold text-slate-700">{{ $submission->competition->title }}</span>
             เรียบร้อยแล้ว
         </p>
 
-        <div class="mt-7 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+        <div class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
             <p class="text-xs font-semibold uppercase tracking-wide text-blue-600">รหัสผลงาน</p>
-            <p class="mt-2 break-all font-mono text-2xl font-bold tracking-wider text-blue-900">
+            <p class="mt-2 break-all font-mono text-xl font-bold tracking-wider text-blue-900">
                 {{ $submission->submission_code }}
             </p>
         </div>
 
-        <dl class="mt-6 divide-y divide-slate-200 rounded-2xl border border-slate-200 text-left">
+        <dl class="mt-4 divide-y divide-slate-200 rounded-xl border border-slate-200 text-left">
             <div class="p-4">
                 <dt class="text-xs font-medium text-slate-500">ชื่อผลงาน</dt>
                 <dd class="mt-1 text-sm font-semibold text-slate-800">{{ $submission->project_title }}</dd>
@@ -51,12 +51,12 @@
             </div>
         </dl>
 
-        <div class="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-left text-xs leading-5 text-amber-800">
+        <div class="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-left text-xs leading-5 text-amber-800">
             กรุณาบันทึกหรือถ่ายภาพหน้าจอรหัสผลงานนี้ไว้สำหรับใช้อ้างอิงและติดตามผลภายหลัง
         </div>
 
         <a href="{{ route('competitions.submissions.create',$submission->competition) }}"
-            class="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200">
+            class="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-4 focus:ring-slate-200 h-9 px-3">
             ส่งผลงานเพิ่มเติม
         </a>
     </main>

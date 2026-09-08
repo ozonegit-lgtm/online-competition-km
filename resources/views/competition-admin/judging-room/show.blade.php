@@ -54,20 +54,18 @@
             </div>
 
             <div class="min-w-0">
-                <h1 class="break-words text-xl font-bold leading-tight text-slate-800 sm:text-2xl">
+                <h1 class="break-words leading-tight text-slate-800 text-xl font-bold">
                     ห้องตัดสิน
                 </h1>
 
-                <p class="mt-1 break-words text-xs text-slate-500 sm:text-sm">
+                <p class="mt-1 break-words text-slate-500 text-xs">
                     {{ $competition->title }}
                 </p>
             </div>
         </div>
 
         <span
-            class="inline-flex w-fit shrink-0 items-center gap-2 rounded-full px-3 py-2
-                   text-xs font-semibold ring-1 sm:px-4 sm:text-sm
-                   {{ $statusConfig['class'] }}"
+            class="inline-flex w-fit shrink-0 items-center gap-2 rounded-full font-semibold ring-1 sm:px-4 sm:text-sm {{ $statusConfig['class'] }} text-xs px-2.5 py-1"
         >
             <span class="h-2.5 w-2.5 rounded-full {{ $statusConfig['dot'] }}"></span>
             {{ $statusConfig['label'] }}
@@ -110,16 +108,16 @@
         $teamName = $currentSubmission?->team_name;
     @endphp
 
-    <div class="mx-auto w-full max-w-7xl space-y-5 sm:space-y-6">
+    <div class="mx-auto w-full max-w-7xl space-y-4 sm:space-y-4">
 
         @if (session('error'))
-            <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+            <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
                 {{ session('error') }}
             </div>
         @endif
 
         @if (session('success'))
-            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
+            <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
                 {{ session('success') }}
             </div>
         @endif
@@ -127,9 +125,9 @@
         {{-- =========================================================
              ROOM CONTROL
         ========================================================== --}}
-        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
-            <div class="border-b border-slate-100 px-4 py-4 sm:px-6 sm:py-5">
+            <div class="border-b border-slate-100 px-4 py-4 sm:px-4 sm:py-4">
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
                     <div class="flex min-w-0 items-start gap-3">
@@ -148,11 +146,11 @@
                         </div>
 
                         <div class="min-w-0">
-                            <h2 class="text-sm font-bold text-slate-800 sm:text-base">
+                            <h2 class="text-slate-800 text-base font-semibold">
                                 ควบคุมห้องตัดสิน
                             </h2>
 
-                            <p class="mt-1 text-xs leading-5 text-slate-500 sm:text-sm">
+                            <p class="mt-1 leading-5 text-slate-500 text-xs">
                                 จัดการสถานะห้องและควบคุมการแสดงผลงานให้กรรมการ
                             </p>
                         </div>
@@ -170,7 +168,7 @@
                 </div>
             </div>
 
-            <div class="bg-slate-50/70 px-4 py-4 sm:px-6">
+            <div class="bg-slate-50/70 px-4 py-4 sm:px-4">
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
 
@@ -187,11 +185,7 @@
 
                             <button
                                 type="submit"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl
-                                       bg-emerald-600 px-5 py-3 text-sm font-bold text-white
-                                       shadow-sm transition hover:bg-emerald-700
-                                       focus:outline-none focus:ring-4 focus:ring-emerald-100
-                                       sm:w-auto"
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-100 sm:w-auto h-9 px-3"
                             >
                                 <svg
                                     class="h-4.5 w-4.5"
@@ -221,11 +215,7 @@
 
                             <button
                                 type="submit"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl
-                                       bg-amber-500 px-5 py-3 text-sm font-bold text-white
-                                       shadow-sm transition hover:bg-amber-600
-                                       focus:outline-none focus:ring-4 focus:ring-amber-100
-                                       sm:w-auto"
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 text-sm font-bold text-white shadow-sm transition hover:bg-amber-600 focus:outline-none focus:ring-4 focus:ring-amber-100 sm:w-auto h-9 px-3"
                             >
                                 <svg
                                     class="h-4.5 w-4.5"
@@ -255,11 +245,7 @@
 
                             <button
                                 type="submit"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl
-                                       bg-emerald-600 px-5 py-3 text-sm font-bold text-white
-                                       shadow-sm transition hover:bg-emerald-700
-                                       focus:outline-none focus:ring-4 focus:ring-emerald-100
-                                       sm:w-auto"
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-100 sm:w-auto h-9 px-3"
                             >
                                 <svg
                                     class="h-4.5 w-4.5"
@@ -290,11 +276,7 @@
 
                             <button
                                 type="submit"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl
-                                       border border-red-200 bg-white px-5 py-3 text-sm font-bold
-                                       text-red-600 transition hover:bg-red-50
-                                       focus:outline-none focus:ring-4 focus:ring-red-100
-                                       sm:w-auto"
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-white text-sm font-bold text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-4 focus:ring-red-100 sm:w-auto h-9 px-3"
                             >
                                 <svg
                                     class="h-4.5 w-4.5"
@@ -325,11 +307,7 @@
 
                             <button
                                 type="submit"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl
-                                       bg-slate-800 px-5 py-3 text-sm font-bold text-white
-                                       shadow-sm transition hover:bg-slate-900
-                                       focus:outline-none focus:ring-4 focus:ring-slate-200
-                                       sm:w-auto"
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-800 text-sm font-bold text-white shadow-sm transition hover:bg-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-200 sm:w-auto h-9 px-3"
                             >
                                 <svg
                                     class="h-4.5 w-4.5"
@@ -364,14 +342,14 @@
         ========================================================== --}}
         <section class="grid gap-3 sm:grid-cols-3 sm:gap-4">
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-4">
                 <div class="flex items-center justify-between gap-3">
                     <div>
-                        <p class="text-xs font-medium text-slate-500">
+                        <p class="font-medium text-slate-500 text-xs">
                             ผลงานพร้อมตัดสิน
                         </p>
 
-                        <p class="mt-2 text-2xl font-bold text-slate-800 sm:text-3xl">
+                        <p class="mt-2 text-xl font-bold text-slate-800 sm:text-xl">
                             {{ $submissions->count() }}
                         </p>
                     </div>
@@ -391,19 +369,19 @@
                     </div>
                 </div>
 
-                <p class="mt-2 text-[11px] text-slate-400">
+                <p class="mt-2 text-slate-400 text-xs">
                     ผลงานที่สามารถเลือกนำเสนอได้
                 </p>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-4">
                 <div class="flex items-center justify-between gap-3">
                     <div>
-                        <p class="text-xs font-medium text-slate-500">
+                        <p class="font-medium text-slate-500 text-xs">
                             เกณฑ์ที่เปิดใช้งาน
                         </p>
 
-                        <p class="mt-2 text-2xl font-bold text-slate-800 sm:text-3xl">
+                        <p class="mt-2 text-xl font-bold text-slate-800 sm:text-xl">
                             {{ $rubrics->count() }}
                         </p>
                     </div>
@@ -422,19 +400,19 @@
                     </div>
                 </div>
 
-                <p class="mt-2 text-[11px] text-slate-400">
+                <p class="mt-2 text-slate-400 text-xs">
                     เกณฑ์ที่กรรมการใช้ประเมิน
                 </p>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-4">
                 <div class="flex items-center justify-between gap-3">
                     <div>
-                        <p class="text-xs font-medium text-slate-500">
+                        <p class="font-medium text-slate-500 text-xs">
                             กรรมการในห้อง
                         </p>
 
-                        <p class="mt-2 text-2xl font-bold text-slate-800 sm:text-3xl">
+                        <p class="mt-2 text-xl font-bold text-slate-800 sm:text-xl">
                             {{ $assignments->count() }}
                         </p>
                     </div>
@@ -455,7 +433,7 @@
                     </div>
                 </div>
 
-                <p class="mt-2 text-[11px] text-slate-400">
+                <p class="mt-2 text-slate-400 text-xs">
                     กรรมการที่ได้รับมอบหมาย
                 </p>
             </div>
@@ -466,10 +444,10 @@
         {{-- =========================================================
              CURRENT SUBMISSION
         ========================================================== --}}
-        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
             {{-- Section Header --}}
-            <div class="border-b border-slate-100 bg-white px-4 py-4 sm:px-6 sm:py-5">
+            <div class="border-b border-slate-100 bg-white px-4 py-4 sm:px-4 sm:py-4">
 
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
@@ -480,11 +458,11 @@
                         </div>
 
                         <div class="min-w-0">
-                            <h2 class="text-sm font-bold text-slate-800 sm:text-base">
+                            <h2 class="text-slate-800 text-base font-semibold">
                                 เลือกผลงานที่ต้องการแสดง
                             </h2>
 
-                            <p class="mt-1 text-xs leading-5 text-slate-500 sm:text-sm">
+                            <p class="mt-1 leading-5 text-slate-500 text-xs">
                                 ผลงานที่เลือกจะแสดงให้กรรมการทุกคนในห้องเห็นทันที
                             </p>
                         </div>
@@ -507,9 +485,7 @@
                             <select
                                 name="submission_id"
                                 required
-                                class="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white
-                                       px-4 py-3 text-sm text-slate-700 outline-none transition
-                                       focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                class="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 h-10 px-3"
                             >
                                 <option value="">
                                     เลือกผลงาน
@@ -530,10 +506,7 @@
 
                             <button
                                 type="submit"
-                                class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl
-                                       bg-blue-600 px-5 py-3 text-sm font-bold text-white
-                                       shadow-sm transition hover:bg-blue-700
-                                       focus:outline-none focus:ring-4 focus:ring-blue-100"
+                                class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 h-9 px-3"
                             >
                                 <svg
                                     class="h-4 w-4"
@@ -582,32 +555,32 @@
             {{-- Current Submission --}}
             @if ($currentSubmission)
 
-                <div class="p-4 sm:p-6">
+                <div class="p-4 sm:p-4">
 
                     {{-- Submission title --}}
-                    <div class="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-start sm:justify-between">
+                    <div class="flex flex-col gap-4 border-b border-slate-100 pb-4 sm:flex-row sm:items-start sm:justify-between">
 
                         <div class="min-w-0">
 
                             <div class="flex flex-wrap items-center gap-2">
 
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 ring-1 ring-emerald-200">
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 font-bold text-emerald-700 ring-1 ring-emerald-200 text-xs px-2.5 py-1">
                                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                                     กำลังแสดง
                                 </span>
 
-                                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-500">
+                                <span class="rounded-full bg-slate-100 font-semibold text-slate-500 text-xs px-2.5 py-1">
                                     {{ $currentSubmission->submission_code }}
                                 </span>
 
                             </div>
 
-                            <h2 class="mt-3 break-words text-xl font-bold leading-tight text-slate-800 sm:text-2xl">
+                            <h2 class="mt-3 break-words leading-tight text-slate-800 text-base font-semibold">
                                 {{ $currentSubmission->project_title }}
                             </h2>
 
                             @if ($currentSubmission->team_name)
-                                <p class="mt-2 flex items-center gap-2 text-sm text-slate-500">
+                                <p class="mt-2 flex items-center gap-2 text-slate-500 text-xs">
                                     <svg
                                         class="h-4 w-4 shrink-0 text-slate-400"
                                         viewBox="0 0 24 24"
@@ -627,7 +600,7 @@
 
                         </div>
 
-                        <span class="w-fit shrink-0 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
+                        <span class="w-fit shrink-0 rounded-full bg-blue-50 font-semibold text-blue-700 text-xs px-2.5 py-1">
                             {{ $currentSubmission->status }}
                         </span>
 
@@ -635,13 +608,13 @@
 
 
                     {{-- Main submission layout --}}
-                    <div class="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+                    <div class="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
 
                         {{-- LEFT --}}
-                        <div class="min-w-0 space-y-5">
+                        <div class="min-w-0 space-y-4">
 
                             {{-- Preview --}}
-                            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                            <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
 
                                 <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3">
                                     <div class="flex min-w-0 items-center gap-2">
@@ -666,7 +639,7 @@
                                             </p>
 
                                             @if ($displayFile)
-                                                <p class="mt-0.5 truncate text-[11px] text-slate-400">
+                                                <p class="mt-0.5 truncate text-slate-400 text-xs">
                                                     {{ $displayFile->original_name
                                                         ?? $displayFile->file_name
                                                         ?? 'ไฟล์ผลงาน' }}
@@ -676,14 +649,14 @@
 
                                     </div>
 
-                                    <span class="shrink-0 rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-600">
+                                    <span class="shrink-0 rounded-full bg-blue-50 font-bold text-blue-600 text-xs px-2.5 py-1">
                                         Live View
                                     </span>
                                 </div>
 
                                 @if ($fileUrl && $isImage)
 
-                                    <div class="flex min-h-[320px] items-center justify-center overflow-hidden bg-slate-100 p-3 sm:min-h-[460px] sm:p-5">
+                                    <div class="flex min-h-[320px] items-center justify-center overflow-hidden bg-slate-100 p-3 sm:min-h-[460px] sm:p-4">
                                         <img
                                             src="{{ $fileUrl }}"
                                             alt="ผลงาน {{ $currentSubmission->project_title }}"
@@ -693,9 +666,9 @@
 
                                 @elseif ($fileUrl)
 
-                                    <div class="flex min-h-[320px] flex-col items-center justify-center p-8 text-center sm:min-h-[460px]">
+                                    <div class="flex min-h-[320px] flex-col items-center justify-center p-4 text-center sm:min-h-[460px]">
 
-                                        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-400 shadow-sm">
+                                        <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm border border-slate-200">
                                             <svg
                                                 class="h-7 w-7"
                                                 viewBox="0 0 24 24"
@@ -713,7 +686,7 @@
                                             ไฟล์นี้ไม่สามารถแสดงตัวอย่างได้
                                         </p>
 
-                                        <p class="mt-1 text-xs text-slate-400">
+                                        <p class="mt-1 text-slate-400 text-xs">
                                             เปิดไฟล์ในหน้าต่างใหม่เพื่อดูผลงาน
                                         </p>
 
@@ -721,9 +694,7 @@
                                             href="{{ $fileUrl }}"
                                             target="_blank"
                                             rel="noopener"
-                                            class="mt-5 inline-flex items-center gap-2 rounded-xl bg-blue-600
-                                                   px-5 py-3 text-sm font-bold text-white shadow-sm
-                                                   transition hover:bg-blue-700"
+                                            class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 h-9 px-3 justify-center"
                                         >
                                             เปิดผลงาน
 
@@ -744,9 +715,9 @@
 
                                 @else
 
-                                    <div class="flex min-h-[320px] flex-col items-center justify-center p-8 text-center sm:min-h-[460px]">
+                                    <div class="flex min-h-[320px] flex-col items-center justify-center p-4 text-center sm:min-h-[460px]">
 
-                                        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-slate-300 shadow-sm">
+                                        <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-white text-slate-300 shadow-sm border border-slate-200">
                                             <svg
                                                 class="h-7 w-7"
                                                 viewBox="0 0 24 24"
@@ -763,7 +734,7 @@
                                             ยังไม่ได้เลือกไฟล์สำหรับแสดง
                                         </p>
 
-                                        <p class="mt-1 text-xs text-slate-400">
+                                        <p class="mt-1 text-slate-400 text-xs">
                                             เลือกไฟล์จากรายการไฟล์ผลงานด้านข้าง
                                         </p>
 
@@ -775,7 +746,7 @@
 
 
                             {{-- Description --}}
-                            <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+                            <div class="rounded-xl border border-slate-200 bg-white p-4 sm:p-4 shadow-sm">
 
                                 <div class="flex items-center gap-2">
                                     <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
@@ -792,11 +763,11 @@
                                     </div>
 
                                     <div>
-                                        <h3 class="text-sm font-bold text-slate-700">
+                                        <h3 class="text-slate-700 text-base font-semibold">
                                             รายละเอียดผลงาน
                                         </h3>
 
-                                        <p class="text-[11px] text-slate-400">
+                                        <p class="text-slate-400 text-xs">
                                             ข้อมูลประกอบการพิจารณาของกรรมการ
                                         </p>
                                     </div>
@@ -819,7 +790,7 @@
                             {{-- =================================================
                                  SENDER INFORMATION
                             ================================================== --}}
-                            <div class="overflow-hidden rounded-2xl border border-blue-100 bg-white">
+                            <div class="overflow-hidden rounded-xl border border-blue-100 bg-white shadow-sm">
 
                                 <div class="border-b border-blue-100 bg-blue-50/60 px-4 py-4">
 
@@ -839,11 +810,11 @@
                                         </div>
 
                                         <div class="min-w-0">
-                                            <h3 class="text-sm font-bold text-slate-800">
+                                            <h3 class="text-slate-800 text-base font-semibold">
                                                 ข้อมูลผู้ส่งผลงาน
                                             </h3>
 
-                                            <p class="mt-0.5 text-[11px] text-slate-500">
+                                            <p class="mt-0.5 text-slate-500 text-xs">
                                                 ข้อมูลที่ผู้ส่งกรอกในแบบฟอร์ม
                                             </p>
                                         </div>
@@ -911,7 +882,7 @@
                                                     {{ $contactEmail }}
                                                 </a>
                                             @else
-                                                <p class="text-sm text-slate-400">
+                                                <p class="text-slate-400 text-xs">
                                                     ไม่ระบุอีเมล
                                                 </p>
                                             @endif
@@ -948,7 +919,7 @@
                                                     {{ $contactPhone }}
                                                 </a>
                                             @else
-                                                <p class="text-sm text-slate-400">
+                                                <p class="text-slate-400 text-xs">
                                                     ไม่ระบุเบอร์โทรศัพท์
                                                 </p>
                                             @endif
@@ -994,9 +965,9 @@
 
 
                             {{-- Submission Meta --}}
-                            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
 
-                                <h3 class="text-sm font-bold text-slate-700">
+                                <h3 class="text-slate-700 text-base font-semibold">
                                     ข้อมูลผลงาน
                                 </h3>
 
@@ -1018,7 +989,7 @@
                                         </dt>
 
                                         <dd>
-                                            <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">
+                                            <span class="rounded-full bg-emerald-50 font-bold text-emerald-700 text-xs px-2.5 py-1">
                                                 {{ $currentSubmission->status }}
                                             </span>
                                         </dd>
@@ -1030,21 +1001,21 @@
 
 
                             {{-- Files --}}
-                            <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
 
                                 <div class="flex items-center justify-between gap-3">
 
                                     <div>
-                                        <h3 class="text-sm font-bold text-slate-700">
+                                        <h3 class="text-slate-700 text-base font-semibold">
                                             ไฟล์ผลงาน
                                         </h3>
 
-                                        <p class="mt-0.5 text-[11px] text-slate-400">
+                                        <p class="mt-0.5 text-slate-400 text-xs">
                                             ไฟล์ทั้งหมดของผลงานนี้
                                         </p>
                                     </div>
 
-                                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-500">
+                                    <span class="rounded-full bg-slate-100 font-bold text-slate-500 text-xs px-2.5 py-1">
                                         {{ $currentSubmission->files->count() }} ไฟล์
                                     </span>
 
@@ -1063,8 +1034,7 @@
                                         @endphp
 
                                         <div
-                                            class="group rounded-xl border p-3 transition
-                                            {{ $isCurrentFile
+                                            class="group rounded-xl border p-3 transition {{ $isCurrentFile
                                                 ? 'border-blue-200 bg-blue-50/70'
                                                 : 'border-slate-200 bg-white hover:bg-slate-50' }}"
                                         >
@@ -1072,8 +1042,7 @@
                                             <div class="flex items-start gap-3">
 
                                                 <div
-                                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
-                                                    {{ $isCurrentFile
+                                                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg {{ $isCurrentFile
                                                         ? 'bg-blue-100 text-blue-600'
                                                         : 'bg-slate-100 text-slate-500' }}"
                                                 >
@@ -1099,13 +1068,13 @@
                                                     </p>
 
                                                     @if ($fileExtension)
-                                                        <p class="mt-0.5 text-[10px] uppercase text-slate-400">
+                                                        <p class="mt-0.5 uppercase text-slate-400 text-xs">
                                                             {{ $fileExtension }} file
                                                         </p>
                                                     @endif
 
                                                     @if ($isCurrentFile)
-                                                        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2 py-1 text-[10px] font-bold text-blue-700">
+                                                        <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-blue-100 font-bold text-blue-700 text-xs px-2.5 py-1">
                                                             <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
                                                             กำลังแสดงให้กรรมการ
                                                         </span>
@@ -1122,10 +1091,7 @@
                                                     href="{{ $file->download_url }}"
                                                     target="_blank"
                                                     rel="noopener"
-                                                    class="mt-3 inline-flex w-full items-center justify-center gap-2
-                                                           rounded-lg border border-slate-200 bg-white px-3 py-2
-                                                           text-xs font-semibold text-blue-600 transition
-                                                           hover:border-blue-200 hover:bg-blue-50"
+                                                    class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-blue-600 transition hover:border-blue-200 hover:bg-blue-50 h-9 px-3"
                                                 >
                                                     เปิดไฟล์
 
@@ -1148,8 +1114,8 @@
 
                                     @empty
 
-                                        <div class="rounded-xl border border-dashed border-slate-200 px-4 py-6 text-center">
-                                            <p class="text-xs text-slate-400">
+                                        <div class="rounded-xl border border-dashed border-slate-200 px-4 py-4 text-center">
+                                            <p class="text-slate-400 text-xs">
                                                 ไม่มีไฟล์แนบ
                                             </p>
                                         </div>
@@ -1168,9 +1134,9 @@
 
             @else
 
-                <div class="px-5 py-16 text-center sm:px-6">
+                <div class="px-4 py-4 text-center sm:px-4">
 
-                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
                         <svg
                             class="h-7 w-7"
                             viewBox="0 0 24 24"
@@ -1183,11 +1149,11 @@
                         </svg>
                     </div>
 
-                    <h2 class="mt-4 text-base font-bold text-slate-700">
+                    <h2 class="mt-4 text-slate-700 text-base font-semibold">
                         ยังไม่ได้เลือกผลงาน
                     </h2>
 
-                    <p class="mx-auto mt-1 max-w-md text-xs leading-5 text-slate-400 sm:text-sm">
+                    <p class="mx-auto mt-1 max-w-md leading-5 text-slate-400 text-xs">
                         เลือกผลงานจากรายการด้านบนเพื่อเริ่มแสดงให้กรรมการในห้องตัดสิน
                     </p>
 
@@ -1201,9 +1167,9 @@
         {{-- =========================================================
              JUDGES
         ========================================================== --}}
-        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
-            <div class="border-b border-slate-100 px-4 py-4 sm:px-6">
+            <div class="border-b border-slate-100 px-4 py-4 sm:px-4">
 
                 <div class="flex items-center justify-between gap-3">
 
@@ -1225,18 +1191,18 @@
                         </div>
 
                         <div>
-                            <h2 class="text-sm font-bold text-slate-800 sm:text-base">
+                            <h2 class="text-slate-800 text-base font-semibold">
                                 กรรมการในห้อง
                             </h2>
 
-                            <p class="mt-0.5 text-[11px] text-slate-400 sm:text-xs">
+                            <p class="mt-0.5 text-slate-400 text-xs">
                                 รายชื่อและสถานะการส่งคะแนน
                             </p>
                         </div>
 
                     </div>
 
-                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500">
+                    <span class="rounded-full bg-slate-100 font-bold text-slate-500 text-xs px-2.5 py-1">
                         {{ $assignments->count() }} คน
                     </span>
 
@@ -1276,7 +1242,7 @@
                             $submittedWorkCount === $submissions->count();
                     @endphp
 
-                    <div class="px-4 py-5 sm:px-6">
+                    <div class="px-4 py-4 sm:px-4">
 
                         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
@@ -1292,7 +1258,7 @@
                                         {{ $judgeName }}
                                     </p>
 
-                                    <p class="mt-0.5 break-all text-xs text-slate-400">
+                                    <p class="mt-0.5 break-all text-slate-400 text-xs">
                                         {{ $judgeEmail }}
                                     </p>
 
@@ -1300,11 +1266,11 @@
                             </div>
 
                             @if ($judgeComplete)
-                                <span class="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200">
+                                <span class="rounded-full bg-emerald-50 font-bold text-emerald-700 ring-1 ring-emerald-200 text-xs px-2.5 py-1">
                                     ส่งครบทุกผลงานแล้ว
                                 </span>
                             @else
-                                <span class="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 ring-1 ring-amber-200">
+                                <span class="rounded-full bg-amber-50 font-bold text-amber-700 ring-1 ring-amber-200 text-xs px-2.5 py-1">
                                     ส่งแล้ว {{ $submittedWorkCount }} / {{ $submissions->count() }} ผลงาน
                                 </span>
                             @endif
@@ -1326,17 +1292,17 @@
                                             <p class="truncate text-xs font-bold text-slate-700">
                                                 {{ $submission->submission_code }}
                                             </p>
-                                            <p class="mt-1 line-clamp-2 text-[11px] leading-5 text-slate-500">
+                                            <p class="mt-1 line-clamp-2 leading-5 text-slate-500 text-xs">
                                                 {{ $submission->project_title }}
                                             </p>
                                         </div>
 
                                         @if ($hasSubmitted)
-                                            <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700">
+                                            <span class="shrink-0 rounded-full bg-emerald-100 font-bold text-emerald-700 text-xs px-2.5 py-1">
                                                 ส่งแล้ว
                                             </span>
                                         @else
-                                            <span class="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-700">
+                                            <span class="shrink-0 rounded-full bg-amber-100 font-bold text-amber-700 text-xs px-2.5 py-1">
                                                 ขาด {{ $progress['missing_count'] ?? $rubrics->count() }} เกณฑ์
                                             </span>
                                         @endif
@@ -1349,9 +1315,9 @@
 
                 @empty
 
-                    <div class="px-5 py-12 text-center">
+                    <div class="px-4 py-4 text-center">
 
-                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
                             <svg
                                 class="h-6 w-6"
                                 viewBox="0 0 24 24"
@@ -1368,7 +1334,7 @@
                             ยังไม่มีกรรมการที่ตอบรับ
                         </p>
 
-                        <p class="mt-1 text-xs text-slate-400">
+                        <p class="mt-1 text-slate-400 text-xs">
                             ต้องมีกรรมการสถานะ accepted ก่อนเริ่มการตัดสิน
                         </p>
 
@@ -1386,10 +1352,7 @@
 
             <a
                 href="{{ route('competition-admin.judging-rooms.index') }}"
-                class="inline-flex w-full items-center justify-center gap-2 rounded-xl
-                       border border-slate-300 bg-white px-5 py-3 text-sm font-semibold
-                       text-slate-600 transition hover:bg-slate-50 active:bg-slate-100
-                       sm:w-auto sm:py-2.5"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-600 transition hover:bg-slate-50 active:bg-slate-100 sm:w-auto h-9 px-3"
             >
                 <svg
                     class="h-4 w-4"

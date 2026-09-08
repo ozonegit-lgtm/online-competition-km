@@ -4,18 +4,18 @@
 
 @section('header')
 <div>
-    <h1 class="text-2xl font-bold text-slate-800">
+    <h1 class="text-slate-800 text-xl font-bold">
         สร้างแบบฟอร์ม Template
     </h1>
 
-    <p class="mt-1 text-sm text-slate-500">
+    <p class="mt-1 text-slate-500 text-xs">
         แม่แบบ: {{ $template->template_name }}
     </p>
 </div>
 @endsection
 
 @section('content')
-    <div class="mx-auto max-w-5xl">
+    <div class="mx-auto max-w-7xl">
 
 
     <form
@@ -29,21 +29,21 @@
         <input type="hidden" name="fields" id="fieldsInput">
 
         {{-- หัวแบบฟอร์ม --}}
-        <div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div class="h-3 bg-violet-600"></div>
 
-            <div class="p-6">
-                <h2 class="text-xl font-bold text-slate-800">
+            <div class="p-4">
+                <h2 class="text-slate-800 text-base font-semibold">
                     {{ $template->template_name }}
                 </h2>
 
                 @if ($template->description)
-                    <p class="mt-2 text-sm text-slate-500">
+                    <p class="mt-2 text-slate-500 text-xs">
                         {{ $template->description }}
                     </p>
                 @endif
 
-                <p class="mt-4 text-xs text-slate-400">
+                <p class="mt-4 text-slate-400 text-xs">
                     เพิ่มคำถามที่ต้องการให้ผู้ส่งผลงานกรอก
                 </p>
             </div>
@@ -56,31 +56,24 @@
         <button
             type="button"
             id="addFieldButton"
-            class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl
-                   border-2 border-dashed border-violet-300 bg-violet-50
-                   px-5 py-4 font-semibold text-violet-700 transition
-                   hover:border-violet-400 hover:bg-violet-100"
+            class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-violet-300 bg-violet-50 font-semibold text-violet-700 transition hover:border-violet-400 hover:bg-violet-100 text-sm h-9 px-3"
         >
             <span class="text-xl">+</span>
             เพิ่มคำถาม
         </button>
 
         {{-- Footer --}}
-        <div class="mt-8 flex items-center justify-between gap-4">
+        <div class="mt-4 flex items-center justify-between gap-4">
             <a
                 href="{{ route('superadmin.templates.index') }}"
-                class="rounded-xl border border-slate-300 px-5 py-3
-                       font-semibold text-slate-600 transition
-                       hover:bg-slate-100"
+                class="rounded-xl border border-slate-300 font-semibold text-slate-600 transition hover:bg-slate-100 inline-flex items-center justify-center text-sm h-9 px-3"
             >
                 ยกเลิก
             </a>
 
             <button
                 type="submit"
-                class="rounded-xl bg-green-600 px-6 py-3
-                       font-semibold text-white transition
-                       hover:bg-green-700">
+                class="rounded-xl bg-green-600 font-semibold text-white transition hover:bg-green-700 inline-flex items-center justify-center text-sm h-9 px-3">
                 บันทึกแบบฟอร์ม
             </button>
         </div>
@@ -89,7 +82,7 @@
 
 <template id="fieldTemplate">
     <div
-        class="field-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+        class="field-card rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
         data-field-id=""
     >
         <div class="mb-4 flex items-center justify-between gap-4">
@@ -98,16 +91,14 @@
             <div class="flex items-center gap-2">
                 <button
                     type="button"
-                    class="duplicate-field rounded-lg px-3 py-2 text-sm
-                           text-slate-500 hover:bg-slate-100"
+                    class="duplicate-field rounded-lg text-sm text-slate-500 hover:bg-slate-100 inline-flex items-center justify-center h-9 px-3"
                 >
                     ทำสำเนา
                 </button>
 
                 <button
                     type="button"
-                    class="delete-field rounded-lg px-3 py-2 text-sm
-                           text-red-500 hover:bg-red-50"
+                    class="delete-field rounded-lg text-sm text-red-500 hover:bg-red-50 inline-flex items-center justify-center h-9 px-3"
                 >
                     ลบ
                 </button>
@@ -123,9 +114,7 @@
 
                 <input
                     type="text"
-                    class="field-label w-full rounded-xl border border-slate-300
-                           px-4 py-3 outline-none transition
-                           focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                    class="field-label w-full rounded-xl border border-slate-300 outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100 text-sm py-2 h-10 px-3"
                     placeholder="ระบุคำถาม"
                 >
             </div>
@@ -137,8 +126,7 @@
                 </label>
 
                 <select
-                    class="field-type w-full rounded-xl border border-slate-300
-                           px-4 py-3 outline-none focus:border-violet-500"
+                    class="field-type w-full rounded-xl border border-slate-300 outline-none focus:border-violet-500 text-sm py-2 h-10 px-3"
                 >
                     <option value="text">ข้อความสั้น</option>
                     <option value="textarea">ข้อความยาว</option>
@@ -162,8 +150,7 @@
 
             <input
                 type="text"
-                class="field-help w-full rounded-xl border border-slate-300
-                       px-4 py-3 outline-none focus:border-violet-500"
+                class="field-help w-full rounded-xl border border-slate-300 outline-none focus:border-violet-500 text-sm py-2 h-10 px-3"
                 placeholder="ข้อความช่วยอธิบายคำถาม (ไม่บังคับ)"
             >
         </div>
@@ -177,7 +164,7 @@
 
                 <button
                     type="button"
-                    class="add-option text-sm font-semibold text-violet-600"
+                    class="add-option text-sm font-semibold text-violet-600 inline-flex items-center justify-center h-9 px-3"
                 >
                     + เพิ่มตัวเลือก
                 </button>
@@ -187,11 +174,11 @@
         </div>
 
         {{-- ตั้งค่าไฟล์ --}}
-        <div class="file-section mt-4 hidden rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <div class="file-section mt-4 hidden rounded-xl border border-slate-200 bg-slate-50 p-4">
             <div class="flex flex-wrap items-start justify-between gap-2">
                 <div>
                     <p class="text-sm font-medium text-slate-700">ประเภทไฟล์ที่อนุญาต</p>
-                    <p class="mt-0.5 text-xs text-slate-500">เลือกได้หลายประเภท</p>
+                    <p class="mt-0.5 text-slate-500 text-xs">เลือกได้หลายประเภท</p>
                 </div>
                 <span class="selected-file-count text-xs font-medium text-blue-700" aria-live="polite"></span>
             </div>
@@ -204,11 +191,7 @@
                             value="{{ $extension }}"
                             class="file-extension-checkbox peer sr-only"
                         >
-                        <span class="flex min-w-0 items-center justify-center gap-1.5 rounded-xl border
-                                     border-slate-300 bg-white px-2 py-2 text-xs font-semibold text-slate-700
-                                     transition hover:border-blue-300 hover:bg-blue-50
-                                     peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700
-                                     peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500 peer-focus-visible:ring-offset-2">
+                        <span class="flex min-w-0 items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-2 py-2 text-xs font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-blue-50 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500 peer-focus-visible:ring-offset-2">
                             <span class="file-extension-check text-blue-600 opacity-0" aria-hidden="true">✓</span>
                             <span class="truncate">{{ strtoupper($extension) }}</span>
                         </span>
@@ -218,9 +201,7 @@
 
             <button
                 type="button"
-                class="select-default-extensions mt-3 rounded-lg border border-slate-300 bg-white px-3 py-2
-                       text-xs font-medium text-slate-700 transition hover:border-blue-300 hover:text-blue-700
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                class="select-default-extensions mt-3 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-700 transition hover:border-blue-300 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 inline-flex items-center justify-center h-9 px-3"
             >
                 ใช้ค่าเริ่มต้นทั้งหมด
             </button>
@@ -232,23 +213,21 @@
                         type="number"
                         min="1"
                         max="{{ config('submissions.uploads.max_file_megabytes') }}"
-                        class="max-file-size w-24 rounded-xl border border-slate-300 bg-white px-3 py-2
-                               outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        class="max-file-size w-24 rounded-xl border border-slate-300 bg-white py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm h-10 px-3"
                         placeholder="10"
                     >
                     <span class="text-sm font-medium text-slate-600">MB</span>
                 </div>
-                <p class="mt-1 text-xs text-slate-500">อนุญาตตั้งแต่ 1–10 MB ต่อไฟล์</p>
+                <p class="mt-1 text-slate-500 text-xs">อนุญาตตั้งแต่ 1–10 MB ต่อไฟล์</p>
             </div>
         </div>
 
         {{-- Required --}}
-        <div class="mt-5 flex items-center justify-end border-t border-slate-100 pt-4">
+        <div class="mt-4 flex items-center justify-end border-t border-slate-100 pt-4">
             <label class="flex cursor-pointer items-center gap-2">
                 <input
                     type="checkbox"
-                    class="field-required h-4 w-4 rounded border-slate-300
-                           text-violet-600 focus:ring-violet-500"
+                    class="field-required h-4 w-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500"
                 >
 
                 <span class="text-sm font-medium text-slate-600">

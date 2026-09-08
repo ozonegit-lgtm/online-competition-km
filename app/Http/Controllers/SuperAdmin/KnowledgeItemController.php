@@ -27,20 +27,24 @@ class KnowledgeItemController extends Controller
     {
         Gate::authorize('viewAny', KnowledgeItem::class);
 
-        $query = KnowledgeItem::query()->with([
-            'creator:id,username',
-            'category:id,category_name,is_active',
-            'submission.competition:id,title',
-        ]);
+        /*
+         * องค์ความรู้ที่เพิ่มเองเท่านั้น
+         * ผลงานจากการแข่งขันจะใช้ Submission query ด้านล่าง
+         */
+        $knowledgeQuery = KnowledgeItem::query()
+            ->whereNull('submission_id')
+            ->with([
+                'creator:id,username',
+                'category:id,category_name,is_active',
+            ]);
 
         if ($request->filled('search')) {
             $search = $request->string('search')->toString();
 
-            $query->where(function ($query) use ($search) {
+            $knowledgeQuery->where(function ($query) use ($search) {
                 $query->where('title', 'like', "%{$search}%")
                     ->orWhere('summary', 'like', "%{$search}%")
-                    ->orWhereHas('creator', fn ($query) => $query->where('username', 'like', "%{$search}%"))
-                    ->orWhereHas('submission.competition', fn ($query) => $query->where('title', 'like', "%{$search}%"));
+                    ->orWhereHas('creator', fn ($query) => $query->where('username', 'like', "%{$search}%"));
             });
         }
 
@@ -48,35 +52,37 @@ class KnowledgeItemController extends Controller
             $categoryId = filter_var($request->input('category_id'), FILTER_VALIDATE_INT);
 
             if ($categoryId !== false && CompetitionCategory::whereKey($categoryId)->exists()) {
-                $query->where('category_id', $categoryId);
+                $knowledgeQuery->where('category_id', $categoryId);
             }
         }
 
         if (in_array($request->status, ['draft', 'published', 'hidden'], true)) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->source === 'manual') {
-            $query->whereNull('submission_id');
-        } elseif ($request->source === 'competition') {
-            $query->whereNotNull('submission_id');
+            $knowledgeQuery->where('status', $request->status);
         }
 
         if ($request->owner === 'unassigned') {
-            $query->whereNull('created_by');
+            $knowledgeQuery->whereNull('created_by');
         } elseif ($request->filled('owner')) {
             $ownerId = filter_var($request->input('owner'), FILTER_VALIDATE_INT);
 
             if ($ownerId !== false && User::whereKey($ownerId)->exists()) {
-                $query->where('created_by', $ownerId);
+                $knowledgeQuery->where('created_by', $ownerId);
             }
         }
 
-        $knowledgeItems = $query
+        if ($request->source === 'competition') {
+            $knowledgeQuery->whereRaw('1 = 0');
+        }
+
+        $knowledgeItems = $knowledgeQuery
             ->latest()
-            ->paginate(15)
+            ->paginate(15, ['*'], 'page')
             ->withQueryString();
 
+        /*
+         * ผลงานจากการแข่งขันทั้งหมด
+         * Super Admin เห็นทุกการแข่งขันที่ตัดสินเสร็จแล้ว
+         */
         $submissionQuery = Submission::query()
             ->where('status', '!=', 'disqualified')
             ->whereHas('competition.judgingSession', fn ($query) => $query->whereIn('status', ['ended', 'closed']))
@@ -104,6 +110,25 @@ class KnowledgeItemController extends Controller
             }
         }
 
+        /*
+         * สถานะ KM ของผลงานแข่งขัน
+         *
+         * ไม่มี KnowledgeItem = ยังไม่เคยเผยแพร่
+         * draft = ถอนเผยแพร่แล้ว
+         * published = เผยแพร่อยู่
+         * hidden = ถูกซ่อน
+         */
+        if ($request->status === 'published') {
+            $submissionQuery->whereHas('knowledgeItem', fn ($query) => $query->where('status', 'published'));
+        } elseif ($request->status === 'hidden') {
+            $submissionQuery->whereHas('knowledgeItem', fn ($query) => $query->where('status', 'hidden'));
+        } elseif ($request->status === 'draft') {
+            $submissionQuery->where(function ($query) {
+                $query->whereDoesntHave('knowledgeItem')
+                    ->orWhereHas('knowledgeItem', fn ($query) => $query->where('status', 'draft'));
+            });
+        }
+
         if ($request->owner === 'unassigned') {
             $submissionQuery->whereHas('competition', fn ($query) => $query->whereNull('created_by'));
         } elseif ($request->filled('owner')) {
@@ -114,12 +139,21 @@ class KnowledgeItemController extends Controller
             }
         }
 
+        if ($request->source === 'manual') {
+            $submissionQuery->whereRaw('1 = 0');
+        }
+
         $submissions = $submissionQuery
             ->orderByDesc('final_score')
             ->paginate(15, ['*'], 'submission_page')
             ->withQueryString();
 
+        /*
+         * รายชื่อเจ้าของสำหรับ Filter
+         * รวมเจ้าของ Manual KM และเจ้าของ Competition
+         */
         $ownerIds = KnowledgeItem::query()
+            ->whereNull('submission_id')
             ->whereNotNull('created_by')
             ->pluck('created_by')
             ->merge(

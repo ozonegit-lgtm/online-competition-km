@@ -4,23 +4,23 @@
 
 @section('header')
 <div>
-    <h1 class="text-2xl font-bold text-slate-800">
+    <h1 class="text-slate-800 text-xl font-bold">
         แก้ไข Template
     </h2>
-    <p class="mt-2 text-sm text-slate-500">
+    <p class="mt-2 text-slate-500 text-xs">
         แก้ไขข้อมูลแม่แบบการแข่งขัน
     </p>
 </div>
 @endsection
 
 @section('content')
-<div class="mx-auto max-w-5xl px-6 py-8">
-            <div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+<div class="mx-auto max-w-7xl">
+            <div class="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             <div class="grid sm:grid-cols-2">
             {{-- ขั้นตอนที่ 1 --}}
                 <a
                     href="{{ route('superadmin.templates.edit', $template) }}"
-                    class="flex items-center gap-4 border-b border-slate-200 bg-blue-50 px-6 py-5 transition hover:bg-blue-100 sm:border-b-0 sm:border-r"
+                    class="flex items-center gap-4 border-b border-slate-200 bg-blue-50 px-4 py-4 transition hover:bg-blue-100 sm:border-b-0 sm:border-r"
                 >
                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 font-bold text-white">
                         1
@@ -31,7 +31,7 @@
                             ข้อมูล Template
                         </p>
 
-                        <p class="mt-1 text-xs text-slate-500">
+                        <p class="mt-1 text-slate-500 text-xs">
                             แก้ไขข้อมูลพื้นฐานแล้ว
                         </p>
                     </div>
@@ -40,7 +40,7 @@
                 {{-- ขั้นตอนที่ 2 --}}
                 <a
                     href="{{ route('superadmin.templates.form-fields.edit', $template) }}"
-                    class="flex items-center gap-4 px-6 py-5 transition hover:bg-slate-50"
+                    class="flex items-center gap-4 px-4 py-4 transition hover:bg-slate-50"
                 >
                     
                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 font-bold text-slate-500">
@@ -52,7 +52,7 @@
                             แก้ไขแบบฟอร์ม
                         </p>
 
-                        <p class="mt-1 text-xs text-slate-500">
+                        <p class="mt-1 text-slate-500 text-xs">
                             แก้ไขช่องกรอกข้อมูลที่มีอยู่ หรือเพิ่มใหม่
                         </p>
                     </div>
@@ -62,12 +62,12 @@
     <form action="{{ route('superadmin.templates.update', $template) }}"
           method="POST"
           enctype="multipart/form-data"
-          class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         @csrf
         @method('PUT')
 
         {{-- Card header --}}
-        <div class="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-slate-50 to-white px-8 py-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-r from-slate-50 to-white px-4 py-4">
             <div class="flex items-center gap-4">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg"
@@ -83,10 +83,10 @@
                 </div>
 
                 <div>
-                    <h1 class="text-xl font-bold text-slate-800">
+                    <h1 class="text-slate-800 text-xl font-bold">
                         {{ $template->template_name }}
                     </h1>
-                    <p class="text-sm text-slate-500">
+                    <p class="text-slate-500 text-xs">
                         แก้ไขรายละเอียดของ Template
                     </p>
                 </div>
@@ -111,13 +111,13 @@
         <div class="border-t border-slate-100"></div>
 
         {{-- Main body --}}
-        <div class="grid grid-cols-1 gap-8 px-8 py-8 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 px-4 py-4 lg:grid-cols-3">
 
             {{-- Left: Template information --}}
-            <div class="space-y-6 lg:col-span-2">
+            <div class="space-y-4 lg:col-span-2">
 
                 {{-- Template name + slug --}}
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
                     {{-- Template name --}}
                     <div>
@@ -143,7 +143,7 @@
                             type="text"
                             name="template_name"
                             value="{{ old('template_name', $template->template_name) }}"
-                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-800 shadow-sm transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 @error('template_name') border-red-400 @enderror"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 font-semibold text-slate-800 shadow-sm transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 @error('template_name') border-red-400 @enderror text-sm py-2 h-10 px-3"
                         >
 
                         @error('template_name')
@@ -175,7 +175,7 @@
                             type="text"
                             name="template_slug"
                             value="{{ old('template_slug', $template->template_slug) }}"
-                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-sm text-slate-800 shadow-sm transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 @error('template_slug') border-red-400 @enderror"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 font-mono text-sm text-slate-800 shadow-sm transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 @error('template_slug') border-red-400 @enderror py-2 h-10 px-3"
                         >
 
                         @error('template_slug')
@@ -208,7 +208,7 @@
                         id="default_description"
                         name="default_description"
                         rows="7"
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 shadow-sm transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 @error('default_description') border-red-400 @enderror"
+                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 shadow-sm transition focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 @error('default_description') border-red-400 @enderror text-sm"
                     >{{ old('default_description', $template->default_description) }}</textarea>
 
                     @error('default_description')
@@ -261,7 +261,7 @@
                                   d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
 
-                        <p class="mt-3 text-sm text-slate-400">
+                        <p class="mt-3 text-slate-400 text-xs">
                             ไม่มีรูปภาพ
                         </p>
                     </div>
@@ -294,7 +294,7 @@
                     >
                 </label>
 
-                <p class="mt-2 text-center text-xs text-slate-400">
+                <p class="mt-2 text-center text-slate-400 text-xs">
                     JPG, PNG ไม่เกิน 10MB
                 </p>
 
@@ -306,22 +306,22 @@
         </div>
 
         {{-- Form Builder --}}
-        <div class="border-t border-slate-100 px-8 py-6">
+        <div class="border-t border-slate-100 px-4 py-4">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                 <div>
-                    <h2 class="text-lg font-bold text-slate-800">
+                    <h2 class="text-slate-800 text-base font-semibold">
                         แบบฟอร์มการแข่งขัน
                     </h2>
 
-                    <p class="mt-1 text-sm text-slate-500">
+                    <p class="mt-1 text-slate-500 text-xs">
                         จัดการช่องกรอกข้อมูลของ Template นี้ผ่าน Form Builder
                     </p>
                 </div>
 
                 <a
                     href="{{ route('superadmin.templates.form-fields.edit', $template) }}"
-                    class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-blue-50 px-4 text-sm font-semibold text-blue-700 ring-1 ring-blue-200 transition hover:bg-blue-100"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-50 text-sm font-semibold text-blue-700 ring-1 ring-blue-200 transition hover:bg-blue-100 h-9 px-3"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg"
                          class="h-4 w-4"
@@ -341,11 +341,11 @@
         </div>
 
         {{-- Footer --}}
-        <div class="flex justify-end gap-3 border-t border-slate-100 bg-slate-50 px-8 py-5">
+        <div class="flex justify-end gap-3 border-t border-slate-100 bg-slate-50 px-4 py-4">
 
             <a
                 href="{{ route('superadmin.templates.index') }}"
-                class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 font-medium text-slate-700 transition hover:bg-slate-100"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 transition hover:bg-slate-100 text-sm h-9 px-3"
             >
                 <svg xmlns="http://www.w3.org/2000/svg"
                      class="h-4 w-4"
@@ -363,7 +363,7 @@
 
             <button
                 type="submit"
-                class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 font-semibold text-white shadow-sm transition hover:bg-blue-700 text-sm h-9 px-3"
             >
                 <svg xmlns="http://www.w3.org/2000/svg"
                      class="h-4 w-4"

@@ -4,35 +4,35 @@
 
 @section('header')
     <div>
-        <h1 class="text-xl font-bold text-slate-900 sm:text-2xl">
+        <h1 class="text-slate-900 text-xl font-bold">
             ศูนย์ผลการแข่งขัน
         </h1>
 
-        <p class="mt-1 text-sm text-slate-500">
+        <p class="mt-1 text-slate-500 text-xs">
             เลือกการแข่งขันเพื่อตรวจสอบคะแนน อันดับ และการประกาศผล
         </p>
     </div>
 @endsection
 
 @section('content')
-    <div class="mx-auto w-full max-w-7xl space-y-5">
+    <div class="mx-auto w-full max-w-7xl space-y-4">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h2 class="text-lg font-bold text-slate-900">
+                <h2 class="text-slate-900 text-base font-semibold">
                     การแข่งขันของฉัน
                 </h2>
 
-                <p class="mt-1 text-xs text-slate-500">
+                <p class="mt-1 text-slate-500 text-xs">
                     แสดงเฉพาะการแข่งขันที่คุณเป็นผู้สร้าง
                 </p>
             </div>
 
-            <span class="inline-flex w-fit items-center rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+            <span class="inline-flex w-fit items-center rounded-full bg-blue-50 font-semibold text-blue-700 ring-1 ring-blue-100 text-xs px-2.5 py-1">
                 {{ number_format($competitions->total()) }} การแข่งขัน
             </span>
         </div>
 
-        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             @forelse ($competitions as $competition)
                 @php
                     $sessionStatus =
@@ -84,35 +84,35 @@
                     };
                 @endphp
 
-                <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
-                    <div class="border-b border-slate-100 px-5 py-5">
+                <article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm">
+                    <div class="border-b border-slate-100 px-4 py-4">
                         <div class="flex flex-wrap items-center justify-between gap-2">
-                            <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 {{ $sessionConfig['class'] }}">
+                            <span class="inline-flex items-center gap-1.5 rounded-full font-semibold ring-1 {{ $sessionConfig['class'] }} text-xs px-2.5 py-1">
                                 <span class="h-1.5 w-1.5 rounded-full {{ $sessionConfig['dot'] }}"></span>
                                 {{ $sessionConfig['label'] }}
                             </span>
 
                             @if ($competition->publish_scores)
-                                <span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                                <span class="inline-flex rounded-full bg-emerald-50 font-semibold text-emerald-700 ring-1 ring-emerald-200 text-xs px-2.5 py-1">
                                     ประกาศผลแล้ว
                                 </span>
                             @elseif ($competition->results_ready)
-                                <span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700 ring-1 ring-blue-200">
+                                <span class="inline-flex rounded-full bg-blue-50 font-semibold text-blue-700 ring-1 ring-blue-200 text-xs px-2.5 py-1">
                                     พร้อมประกาศ
                                 </span>
                             @endif
                         </div>
 
-                        <h3 class="mt-4 line-clamp-2 text-lg font-bold leading-6 text-slate-900">
+                        <h3 class="mt-4 line-clamp-2 leading-6 text-slate-900 text-base font-semibold">
                             {{ $competition->title }}
                         </h3>
 
-                        <p class="mt-1 text-sm text-slate-500">
+                        <p class="mt-1 text-slate-500 text-xs">
                             {{ $competition->category?->category_name ?? 'ไม่ระบุหมวดหมู่' }}
                         </p>
                     </div>
 
-                    <div class="space-y-4 px-5 py-4">
+                    <div class="space-y-4 px-4 py-4">
                         <div>
                             <div class="flex items-center justify-between text-xs">
                                 <span class="font-medium text-slate-500">
@@ -134,7 +134,7 @@
 
                         <div class="grid grid-cols-2 gap-3 rounded-xl bg-slate-50 p-3">
                             <div>
-                                <p class="text-[11px] font-medium text-slate-500">
+                                <p class="font-medium text-slate-500 text-xs">
                                     Rubric active
                                 </p>
 
@@ -144,7 +144,7 @@
                             </div>
 
                             <div>
-                                <p class="text-[11px] font-medium text-slate-500">
+                                <p class="font-medium text-slate-500 text-xs">
                                     กรรมการ accepted
                                 </p>
 
@@ -158,7 +158,7 @@
                     <div class="border-t border-slate-100 bg-slate-50/60 p-4">
                         <a
                             href="{{ route('competition-admin.competitions.results.index', $competition) }}"
-                            class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100"
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 h-9 px-3"
                         >
                             ตรวจสอบอันดับ
 
@@ -169,18 +169,18 @@
                     </div>
                 </article>
             @empty
-                <div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center md:col-span-2 xl:col-span-3">
-                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                <div class="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-4 text-center md:col-span-2 xl:col-span-3 shadow-sm">
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
                         <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h7.5M8.25 10.5h7.5m-7.5 3.75h4.5M6 21h12a2.25 2.25 0 0 0 2.25-2.25V5.25A2.25 2.25 0 0 0 18 3H6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 6 21Z" />
                         </svg>
                     </div>
 
-                    <h3 class="mt-4 font-bold text-slate-800">
+                    <h3 class="mt-4 text-slate-800 text-base font-semibold">
                         ยังไม่มีการแข่งขัน
                     </h3>
 
-                    <p class="mt-1 text-sm text-slate-500">
+                    <p class="mt-1 text-slate-500 text-xs">
                         สร้างการแข่งขันและดำเนินการตัดสินก่อนตรวจสอบผล
                     </p>
                 </div>
@@ -188,7 +188,7 @@
         </div>
 
         @if ($competitions->hasPages())
-            <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+            <div class="rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
                 {{ $competitions->links() }}
             </div>
         @endif

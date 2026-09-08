@@ -4,11 +4,11 @@
 
 @section('header')
 <div>
-    <h1 class="text-xl font-bold text-slate-800">
+    <h1 class="text-slate-800 text-xl font-bold">
         ผลงานที่ส่งเข้าประกวด
     </h1>
 
-    <p class="mt-1 text-sm text-slate-500">
+    <p class="mt-1 text-slate-500 text-xs">
         ตรวจสอบผลงานที่ผู้เข้าร่วมส่งเข้าประกวด
     </p>
 </div>
@@ -53,7 +53,7 @@
             {{ $submission->competition->category->category_name }}
         </span>
 
-        <h3 class="mt-2 line-clamp-2 text-sm font-bold text-slate-800">
+        <h3 class="mt-2 line-clamp-2 text-slate-800 text-base font-semibold">
             {{ $submission->project_title }}
         </h3>
 
@@ -90,7 +90,7 @@
 
 @empty
 
-<div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+<div class="col-span-full rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center text-sm text-slate-500 shadow-sm">
     ยังไม่มีผลงานที่ส่งเข้าประกวด
 </div>
 
@@ -98,7 +98,7 @@
 
 </div>
 
-<div class="mt-6">
+<div class="mt-4">
     {{ $submissions->links() }}
 </div>
 

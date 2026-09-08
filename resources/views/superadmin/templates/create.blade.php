@@ -4,22 +4,22 @@
 
 @section('header')
 <div>
-    <h1 class="text-2xl font-bold text-slate-800">
+    <h1 class="text-slate-800 text-xl font-bold">
         สร้าง Template
     </h1>
 
-    <p class="mt-2 text-sm text-slate-500">
+    <p class="mt-2 text-slate-500 text-xs">
         สร้างแม่แบบการแข่งขันและกำหนดแบบฟอร์มรับผลงาน
     </p>
 </div>
 @endsection
 
 @section('content')
-<div class="mx-auto max-w-6xl">
+<div class="mx-auto max-w-7xl">
 
     {{-- แสดงข้อผิดพลาด --}}
     @if($errors->any())
-        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
+        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-4">
             <p class="font-semibold text-red-700">
                 กรุณาตรวจสอบข้อมูลอีกครั้ง
             </p>
@@ -33,11 +33,11 @@
     @endif
 
     {{-- ขั้นตอนการสร้าง Template --}}
-    <div class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <div class="grid sm:grid-cols-2">
 
             {{-- ขั้นตอนที่ 1 --}}
-            <div class="flex items-center gap-4 border-b border-slate-200 bg-blue-50 px-6 py-5 sm:border-b-0 sm:border-r">
+            <div class="flex items-center gap-4 border-b border-slate-200 bg-blue-50 px-4 py-4 sm:border-b-0 sm:border-r">
                 <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 font-bold text-white">
                     1
                 </span>
@@ -47,14 +47,14 @@
                         ข้อมูล Template
                     </p>
 
-                    <p class="mt-1 text-xs text-slate-500">
+                    <p class="mt-1 text-slate-500 text-xs">
                         กำลังกรอกข้อมูลพื้นฐาน
                     </p>
                 </div>
             </div>
 
             {{-- ขั้นตอนที่ 2 --}}
-            <div class="flex items-center gap-4 px-6 py-5">
+            <div class="flex items-center gap-4 px-4 py-4">
                 <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 font-bold text-slate-500">
                     2
                 </span>
@@ -64,7 +64,7 @@
                         สร้างแบบฟอร์ม
                     </p>
 
-                    <p class="mt-1 text-xs text-slate-500">
+                    <p class="mt-1 text-slate-500 text-xs">
                         สร้างช่องกรอกข้อมูลในขั้นตอนถัดไป
                     </p>
                 </div>
@@ -76,25 +76,25 @@
         action="{{ route('superadmin.templates.store') }}"
         method="POST"
         enctype="multipart/form-data"
-        class="space-y-8">
+        class="space-y-4">
 
         @csrf
 
-        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
             {{-- Header --}}
-            <div class="border-b border-slate-200 bg-slate-50 px-8 py-6">
-                <h2 class="text-xl font-semibold tracking-tight text-slate-800">
+            <div class="border-b border-slate-200 bg-slate-50 px-4 py-4">
+                <h2 class="tracking-tight text-slate-800 text-base font-semibold">
                     ข้อมูล Template
                 </h2>
 
-                <p class="mt-1.5 text-sm text-slate-500">
+                <p class="mt-1.5 text-slate-500 text-xs">
                     กรอกข้อมูลพื้นฐานของแม่แบบการแข่งขัน
                 </p>
             </div>
 
             {{-- Body --}}
-            <div class="space-y-10 p-8">
+            <div class="space-y-4 p-4">
 
                 {{-- Template Name --}}
                 <div class="space-y-3">
@@ -113,13 +113,9 @@
                         value="{{ old('template_name') }}"
                         placeholder="เช่น การแข่งขันออกแบบโปสเตอร์"
                         required
-                        class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4
-                               text-slate-700 outline-none transition
-                               placeholder:text-slate-400
-                               focus:border-blue-500 focus:ring-4 focus:ring-blue-100
-                               @error('template_name') border-red-500 @enderror">
+                        class="w-full rounded-xl border border-slate-200 bg-white text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 @error('template_name') border-red-500 @enderror text-sm py-2 h-10 px-3">
 
-                    <p class="text-xs text-slate-500">
+                    <p class="text-slate-500 text-xs">
                         ชื่อสำหรับให้ Competition Admin เลือกใช้งาน
                     </p>
 
@@ -144,13 +140,9 @@
                         name="template_slug"
                         value="{{ old('template_slug') }}"
                         placeholder="เช่น poster-competition"
-                        class="h-12 w-full rounded-xl border border-slate-200 bg-white px-4
-                               text-slate-700 outline-none transition
-                               placeholder:text-slate-400
-                               focus:border-blue-500 focus:ring-4 focus:ring-blue-100
-                               @error('template_slug') border-red-500 @enderror">
+                        class="w-full rounded-xl border border-slate-200 bg-white text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 @error('template_slug') border-red-500 @enderror text-sm py-2 h-10 px-3">
 
-                    <p class="text-xs text-slate-500">
+                    <p class="text-slate-500 text-xs">
                         หากไม่กรอก ระบบจะสร้างจากชื่อ Template ให้อัตโนมัติ
                     </p>
 
@@ -174,11 +166,7 @@
                         name="default_description"
                         rows="6"
                         placeholder="อธิบายว่า Template นี้ใช้สำหรับการแข่งขันประเภทใด"
-                        class="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3
-                               text-slate-700 outline-none transition
-                               placeholder:text-slate-400
-                               focus:border-blue-500 focus:ring-4 focus:ring-blue-100
-                               @error('default_description') border-red-500 @enderror">{{ old('default_description') }}</textarea>
+                        class="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 @error('default_description') border-red-500 @enderror text-sm">{{ old('default_description') }}</textarea>
 
                     @error('default_description')
                         <p class="text-sm text-red-600">
@@ -197,12 +185,9 @@
 
                     <label
                         for="cover_image"
-                        class="flex cursor-pointer flex-col gap-5 rounded-xl border-2 border-dashed
-                               border-slate-200 bg-white px-6 py-6 transition
-                               hover:border-blue-400 hover:bg-blue-50 sm:flex-row
-                               sm:items-center sm:justify-between">
+                        class="flex cursor-pointer flex-col gap-4 rounded-xl border-2 border-dashed border-slate-200 bg-white px-4 py-4 transition hover:border-blue-400 hover:bg-blue-50 sm:flex-row sm:items-center sm:justify-between">
 
-                        <div class="flex items-center gap-5">
+                        <div class="flex items-center gap-4">
                             <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -228,7 +213,7 @@
 
                                 <p
                                     id="file-info"
-                                    class="mt-1 text-sm text-slate-500">
+                                    class="mt-1 text-slate-500 text-xs">
                                     รองรับ JPG, JPEG, PNG และ WEBP ขนาดไม่เกิน 10 MB
                                 </p>
                             </div>
@@ -309,29 +294,23 @@
             </div>
 
             {{-- Footer --}}
-            <div class="border-t border-slate-200 bg-slate-50 px-8 py-5">
+            <div class="border-t border-slate-200 bg-slate-50 px-4 py-4">
                 <div class="flex flex-wrap items-center justify-between gap-4">
 
-                    <p class="text-sm text-slate-500">
+                    <p class="text-slate-500 text-xs">
                         ขั้นตอนถัดไป: สร้างช่องกรอกข้อมูลพร้อมดูตัวอย่างแบบฟอร์ม
                     </p>
 
                     <div class="flex items-center gap-3">
                         <a
                             href="{{ route('superadmin.templates.index') }}"
-                            class="inline-flex h-11 min-w-[110px] items-center justify-center
-                                   rounded-lg border border-slate-300 bg-white px-5
-                                   text-sm font-medium text-slate-700 transition
-                                   hover:bg-slate-100">
+                            class="inline-flex min-w-[110px] items-center justify-center rounded-lg border border-slate-300 bg-white text-sm font-medium text-slate-700 transition hover:bg-slate-100 h-9 px-3">
                             ยกเลิก
                         </a>
 
                         <button
                             type="submit"
-                            class="inline-flex h-11 min-w-[215px] items-center justify-center gap-2
-                                   rounded-lg bg-blue-600 px-6 text-sm font-medium text-white
-                                   shadow-sm transition hover:bg-blue-700
-                                   focus:ring-4 focus:ring-blue-200">
+                            class="inline-flex min-w-[215px] items-center justify-center gap-2 rounded-lg bg-blue-600 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 h-9 px-3">
 
                             บันทึกและสร้างแบบฟอร์ม
 

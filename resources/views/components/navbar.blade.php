@@ -5,7 +5,7 @@
 
 <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
 
-    <div class="flex h-20 items-center justify-between gap-4 px-4 sm:px-6">
+    <div class="flex h-16 items-center justify-between gap-3 px-4">
 
         <div class="flex min-w-0 items-center gap-3">
 
@@ -13,8 +13,7 @@
             <button
                 id="sidebar-open-button"
                 type="button"
-                class="rounded-xl border border-slate-200 p-2.5 text-slate-600
-                       transition hover:bg-slate-100 hover:text-slate-900 lg:hidden"
+                class="rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 lg:hidden inline-flex items-center justify-center text-sm h-9 px-3"
                 aria-label="เปิดเมนู"
             >
                 <svg
@@ -29,11 +28,11 @@
             </button>
 
             <div class="min-w-0">
-                <p class="truncate text-lg font-semibold text-slate-800">
+                <p class="truncate text-base font-semibold text-slate-800">
                     @yield('title', 'แดชบอร์ด')
                 </p>
 
-                <p class="hidden truncate text-sm text-slate-500 sm:block">
+                <p class="hidden truncate text-slate-500 sm:block text-xs">
                     Online Competition & Knowledge Management Platform
                 </p>
             </div>
@@ -48,7 +47,7 @@
                     {{ $navbarUser?->username }}
                 </p>
 
-                <p class="text-xs text-slate-500">
+                <p class="text-slate-500 text-xs">
                     {{ $navbarUser?->role?->display_name }}
                 </p>
             </div>
@@ -56,10 +55,7 @@
             {{-- รูปโปรไฟล์ --}}
             <a
                 href="{{ route('profile.edit') }}"
-                class="flex h-10 w-10 shrink-0 items-center justify-center
-                       overflow-hidden rounded-full bg-blue-100
-                       font-semibold text-blue-700 ring-2 ring-transparent
-                       transition hover:ring-blue-300"
+                class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-100 font-semibold text-blue-700 ring-2 ring-transparent transition hover:ring-blue-300"
                 title="แก้ไขโปรไฟล์"
                 aria-label="แก้ไขโปรไฟล์"
             >
@@ -85,9 +81,7 @@
 
                 <button
                     type="submit"
-                    class="rounded-xl border border-red-200 px-3 py-2
-                           text-sm font-medium text-red-600 transition
-                           hover:bg-red-50 hover:text-red-700"
+                    class="rounded-xl border border-red-200 text-sm font-medium text-red-600 transition hover:bg-red-50 hover:text-red-700 inline-flex items-center justify-center h-9 px-3"
                 >
                     <span class="hidden sm:inline">
                         ออกจากระบบ

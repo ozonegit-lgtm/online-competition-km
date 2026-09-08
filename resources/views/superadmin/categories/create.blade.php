@@ -3,22 +3,19 @@
 @section('title', 'จัดการประเภทการแข่งขัน')
 
 @section('header')
-    <div class="flex flex-col gap-3 sm:flex-row
-                sm:items-end sm:justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 
         <div>
-            <h1 class="text-2xl font-bold text-slate-900">
+            <h1 class="text-slate-900 text-xl font-bold">
                 จัดการประเภทการแข่งขัน
             </h1>
 
-            <p class="mt-1 text-sm text-slate-500">
+            <p class="mt-1 text-slate-500 text-xs">
                 เพิ่ม แก้ไข และจัดการประเภทการแข่งขันภายในระบบ
             </p>
         </div>
 
-        <span class="inline-flex w-fit items-center rounded-full
-                     border border-blue-200 bg-blue-50 px-3 py-1.5
-                     text-sm font-semibold text-blue-700">
+        <span class="inline-flex w-fit items-center rounded-full border border-blue-200 bg-blue-50 font-semibold text-blue-700 text-xs px-2.5 py-1">
             {{ number_format($categories->total()) }}
             ประเภท
         </span>
@@ -28,20 +25,17 @@
 @section('content')
     <div class="mx-auto max-w-7xl">
 
-        <div class="grid items-start gap-6 lg:grid-cols-[400px_minmax(0,1fr)]">
+        <div class="grid items-start gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
 
             {{-- แบบฟอร์มเพิ่มประเภท --}}
-            <section class="overflow-hidden rounded-2xl border
-                            border-slate-200 bg-white shadow-sm">
+            <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
                 {{-- หัวการ์ด --}}
-                <div class="border-b border-slate-200 px-6 py-5">
+                <div class="border-b border-slate-200 px-4 py-4">
 
                     <div class="flex items-center gap-3">
 
-                        <div class="flex h-11 w-11 shrink-0 items-center
-                                    justify-center rounded-xl bg-emerald-100
-                                    text-emerald-700">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
 
                             <svg
                                 class="h-6 w-6"
@@ -56,11 +50,11 @@
                         </div>
 
                         <div>
-                            <h2 class="text-lg font-bold text-slate-900">
+                            <h2 class="text-slate-900 text-base font-semibold">
                                 เพิ่มประเภทใหม่
                             </h2>
 
-                            <p class="mt-1 text-sm text-slate-500">
+                            <p class="mt-1 text-slate-500 text-xs">
                                 กรอกข้อมูลประเภทการแข่งขัน
                             </p>
                         </div>
@@ -73,14 +67,13 @@
                 >
                     @csrf
 
-                    <div class="space-y-5 p-6">
+                    <div class="space-y-4 p-4">
 
                         {{-- ชื่อประเภท --}}
                         <div>
                             <label
                                 for="category_name"
-                                class="block text-sm font-semibold
-                                       text-slate-700"
+                                class="block text-sm font-semibold text-slate-700"
                             >
                                 ชื่อประเภทการแข่งขัน
 
@@ -96,16 +89,7 @@
                                 value="{{ old('category_name') }}"
                                 placeholder="เช่น การประกวดโปสเตอร์"
                                 required
-                                class="mt-2 w-full rounded-xl border
-                                       bg-white px-4 py-3 text-sm
-                                       text-slate-800 outline-none transition
-                                       focus:border-blue-500 focus:ring-4
-                                       focus:ring-blue-100
-                                       @error('category_name')
-                                           border-red-400
-                                       @else
-                                           border-slate-300
-                                       @enderror"
+                                class="mt-2 w-full rounded-xl border bg-white text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 @error('category_name') border-red-400 @else border-slate-300 @enderror py-2 h-10 px-3"
                             >
 
                             @error('category_name')
@@ -119,26 +103,14 @@
                         <div>
                             <label
                                 for="category_slug"
-                                class="block text-sm font-semibold
-                                       text-slate-700"
+                                class="block text-sm font-semibold text-slate-700"
                             >
                                 ชื่อ URL
                             </label>
 
-                            <div class="mt-2 flex overflow-hidden rounded-xl
-                                        border bg-white transition
-                                        focus-within:border-blue-500
-                                        focus-within:ring-4
-                                        focus-within:ring-blue-100
-                                        @error('category_slug')
-                                            border-red-400
-                                        @else
-                                            border-slate-300
-                                        @enderror">
+                            <div class="mt-2 flex overflow-hidden rounded-xl border bg-white transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 @error('category_slug') border-red-400 @else border-slate-300 @enderror shadow-sm">
 
-                                <span class="flex items-center border-r
-                                             border-slate-200 bg-slate-50
-                                             px-3 text-sm text-slate-400">
+                                <span class="flex items-center border-r border-slate-200 bg-slate-50 px-3 text-sm text-slate-400">
                                     /
                                 </span>
 
@@ -148,13 +120,11 @@
                                     name="category_slug"
                                     value="{{ old('category_slug') }}"
                                     placeholder="poster-competition"
-                                    class="min-w-0 flex-1 border-0 px-3
-                                           py-3 text-sm text-slate-800
-                                           outline-none"
+                                    class="min-w-0 flex-1 border-0 text-sm text-slate-800 outline-none py-2 h-10 px-3"
                                 >
                             </div>
 
-                            <p class="mt-2 text-xs leading-5 text-slate-400">
+                            <p class="mt-2 leading-5 text-slate-400 text-xs">
                                 หากไม่กรอก ระบบจะสร้างจากชื่อประเภทให้อัตโนมัติ
                             </p>
 
@@ -169,8 +139,7 @@
                         <div>
                             <label
                                 for="description"
-                                class="block text-sm font-semibold
-                                       text-slate-700"
+                                class="block text-sm font-semibold text-slate-700"
                             >
                                 คำอธิบาย
                             </label>
@@ -180,16 +149,7 @@
                                 name="description"
                                 rows="4"
                                 placeholder="อธิบายรายละเอียดของประเภทการแข่งขัน"
-                                class="mt-2 w-full resize-none rounded-xl
-                                       border bg-white px-4 py-3 text-sm
-                                       text-slate-800 outline-none transition
-                                       focus:border-blue-500 focus:ring-4
-                                       focus:ring-blue-100
-                                       @error('description')
-                                           border-red-400
-                                       @else
-                                           border-slate-300
-                                       @enderror"
+                                class="mt-2 w-full resize-none rounded-xl border bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 @error('description') border-red-400 @else border-slate-300 @enderror"
                             >{{ old('description') }}</textarea>
 
                             @error('description')
@@ -201,8 +161,7 @@
 
                         {{-- สถานะ --}}
                         <fieldset>
-                            <legend class="text-sm font-semibold
-                                           text-slate-700">
+                            <legend class="text-sm font-semibold text-slate-700">
                                 สถานะการใช้งาน
 
                                 <span class="text-red-500">
@@ -212,12 +171,7 @@
 
                             <div class="mt-3 grid gap-3 sm:grid-cols-2">
 
-                                <label class="flex cursor-pointer items-center
-                                              gap-3 rounded-xl border
-                                              border-slate-200 bg-slate-50
-                                              p-3 transition
-                                              hover:border-emerald-300
-                                              hover:bg-emerald-50">
+                                <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 transition hover:border-emerald-300 hover:bg-emerald-50">
 
                                     <input
                                         type="radio"
@@ -226,29 +180,21 @@
                                         @checked(
                                             old('is_active', '1') === '1'
                                         )
-                                        class="h-5 w-5 border-slate-300
-                                               text-emerald-600
-                                               focus:ring-emerald-500"
+                                        class="h-5 w-5 border-slate-300 text-emerald-600 focus:ring-emerald-500"
                                     >
 
                                     <div>
-                                        <p class="text-sm font-semibold
-                                                  text-slate-700">
+                                        <p class="text-sm font-semibold text-slate-700">
                                             เปิดใช้งาน
                                         </p>
 
-                                        <p class="text-xs text-slate-400">
+                                        <p class="text-slate-400 text-xs">
                                             สามารถเลือกใช้งานได้
                                         </p>
                                     </div>
                                 </label>
 
-                                <label class="flex cursor-pointer items-center
-                                              gap-3 rounded-xl border
-                                              border-slate-200 bg-slate-50
-                                              p-3 transition
-                                              hover:border-slate-300
-                                              hover:bg-slate-100">
+                                <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 transition hover:border-slate-300 hover:bg-slate-100">
 
                                     <input
                                         type="radio"
@@ -257,18 +203,15 @@
                                         @checked(
                                             old('is_active') === '0'
                                         )
-                                        class="h-5 w-5 border-slate-300
-                                               text-slate-600
-                                               focus:ring-slate-500"
+                                        class="h-5 w-5 border-slate-300 text-slate-600 focus:ring-slate-500"
                                     >
 
                                     <div>
-                                        <p class="text-sm font-semibold
-                                                  text-slate-700">
+                                        <p class="text-sm font-semibold text-slate-700">
                                             ปิดใช้งาน
                                         </p>
 
-                                        <p class="text-xs text-slate-400">
+                                        <p class="text-slate-400 text-xs">
                                             ซ่อนจากการเลือกใช้งาน
                                         </p>
                                     </div>
@@ -284,24 +227,16 @@
                     </div>
 
                     {{-- ปุ่มบันทึก --}}
-                    <div class="flex flex-col-reverse gap-3 border-t
-                                border-slate-200 bg-slate-50 px-6 py-5
-                                sm:flex-row sm:items-center
-                                sm:justify-between">
+                    <div class="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
 
-                        <p class="text-xs text-slate-500">
+                        <p class="text-slate-500 text-xs">
                             <span class="text-red-500">*</span>
                             จำเป็นต้องกรอก
                         </p>
 
                         <button
                             type="submit"
-                            class="inline-flex items-center justify-center gap-2
-                                rounded-xl bg-green-600 px-5 py-3
-                                text-sm font-semibold text-white shadow-sm
-                                transition hover:bg-green-700
-                                focus:outline-none focus:ring-4
-                                focus:ring-green-200"
+                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-200 h-9 px-3"
                         >
                             <svg
                                 class="h-5 w-5"
@@ -321,27 +256,22 @@
             </section>
 
             {{-- รายการประเภทการแข่งขัน --}}
-            <section class="overflow-hidden rounded-2xl border
-                            border-slate-200 bg-white shadow-sm">
+            <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
                 {{-- หัวรายการ --}}
-                <div class="flex flex-col gap-3 border-b
-                            border-slate-200 px-6 py-5 sm:flex-row
-                            sm:items-center sm:justify-between">
+                <div class="flex flex-col gap-3 border-b border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
 
                     <div>
-                        <h2 class="text-lg font-bold text-slate-900">
+                        <h2 class="text-slate-900 text-base font-semibold">
                             รายการประเภทการแข่งขัน
                         </h2>
 
-                        <p class="mt-1 text-sm text-slate-500">
+                        <p class="mt-1 text-slate-500 text-xs">
                             จัดการประเภทการแข่งขันทั้งหมดภายในระบบ
                         </p>
                     </div>
 
-                    <span class="inline-flex w-fit rounded-full
-                                 bg-slate-100 px-3 py-1.5 text-xs
-                                 font-semibold text-slate-600">
+                    <span class="inline-flex w-fit rounded-full bg-slate-100 font-semibold text-slate-600 text-xs px-2.5 py-1">
                         {{ number_format($categories->total()) }}
                         รายการ
                     </span>
@@ -350,11 +280,9 @@
                 @if ($categories->isEmpty())
 
                     {{-- Empty state --}}
-                    <div class="px-6 py-16 text-center">
+                    <div class="px-4 py-4 text-center">
 
-                        <div class="mx-auto flex h-16 w-16
-                                    items-center justify-center rounded-2xl
-                                    bg-slate-100 text-slate-400">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
 
                             <svg
                                 class="h-8 w-8"
@@ -369,11 +297,11 @@
                             </svg>
                         </div>
 
-                        <h3 class="mt-4 font-bold text-slate-700">
+                        <h3 class="mt-4 text-slate-700 text-base font-semibold">
                             ยังไม่มีประเภทการแข่งขัน
                         </h3>
 
-                        <p class="mt-2 text-sm text-slate-500">
+                        <p class="mt-2 text-slate-500 text-xs">
                             เพิ่มประเภทแรกจากแบบฟอร์มด้านซ้าย
                         </p>
                     </div>
@@ -384,20 +312,14 @@
                     <div class="divide-y divide-slate-100">
 
                         @foreach ($categories as $category)
-                            <article class="p-5 transition
-                                            hover:bg-slate-50">
+                            <article class="p-4 transition hover:bg-slate-50">
 
-                                <div class="flex flex-col gap-4
-                                            sm:flex-row sm:items-start
-                                            sm:justify-between">
+                                <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
                                     <div class="flex min-w-0 gap-4">
 
                                         {{-- Icon --}}
-                                        <div class="flex h-11 w-11 shrink-0
-                                                    items-center justify-center
-                                                    rounded-xl bg-blue-100
-                                                    text-blue-700">
+                                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
 
                                             <svg
                                                 class="h-5 w-5"
@@ -413,47 +335,28 @@
                                         </div>
 
                                         <div class="min-w-0">
-                                            <div class="flex flex-wrap
-                                                        items-center gap-2">
+                                            <div class="flex flex-wrap items-center gap-2">
 
-                                                <h3 class="font-bold
-                                                           text-slate-900">
+                                                <h3 class="text-slate-900 text-base font-semibold">
                                                     {{ $category->category_name }}
                                                 </h3>
 
                                                 @if ($category->is_active)
-                                                    <span class="rounded-full
-                                                                 border
-                                                                 border-emerald-200
-                                                                 bg-emerald-50
-                                                                 px-2.5 py-1
-                                                                 text-xs
-                                                                 font-semibold
-                                                                 text-emerald-700">
+                                                    <span class="rounded-full border border-emerald-200 bg-emerald-50 font-semibold text-emerald-700 text-xs px-2.5 py-1">
                                                         เปิดใช้งาน
                                                     </span>
                                                 @else
-                                                    <span class="rounded-full
-                                                                 border
-                                                                 border-slate-200
-                                                                 bg-slate-100
-                                                                 px-2.5 py-1
-                                                                 text-xs
-                                                                 font-semibold
-                                                                 text-slate-600">
+                                                    <span class="rounded-full border border-slate-200 bg-slate-100 font-semibold text-slate-600 text-xs px-2.5 py-1">
                                                         ปิดใช้งาน
                                                     </span>
                                                 @endif
                                             </div>
 
-                                            <p class="mt-1 truncate
-                                                      font-mono text-xs
-                                                      text-slate-400">
+                                            <p class="mt-1 truncate font-mono text-slate-400 text-xs">
                                                 /{{ $category->category_slug }}
                                             </p>
 
-                                            <p class="mt-3 text-sm leading-6
-                                                      text-slate-600">
+                                            <p class="mt-3 text-sm leading-6 text-slate-600">
                                                 {{ $category->description
                                                     ?: 'ไม่มีคำอธิบาย' }}
                                             </p>
@@ -461,22 +364,14 @@
                                     </div>
 
                                     {{-- ปุ่มจัดการ --}}
-                                    <div class="flex shrink-0 items-center
-                                                gap-2 sm:justify-end">
+                                    <div class="flex shrink-0 items-center gap-2 sm:justify-end">
 
                                         <a
                                             href="{{ route(
                                                 'superadmin.categories.edit',
                                                 $category
                                             ) }}"
-                                            class="inline-flex items-center
-                                                   justify-center gap-1.5
-                                                   rounded-lg border
-                                                   border-amber-200
-                                                   bg-amber-50 px-3 py-2
-                                                   text-sm font-semibold
-                                                   text-amber-700 transition
-                                                   hover:bg-amber-100"
+                                            class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 text-sm font-semibold text-amber-700 transition hover:bg-amber-100 h-9 px-3"
                                         >
                                             <svg
                                                 class="h-4 w-4"
@@ -507,14 +402,7 @@
 
                                             <button
                                                 type="submit"
-                                                class="inline-flex items-center
-                                                       justify-center gap-1.5
-                                                       rounded-lg border
-                                                       border-red-200
-                                                       bg-red-50 px-3 py-2
-                                                       text-sm font-semibold
-                                                       text-red-700 transition
-                                                       hover:bg-red-100"
+                                                class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 text-sm font-semibold text-red-700 transition hover:bg-red-100 h-9 px-3"
                                             >
                                                 <svg
                                                     class="h-4 w-4"
@@ -539,7 +427,7 @@
 
                     {{-- Pagination --}}
                     @if ($categories->hasPages())
-                        <div class="border-t border-slate-200 px-6 py-5">
+                        <div class="border-t border-slate-200 px-4 py-4">
                             {{ $categories->links() }}
                         </div>
                     @endif

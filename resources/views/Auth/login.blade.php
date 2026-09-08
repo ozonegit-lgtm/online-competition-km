@@ -8,24 +8,24 @@
 <div class="w-full max-w-sm">
 
     {{-- Logo --}}
-    <div class="text-center mb-6">
+    <div class="text-center mb-4">
         <img src="{{ asset('images/logo.png') }}"
              alt="Logo"
              class="w-14 h-14 mx-auto mb-3">
 
-        <h1 class="text-xl font-bold text-gray-800">
+        <h1 class="text-gray-800 text-xl font-bold">
             Online Competition
         </h1>
 
-        <p class="text-gray-500 text-sm mt-1">
+        <p class="text-gray-500 mt-1 text-xs">
             ระบบจัดการแข่งขันออนไลน์และคลังองค์ความรู้
         </p>
     </div>
 
     {{-- Card --}}
-    <div class="bg-white shadow-xl rounded-2xl p-6 border border-gray-100">
+    <div class="bg-white shadow-sm rounded-xl p-4 border border-gray-100">
 
-        <div class="flex items-center gap-2 mb-5">
+        <div class="flex items-center gap-2 mb-4">
             <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-600">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -33,7 +33,7 @@
                     <path d="M15 12H3"/>
                 </svg>
             </div>
-            <h2 class="text-lg font-semibold text-gray-800">
+            <h2 class="text-gray-800 text-base font-semibold">
                 เข้าสู่ระบบ
             </h2>
         </div>
@@ -87,7 +87,7 @@
                         autofocus
                         required
                         placeholder="you@example.com"
-                        class="w-full rounded-xl border border-gray-300 pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
+                        class="w-full rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none py-2 h-10 px-3 pl-10 pr-4">
                 </div>
 
                 @error('email')
@@ -115,12 +115,12 @@
                         name="password"
                         required
                         placeholder="••••••••"
-                        class="w-full rounded-xl border border-gray-300 pl-10 pr-11 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none">
+                        class="w-full rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none py-2 h-10 px-3 pl-10 pr-11">
 
                     <button
                         type="button"
                         id="km-toggle-password"
-                        class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 inline-flex items-center justify-center text-sm h-9 px-3"
                         aria-label="แสดง/ซ่อนรหัสผ่าน">
                         <svg id="km-eye-open" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
@@ -158,7 +158,7 @@
             {{-- Button --}}
             <button
                 type="submit"
-                class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 transition text-white text-sm font-medium py-2.5 rounded-xl shadow-sm shadow-blue-600/20">
+                class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 transition text-white text-sm font-medium rounded-xl shadow-sm shadow-blue-600/20 h-9 px-3">
 
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -172,7 +172,7 @@
 
     </div>
 
-    <div class="mt-5 text-center text-xs text-gray-400">
+    <div class="mt-4 text-center text-xs text-gray-400">
         © {{ date('Y') }} Online Competition Platform
     </div>
 
