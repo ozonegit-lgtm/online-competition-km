@@ -12,16 +12,21 @@
     <title>
         @yield('title', config('app.name'))
     </title>
+    
+    <script>
+        try {
+            if (window.matchMedia('(min-width: 1024px)').matches && localStorage.getItem('app-sidebar-collapsed') === '1') {
+                document.documentElement.classList.add('sidebar-collapsed');
+            }
+        } catch (e) {}
+    </script>
 
-    @vite([
-        'resources/css/app.css',
-        'resources/js/app.js'
-    ])
+    @vite(['resources/css/app.css','resources/js/app.js'])
 
     @stack('styles')
 </head>
 
-<body class="bg-slate-100 font-sans text-slate-800">
+<body class="bg-slate-100 font-sans text-slate-800 text-sm">
 
     <div class="min-h-screen lg:flex">
 
@@ -40,7 +45,7 @@
             @include('components.navbar')
 
             {{-- Main Content --}}
-            <main class="flex-1 p-4 sm:p-6">
+            <main class="flex-1 p-4">
 
                 <div class="mx-auto w-full max-w-7xl">
 
@@ -53,7 +58,7 @@
 
                     {{-- Page Header --}}
                     @hasSection('header')
-                        <div class="mb-6">
+                        <div class="mb-4">
                             @yield('header')
                         </div>
                     @endif
