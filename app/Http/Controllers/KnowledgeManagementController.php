@@ -10,6 +10,28 @@ use Illuminate\Http\Request;
 
 class KnowledgeManagementController extends Controller
 {
+    public function show(KnowledgeItem $knowledgeItem)
+    {
+        abort_unless($knowledgeItem->status === 'published', 404);
+
+        if ($knowledgeItem->submission_id !== null) {
+            $knowledgeItem->load([
+                'submission.competition.category',
+                'submission.members',
+                'submission.files',
+            ]);
+
+            abort_unless(
+                $knowledgeItem->submission && $knowledgeItem->submission->status !== 'disqualified',
+                404
+            );
+        } else {
+            $knowledgeItem->load('creator');
+        }
+
+        return view('show', compact('knowledgeItem'));
+    }
+
     public function index(Request $request)
     {
         /*

@@ -71,9 +71,9 @@
                         <span class="sidebar-menu-text">จัดการประเภทการแข่งขัน</span>
                     </a>
 
-                    <a href="{{ route('superadmin.templates.index') }}" data-sidebar-tooltip="จัดการ Form-Template" class="sidebar-menu-link flex h-9 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition {{ request()->routeIs('superadmin.templates.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                    <a href="{{ route('superadmin.templates.index') }}" data-sidebar-tooltip="จัดการ ช่างรับผลงาน" class="sidebar-menu-link flex h-9 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition {{ request()->routeIs('superadmin.templates.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                         <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5.25H6.75A2.25 2.25 0 004.5 7.5V18a2.25 2.25 0 002.25 2.25h10.5A2.25 2.25 0 0019.5 18V7.5a2.25 2.25 0 00-2.25-2.25H15M9 5.25a3 3 0 006 0M9 5.25a3 3 0 016 0M8.25 11.25h7.5M8.25 15h5.25"/></svg>
-                        <span class="sidebar-menu-text">จัดการ Form-Template</span>
+                        <span class="sidebar-menu-text">จัดการ ช่องรับผลงาน</span>
                     </a>
 
                     <a href="{{ route('superadmin.competitions.judges.list') }}" data-sidebar-tooltip="จัดการสิทธิ์การตัดสินการแข่งขัน" class="sidebar-menu-link flex h-9 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition {{ request()->routeIs('superadmin.competitions.judges.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">

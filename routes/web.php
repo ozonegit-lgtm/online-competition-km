@@ -36,6 +36,9 @@ use App\Http\Controllers\SuperAdmin\KmSubmissionController as SuperAdminKmSubmis
 
 Route::get('/', [KnowledgeManagementController::class, 'index'])->name('home');
 
+Route::get('/knowledge/{knowledgeItem}', [KnowledgeManagementController::class, 'show'])
+    ->name('knowledge.show');
+
 Route::get('/submission-files/{submissionFile}', [SubmissionFileController::class, 'show'])
     ->name('submission-files.show');
 

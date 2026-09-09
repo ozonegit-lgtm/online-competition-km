@@ -125,7 +125,7 @@
             @endphp
 
             <article class="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md">
-                <div class="h-1 {{ $statusConfig['bar'] }}"></div>
+                <!-- <div class="h-1 {{ $statusConfig['bar'] }}"></div> -->
 
                 <div class="flex flex-1 flex-col p-4">
                     <div class="flex flex-wrap items-center gap-2">
@@ -180,38 +180,28 @@
 
                         @if($item->status === 'published')
                             @can('unpublish', $item)
-                                <form method="POST" action="{{ route('superadmin.km.unpublish', $item) }}">
-                                    @csrf
-                                    @method('DELETE')
+                                <x-ajax-form target="#km-list" :action="route('superadmin.km.unpublish', $item)" method="DELETE" confirm="ยืนยันถอนเผยแพร่องค์ความรู้นี้?" success="ถอนเผยแพร่องค์ความรู้เรียบร้อยแล้ว">
                                     <button type="submit" class="inline-flex h-8 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 px-3 text-xs font-semibold text-amber-700 transition hover:bg-amber-100">ถอนเผยแพร่</button>
-                                </form>
+                                </x-ajax-form>
                             @endcan
                         @else
                             @can('publish', $item)
-                                <form method="POST" action="{{ route('superadmin.km.publish', $item) }}">
-                                    @csrf
+                                <x-ajax-form target="#km-list" :action="route('superadmin.km.publish', $item)" method="POST" confirm="ยืนยันเผยแพร่องค์ความรู้นี้?" success="เผยแพร่องค์ความรู้เรียบร้อยแล้ว">
                                     <button type="submit" class="inline-flex h-8 items-center justify-center rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white transition hover:bg-emerald-700">เผยแพร่</button>
-                                </form>
+                                </x-ajax-form>
                             @endcan
                         @endif
 
                         @can('feature', $item)
-                            <form method="POST" action="{{ route($item->is_featured ? 'superadmin.km.unfeature' : 'superadmin.km.feature', $item) }}">
-                                @csrf
-                                @if($item->is_featured)
-                                    @method('DELETE')
-                                @endif
-
+                            <x-ajax-form target="#km-list" :action="route($item->is_featured ? 'superadmin.km.unfeature' : 'superadmin.km.feature', $item)" :method="$item->is_featured ? 'DELETE' : 'POST'" :confirm="$item->is_featured ? 'ยืนยันถอน Featured องค์ความรู้นี้?' : 'ยืนยันตั้ง Featured องค์ความรู้นี้?'" :success="$item->is_featured ? 'ถอน Featured เรียบร้อยแล้ว' : 'ตั้ง Featured เรียบร้อยแล้ว'">
                                 <button type="submit" class="inline-flex h-8 items-center justify-center rounded-lg border border-amber-200 bg-white px-3 text-xs font-semibold text-amber-700 transition hover:bg-amber-50">{{ $item->is_featured ? 'ถอน Featured' : 'ตั้ง Featured' }}</button>
-                            </form>
+                            </x-ajax-form>
                         @endcan
 
                         @can('delete', $item)
-                            <form method="POST" action="{{ route('superadmin.km.destroy', $item) }}" class="sm:ml-auto" onsubmit="return confirm('ยืนยันการลบองค์ความรู้นี้?')">
-                                @csrf
-                                @method('DELETE')
+                            <x-ajax-form target="#km-list" :action="route('superadmin.km.destroy', $item)" method="DELETE" confirm="ยืนยันการลบองค์ความรู้นี้?" success="ลบองค์ความรู้เรียบร้อยแล้ว" class="sm:ml-auto">
                                 <button type="submit" class="inline-flex h-8 items-center justify-center rounded-lg border border-red-200 bg-white px-3 text-xs font-semibold text-red-600 transition hover:bg-red-50">ลบ</button>
-                            </form>
+                            </x-ajax-form>
                         @endcan
                     </div>
                 </div>
@@ -232,7 +222,7 @@
             @endphp
 
             <article id="km-submission-{{ $submission->id }}" class="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md">
-                <div class="h-1 {{ $statusConfig['bar'] }}"></div>
+                <!-- <div class="h-1 {{ $statusConfig['bar'] }}"></div> -->
 
                 <div class="flex flex-1 flex-col p-4">
                     <div class="flex flex-wrap items-center gap-2">

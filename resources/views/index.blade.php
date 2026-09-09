@@ -671,7 +671,7 @@
                             class="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-sm"
                         >
 
-                            <a href="#" class="block">
+                            <a href="{{ route('knowledge.show', $item) }}" class="block">
 
                                 <div
                                     class="relative aspect-[16/10] overflow-hidden bg-slate-100"
@@ -934,7 +934,7 @@
                         >
 
                             <a
-                                href="#"
+                                href="{{ route('knowledge.show', $item) }}"
                                 class="flex h-full flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset"
                             >
 
