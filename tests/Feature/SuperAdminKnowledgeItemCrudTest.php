@@ -45,7 +45,11 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
 
         $this->actingAs($super)->get(route('superadmin.km.index'))->assertOk();
         $this->actingAs($super)->get(route('superadmin.km.create'))->assertOk();
+        $this->flushSession();
+        auth()->forgetGuards();
         $this->actingAs($admin)->get(route('superadmin.km.index'))->assertForbidden();
+        $this->flushSession();
+        auth()->forgetGuards();
         $this->actingAs($judge)->get(route('superadmin.km.index'))->assertForbidden();
     }
 

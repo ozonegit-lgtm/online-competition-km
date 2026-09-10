@@ -1,6 +1,7 @@
 import './bootstrap';
 import './form-builder';
 import './ajax-form';
+import './km-index';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('app-sidebar');

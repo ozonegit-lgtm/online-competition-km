@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Competition;
+use App\Models\CompetitionFormField;
 use App\Models\JudgeAssignment;
 use App\Models\JudgingSession;
 use App\Models\KnowledgeItem;
@@ -137,6 +138,8 @@ class KnowledgeManagementPublicationTest extends TestCase
         $item = KnowledgeItem::sole();
         $otherAdmin = $this->user('other-admin', 'Competition Admin');
 
+        $this->flushSession();
+        auth()->forgetGuards();
         $response = $this->actingAs($otherAdmin)->delete(
             route('competition-admin.submissions.km.unpublish', $context['submission'])
         );
@@ -258,6 +261,8 @@ class KnowledgeManagementPublicationTest extends TestCase
             ->assertOk()->assertSee($file->file_url, false)->assertDontSee('/storage/submissions/', false);
         $this->get(route('competition-admin.competitions.results.index', $context['competition']))
             ->assertOk()->assertSee($file->file_url, false);
+        $this->flushSession();
+        auth()->forgetGuards();
         $this->actingAs($context['judge'])->get(route('judge.judging-rooms.show', $context['session']))
             ->assertOk()->assertSee($file->file_url, false)->assertDontSee('/storage/submissions/', false);
         auth()->logout();
@@ -265,8 +270,112 @@ class KnowledgeManagementPublicationTest extends TestCase
         $this->get($file->file_url)->assertNotFound();
     }
 
+    public function test_public_competition_detail_renders_sorted_dynamic_values_with_escaped_html(): void
+    {
+        $context = $this->context();
+        $label = '<b>Project objectives</b>';
+        $value = '<script>alert("detail")</script>';
+        $this->fieldValue($context, ['label' => 'Technologies', 'field_type' => 'checkbox', 'sort_order' => 20], '["Laravel","Docker","0"]');
+        $this->fieldValue($context, ['label' => $label, 'field_type' => 'textarea', 'sort_order' => 10], $value);
+        $this->fieldValue($context, ['label' => 'Approach', 'sort_order' => 30], 'Community learning');
+        $this->fieldValue($context, ['label' => 'Selected area', 'field_type' => 'select', 'sort_order' => 40], 'Education');
+        $this->fieldValue($context, ['label' => 'Selected outcome', 'field_type' => 'radio', 'sort_order' => 50], 'Completed');
+        $this->publish($context)->assertSessionHas('success');
+        $item = KnowledgeItem::sole();
+        auth()->logout();
+
+        $this->get(route('knowledge.show', $item))->assertOk()
+            ->assertSeeInOrder(['Project summary', $label, $value, 'Technologies', 'Laravel, Docker, 0', 'Approach', 'Community learning', 'Selected area', 'Education', 'Selected outcome', 'Completed'])
+            ->assertDontSee($label, false)
+            ->assertDontSee($value, false);
+
+        $context['submission']->update(['project_description' => null]);
+        $item->update(['content' => 'Fallback KM content']);
+        $this->get(route('knowledge.show', $item))->assertOk()
+            ->assertSeeInOrder(['Fallback KM content', $label, $value, 'Technologies', 'Laravel, Docker, 0']);
+    }
+
+    public function test_public_competition_detail_omits_empty_file_and_contact_fields(): void
+    {
+        $context = $this->context();
+        $hiddenFields = [
+            [['label' => 'Null answer'], null],
+            [['label' => 'Blank answer'], " \n\t "],
+            [['label' => 'Empty choices', 'field_type' => 'checkbox'], '[]'],
+            [['label' => 'Private upload', 'field_type' => 'file'], 'submissions/1/secret/report.pdf'],
+            [['label' => 'Private email', 'field_type' => 'email'], 'private@example.com'],
+            [['label' => 'Private phone', 'field_type' => 'phone'], '0812345678'],
+            [['label' => 'Contact email text', 'field_name' => 'contact_email'], 'contact@example.com'],
+            [['label' => 'Contact phone text', 'field_name' => 'contact_phone'], '0823456789'],
+            [['label' => 'Mapped contact email', 'system_field' => 'contact_email'], 'mapped@example.com'],
+            [['label' => 'Mapped contact phone', 'system_field' => 'contact_phone'], '0834567890'],
+        ];
+        foreach ($hiddenFields as [$attributes, $value]) {
+            $this->fieldValue($context, $attributes, $value);
+        }
+        $this->publish($context)->assertSessionHas('success');
+        auth()->logout();
+
+        $response = $this->get(route('knowledge.show', KnowledgeItem::sole()))->assertOk()
+            ->assertSee('Project summary')
+            ->assertDontSee($context['submission']->contact_email)
+            ->assertDontSee($context['submission']->contact_phone);
+        foreach ($hiddenFields as [$attributes, $value]) {
+            $response->assertDontSee($attributes['label']);
+            if ($value !== null && trim($value) !== '' && $value !== '[]') {
+                $response->assertDontSee($value);
+            }
+        }
+    }
+
+    public function test_public_competition_detail_without_dynamic_values_preserves_existing_description(): void
+    {
+        $context = $this->context();
+        $this->publish($context)->assertSessionHas('success');
+        $item = KnowledgeItem::sole();
+        auth()->logout();
+
+        $this->get(route('knowledge.show', $item))->assertOk()
+            ->assertSee($context['submission']->project_title)
+            ->assertSee('Project summary');
+        $context['submission']->update(['project_description' => null]);
+        $this->get(route('knowledge.show', $item))->assertOk()->assertSee('ไม่มีรายละเอียดเพิ่มเติม');
+    }
+
+    public function test_public_manual_detail_preserves_content_and_summary_fallback(): void
+    {
+        $item = KnowledgeItem::create([
+            'title' => 'Manual detail',
+            'content' => 'Manual body content',
+            'summary' => 'Manual summary fallback',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $this->get(route('knowledge.show', $item))->assertOk()
+            ->assertSee('Manual detail')->assertSee('Manual body content');
+        $item->update(['content' => null]);
+        $this->get(route('knowledge.show', $item))->assertOk()->assertSee('Manual summary fallback');
+    }
+
+    private function fieldValue(array $context, array $attributes, ?string $value): void
+    {
+        $field = CompetitionFormField::forceCreate(array_merge([
+            'competition_id' => $context['competition']->id,
+            'field_name' => 'field_'.uniqid(),
+            'field_type' => 'text',
+            'sort_order' => 1,
+        ], $attributes));
+        $context['submission']->fieldValues()->create(['field_id' => $field->id, 'field_value' => $value]);
+    }
+
     private function publish(array $context)
     {
+        if (auth()->id() !== $context['owner']->id) {
+            $this->flushSession();
+            auth()->forgetGuards();
+        }
+
         return $this->actingAs($context['owner'])->post(
             route('competition-admin.submissions.km.publish', $context['submission'])
         );

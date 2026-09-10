@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Competition;
 use App\Models\JudgeAssignment;
 use App\Models\JudgingSession;
+use App\Models\KnowledgeItem;
 use App\Models\Rubric;
 use App\Models\Score;
 use App\Models\Submission;
@@ -214,11 +215,188 @@ class ResultRankingTest extends TestCase
         $this->assertSame($before['session'], $context['session']->fresh()->getAttributes());
     }
 
+    public function test_public_km_detail_shows_top_three_ranks_matching_the_public_index(): void
+    {
+        $context = $this->publishedRankingContext([70.25, 90.75, 80.50]);
+        $this->assertTrue($context['competition']->resultReadiness()['ready']);
+        $index = $this->get(route('home'))->assertOk()
+            ->viewData('publishedResults')->sole()->submissions->keyBy('id');
+
+        foreach ($context['submissions'] as $submission) {
+            $before = $submission->fresh()->getAttributes();
+            $rank = $index->get($submission->id)->rank;
+            $item = $this->publicKnowledgeItem($submission);
+
+            $this->get(route('knowledge.show', $item))->assertOk()
+                ->assertSeeText('อันดับ '.$rank)
+                ->assertDontSeeText('อันดับ '.$rank.' ร่วม')
+                ->assertViewHas('knowledgeItem', fn ($item) =>
+                    $item->submission->rank === $rank
+                    && $item->submission->is_shared_rank === false
+                );
+
+            $this->assertSame($before, $submission->fresh()->getAttributes());
+        }
+    }
+
+    public function test_public_km_detail_shows_shared_first_place_with_competition_ranks_one_one_three(): void
+    {
+        $context = $this->publishedRankingContext([90.75, 90.75, 80.50]);
+
+        foreach ($context['submissions'] as $position => $submission) {
+            $rank = [1, 1, 3][$position];
+            $shared = $position < 2;
+            $item = $this->publicKnowledgeItem($submission);
+            $response = $this->get(route('knowledge.show', $item))->assertOk()
+                ->assertSeeText('อันดับ '.$rank.($shared ? ' ร่วม' : ''))
+                ->assertViewHas('knowledgeItem', fn ($item) =>
+                    $item->submission->rank === $rank
+                    && $item->submission->is_shared_rank === $shared
+                );
+
+            if (! $shared) {
+                $response->assertDontSeeText('อันดับ 3 ร่วม');
+            }
+        }
+    }
+
+    public function test_public_km_detail_shows_every_submission_tied_at_third_place(): void
+    {
+        $context = $this->publishedRankingContext([100, 90, 80, 80]);
+
+        foreach ($context['submissions']->slice(2) as $submission) {
+            $item = $this->publicKnowledgeItem($submission);
+
+            $this->get(route('knowledge.show', $item))->assertOk()
+                ->assertSeeText('อันดับ 3 ร่วม')
+                ->assertViewHas('knowledgeItem', fn ($item) =>
+                    $item->submission->rank === 3
+                    && $item->submission->is_shared_rank === true
+                );
+        }
+    }
+
+    public function test_public_km_detail_has_no_badge_below_third_place(): void
+    {
+        $context = $this->publishedRankingContext([100, 90, 80, 70]);
+
+        $this->assertPublicDetailHasNoRank($this->publicKnowledgeItem($context['submissions']->last()));
+    }
+
+    public function test_public_km_detail_has_no_badge_when_scores_are_unpublished(): void
+    {
+        $context = $this->publishedRankingContext([90]);
+        $context['competition']->update(['publish_scores' => false]);
+
+        $this->assertPublicDetailHasNoRank($this->publicKnowledgeItem($context['submissions']->first()));
+    }
+
+    public function test_public_km_detail_has_no_badge_without_result_announcement(): void
+    {
+        $context = $this->publishedRankingContext([90]);
+        $context['competition']->update(['result_announcement' => null]);
+
+        $this->assertPublicDetailHasNoRank($this->publicKnowledgeItem($context['submissions']->first()));
+    }
+
+    public function test_public_km_detail_has_no_badge_until_judging_is_finished(): void
+    {
+        $context = $this->publishedRankingContext([90], 'live');
+        $this->assertFalse($context['competition']->resultReadiness()['ready']);
+
+        $this->assertPublicDetailHasNoRank($this->publicKnowledgeItem($context['submissions']->first()));
+    }
+
+    public function test_public_km_detail_has_no_badge_until_all_submissions_have_completed_scores(): void
+    {
+        $context = $this->publishedRankingContext([90]);
+        $this->submission($context['competition'], 100);
+        $this->assertFalse($context['competition']->resultReadiness()['ready']);
+
+        $this->assertPublicDetailHasNoRank($this->publicKnowledgeItem($context['submissions']->first()));
+    }
+
+    public function test_public_km_detail_excludes_disqualified_submissions_and_keeps_their_detail_hidden(): void
+    {
+        $context = $this->publishedRankingContext([90]);
+        $disqualified = $this->rankableSubmission($context, 100, 'disqualified');
+        $item = $this->publicKnowledgeItem($context['submissions']->first());
+
+        $this->get(route('knowledge.show', $item))->assertOk()
+            ->assertSeeText('อันดับ 1')
+            ->assertViewHas('knowledgeItem', fn ($item) => $item->submission->rank === 1);
+        $this->get(route('knowledge.show', $this->publicKnowledgeItem($disqualified)))->assertNotFound();
+    }
+
+    public function test_public_km_detail_ranks_only_submissions_from_the_same_competition(): void
+    {
+        $context = $this->publishedRankingContext([70]);
+        $this->publishedRankingContext([100, 90, 80, 70]);
+        $item = $this->publicKnowledgeItem($context['submissions']->first());
+
+        $this->get(route('knowledge.show', $item))->assertOk()
+            ->assertSeeText('อันดับ 1')
+            ->assertDontSeeText('อันดับ 1 ร่วม')
+            ->assertViewHas('knowledgeItem', fn ($item) =>
+                $item->submission->rank === 1
+                && $item->submission->is_shared_rank === false
+            );
+    }
+
+    public function test_public_manual_km_detail_has_no_rank_badge(): void
+    {
+        $this->publishedRankingContext([90]);
+        $item = KnowledgeItem::create([
+            'title' => 'Manual knowledge item',
+            'content' => 'Manual content',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $this->get(route('knowledge.show', $item))->assertOk()
+            ->assertSeeText('Manual content')
+            ->assertDontSeeText('อันดับ')
+            ->assertViewHas('knowledgeItem', fn ($item) => $item->submission === null);
+    }
+
+    private function publishedRankingContext(array $scores, string $sessionStatus = 'ended'): array
+    {
+        $context = $this->rankingContext($scores, $sessionStatus);
+        $context['competition']->update(['publish_scores' => true, 'result_announcement' => now()]);
+
+        return $context;
+    }
+
+    private function publicKnowledgeItem(Submission $submission): KnowledgeItem
+    {
+        return KnowledgeItem::create([
+            'submission_id' => $submission->id,
+            'title' => $submission->project_title,
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+    }
+
+    private function assertPublicDetailHasNoRank(KnowledgeItem $item): void
+    {
+        $this->get(route('knowledge.show', $item))->assertOk()
+            ->assertDontSeeText('อันดับ')
+            ->assertViewHas('knowledgeItem', fn ($item) =>
+                ! array_key_exists('rank', $item->submission->getAttributes())
+                && ! array_key_exists('is_shared_rank', $item->submission->getAttributes())
+            );
+    }
+
     private function submitScores(array $context, int $judgeIndex, array $scores): void
     {
         $payload = [];
         foreach ($context['rubrics'] as $index => $rubric) {
             $payload[$rubric->id] = ['score' => $scores[$index], 'comment' => null];
+        }
+
+        if (auth()->id() !== $context['judges'][$judgeIndex]->id) {
+            $this->flushSession();
+            auth()->forgetGuards();
         }
 
         $this->actingAs($context['judges'][$judgeIndex])->post(

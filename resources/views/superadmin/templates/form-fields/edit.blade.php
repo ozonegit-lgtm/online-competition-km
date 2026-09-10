@@ -338,12 +338,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    function escapeHtml(value) {
-        const element = document.createElement('div');
-        element.textContent = value ?? '';
-        return element.innerHTML;
-    }
-
     function renderFields() {
         fieldsContainer.innerHTML = '';
 
@@ -413,25 +407,21 @@ document.addEventListener('DOMContentLoaded', function () {
             const row = document.createElement('div');
             row.className = 'flex items-center gap-2';
 
-            row.innerHTML = `
-                <input
-                    type="text"
-                    value="${escapeHtml(option)}"
-                    data-option-index="${optionIndex}"
-                    class="option-input w-full rounded-xl border
-                           border-slate-300 px-4 py-2"
-                    placeholder="ตัวเลือกที่ ${optionIndex + 1}"
-                >
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = option ?? '';
+            input.dataset.optionIndex = optionIndex;
+            input.className = 'option-input w-full rounded-xl border border-slate-300 px-4 py-2';
+            input.placeholder = `ตัวเลือกที่ ${optionIndex + 1}`;
 
-                <button
-                    type="button"
-                    data-option-index="${optionIndex}"
-                    class="delete-option rounded-lg px-3 py-2
-                           text-red-500 hover:bg-red-50"
-                >
-                    ลบ
-                </button>
-            `;
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.dataset.optionIndex = optionIndex;
+            button.className = 'delete-option rounded-lg px-3 py-2 text-red-500 hover:bg-red-50';
+            button.textContent = 'ลบ';
+
+            row.appendChild(input);
+            row.appendChild(button);
 
             container.appendChild(row);
         });

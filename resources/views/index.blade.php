@@ -3,7 +3,6 @@
 @section('title', 'คลังผลงานการประกวด')
 
 @section('content')
-
 <div class="min-h-screen bg-slate-50">
 
     {{-- =========================================================
@@ -98,6 +97,8 @@
 
                 {{-- Search --}}
                 <form
+                    id="hero-search-form"
+                    data-search-form
                     method="GET"
                     action="{{ route('home') }}"
                     class="mx-auto mt-4 w-full max-w-2xl"
@@ -136,9 +137,11 @@
                         {{-- Button --}}
                         <button
                             type="submit"
-                            class="shrink-0 rounded-xl bg-emerald-600 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/20 inline-flex items-center justify-center h-9 px-3"
+                            data-search-button
+                            class="shrink-0 rounded-xl bg-emerald-600 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/20 disabled:cursor-wait disabled:opacity-80 inline-flex items-center justify-center gap-2 h-9 px-3"
                         >
-                            ค้นหาผลงาน
+                            <span data-search-spinner class="km-search-spinner hidden" aria-hidden="true"></span>
+                            <span data-search-label>ค้นหาผลงาน</span>
                         </button>
 
                     </div>
@@ -176,7 +179,6 @@
         </div>
 
     </section>
-
 
     {{-- =========================================================
         DESKTOP 3-COLUMN LAYOUT
@@ -298,7 +300,7 @@
                 <div class="space-y-4">
                     @foreach ($publishedResults as $resultCompetition)
                         <article
-                            class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+                            class="km-reveal overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
                         >
                             <div
                                 class="flex flex-col gap-1.5 border-b border-slate-200 bg-white px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between"
@@ -329,6 +331,7 @@
 
                             {{-- Podium --}}
                             <div
+                                data-podium-stage
                                 class="relative overflow-hidden bg-gradient-to-b from-amber-50/40 via-white to-emerald-50/30 px-4 py-4 sm:px-4 sm:py-4"
                             >
                                 {{-- ambient glow, echoes hero background --}}
@@ -435,7 +438,9 @@
                                         @endphp
 
                                         <div
-                                            class="{{ $rankStyle['order'] }} {{ $rankStyle['card'] }} relative flex flex-col items-center"
+                                            data-podium-item
+                                            data-rank="{{ $rank }}"
+                                            class="km-podium-item {{ $rankStyle['order'] }} {{ $rankStyle['card'] }} relative flex flex-col items-center"
                                         >
                                             {{-- Award title --}}
                                             <div
@@ -491,7 +496,7 @@
                                                 ></div>
 
                                                 <div
-                                                    class="relative flex aspect-square items-center justify-center overflow-hidden bg-slate-50/70 p-1.5"
+                                                    class="relative flex aspect-square items-center justify-center overflow-hidden bg-slate-50/70 p-1.5 {{ $imageUrl ? 'km-image-frame is-loading' : 'km-empty-pattern' }}"
                                                 >
                                                     @if ($imageUrl)
                                                         <img
@@ -499,10 +504,16 @@
                                                             alt="{{ $submission->project_title }}"
                                                             class="h-full w-full object-contain"
                                                             loading="lazy"
+                                                            data-km-image
                                                         >
                                                     @else
-                                                        <div class="text-[10px] text-slate-400">
-                                                            ไม่มีรูปภาพ
+                                                        <div class="flex flex-col items-center gap-1.5 text-slate-400">
+                                                            <svg class="h-6 w-6 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                                                                <rect x="3" y="4" width="18" height="16" rx="2"/>
+                                                                <circle cx="8.5" cy="9" r="1.5"/>
+                                                                <path d="m4 17 5-5 4 4 2-2 5 4"/>
+                                                            </svg>
+                                                            <span class="text-[9px]">ยังไม่มีภาพ</span>
                                                         </div>
                                                     @endif
 
@@ -535,12 +546,9 @@
 
                                                         <span
                                                             class="text-sm font-black leading-none tabular-nums {{ $rankStyle['score'] }}"
+                                                            data-count-score="{{ number_format((float) $submission->final_score, 2, '.', '') }}"
                                                         >
-                                                            {{ number_format(
-                                                                (float)
-                                                                    $submission->final_score,
-                                                                2
-                                                            ) }}
+                                                            {{ number_format((float) $submission->final_score, 2) }}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -587,12 +595,7 @@
                     @endforeach
                 </div>
             </section>
-
-            <style>
-                .km-ribbon-l { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 65%); }
-                .km-ribbon-r { clip-path: polygon(0 0, 100% 0, 100% 65%, 0 100%); }
-            </style>
-        @endif
+@endif
 
 
         {{-- =====================================================
@@ -655,26 +658,26 @@
 
                         @php
                             $submission = $item->submission;
-
-                            $image = $submission?->files
-                                ?->first(
-                                    fn ($file) => str_starts_with(
-                                        (string) $file->mime_type,
-                                        'image/'
-                                    )
-                                );
-
+                            $isManual = $item->submission_id === null;
                             $imageUrl = $item->cover_image_url;
+
+                            $sourceType = $isManual
+                                ? 'องค์ความรู้'
+                                : 'การแข่งขัน';
+
+                            $sourceDetail = $isManual
+                                ? ($item->category?->category_name ?? 'ไม่ระบุหมวดหมู่')
+                                : ($submission?->competition?->title ?? 'ไม่ระบุการแข่งขัน');
                         @endphp
 
                         <article
-                            class="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-sm"
+                            class="km-reveal km-card-motion group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:border-emerald-200"
                         >
 
                             <a href="{{ route('knowledge.show', $item) }}" class="block">
 
                                 <div
-                                    class="relative aspect-[16/10] overflow-hidden bg-slate-100"
+                                    class="relative aspect-[16/10] overflow-hidden bg-slate-100 {{ $imageUrl ? 'km-image-frame is-loading' : 'km-empty-pattern' }}"
                                 >
 
                                     @if ($imageUrl)
@@ -684,14 +687,30 @@
                                             alt="{{ $item->title }}"
                                             class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                                             loading="lazy"
+                                            data-km-image
                                         >
 
                                     @else
 
-                                        <div
-                                            class="flex h-full items-center justify-center text-sm text-slate-400"
-                                        >
-                                            ไม่มีรูปภาพ
+                                        <div class="flex h-full flex-col items-center justify-center gap-2 text-slate-400">
+                                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/80 shadow-sm ring-1 ring-slate-200/80">
+                                                @if ($isManual)
+                                                    <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                                                    </svg>
+                                                @else
+                                                    <svg class="h-5 w-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                        <path d="M8 21h8M12 17v4"/>
+                                                        <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/>
+                                                        <path d="M7 6H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4"/>
+                                                        <path d="M17 6h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4"/>
+                                                    </svg>
+                                                @endif
+                                            </div>
+                                            <span class="text-xs font-medium">
+                                                {{ $isManual ? 'องค์ความรู้' : 'ผลงานการแข่งขัน' }}
+                                            </span>
                                         </div>
 
                                     @endif
@@ -714,11 +733,32 @@
 
                                 <div class="p-4">
 
-                                    <p
-                                        class="mb-1.5 line-clamp-1 text-slate-400 text-xs"
-                                    >
-                                        {{ $submission?->competition?->title ?? 'ไม่ระบุการแข่งขัน' }}
-                                    </p>
+                                    <div class="mb-1.5 flex items-center gap-2">
+                                        <span
+                                            class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $isManual ? 'bg-slate-100 text-slate-600' : 'bg-emerald-50 text-emerald-700' }}"
+                                        >
+                                            @if ($isManual)
+                                                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                                                </svg>
+                                            @else
+                                                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <path d="M8 21h8"/>
+                                                    <path d="M12 17v4"/>
+                                                    <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/>
+                                                    <path d="M7 6H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4"/>
+                                                    <path d="M17 6h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4"/>
+                                                </svg>
+                                            @endif
+
+                                            {{ $sourceType }}
+                                        </span>
+
+                                        <p class="min-w-0 line-clamp-1 text-xs font-medium text-slate-500">
+                                            {{ $sourceDetail }}
+                                        </p>
+                                    </div>
 
                                     <h3
                                         class="line-clamp-2 text-slate-800 transition group-hover:text-emerald-700 text-base font-semibold"
@@ -726,7 +766,7 @@
                                         {{ $item->title }}
                                     </h3>
 
-                                    @if ($item->summary)
+                                    @if (! $isManual && $item->summary)
 
                                         <p
                                             class="mt-1.5 line-clamp-2 leading-6 text-slate-500 text-xs"
@@ -738,23 +778,38 @@
 
 
                                     <div
-                                        class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3"
+                                        class="mt-3 flex items-center justify-between gap-3 border-t border-slate-100 pt-3"
                                     >
+                                        <div class="min-w-0">
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-medium text-slate-400">
+                                                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <rect x="3" y="5" width="18" height="16" rx="2"/>
+                                                    <path d="M16 3v4M8 3v4M3 10h18"/>
+                                                </svg>
+                                                เผยแพร่เมื่อ
+                                            </span>
+                                            <span class="mt-0.5 block text-xs font-semibold text-slate-600">
+                                                {{ $item->published_at?->format('d/m/Y') ?? '-' }}
+                                            </span>
+                                        </div>
 
-                                        <span
-                                            class="text-xs text-slate-400"
-                                        >
-                                            คะแนน
-                                        </span>
-
-                                        <span
-                                            class="text-sm font-bold text-emerald-600"
-                                        >
-                                            {{ $submission?->final_score !== null
-                                                ? number_format((float) $submission->final_score, 2)
-                                                : '-' }}
-                                        </span>
-
+                                        @if (! $isManual)
+                                            <div class="shrink-0 text-right">
+                                                <span class="inline-flex items-center justify-end gap-1 text-[10px] font-medium text-slate-400">
+                                                    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                        <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>
+                                                    </svg>
+                                                    คะแนนรวม
+                                                </span>
+                                                <span
+                                                    class="mt-0.5 block text-sm font-bold tabular-nums text-emerald-600"
+                                                >
+                                                    {{ $submission?->final_score !== null
+                                                        ? number_format((float) $submission->final_score, 2)
+                                                        : '-' }}
+                                                </span>
+                                            </div>
+                                        @endif
                                     </div>
 
                                 </div>
@@ -865,7 +920,7 @@
                         {{-- Panel --}}
                         <div
                             id="sort-panel"
-                            class="absolute right-0 z-20 mt-2 hidden w-full min-w-[11rem] overflow-hidden rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-slate-200 sm:w-44 border border-slate-200"
+                            class="km-sort-panel absolute right-0 z-20 mt-2 w-full min-w-[11rem] overflow-hidden rounded-xl bg-white p-1.5 shadow-lg ring-1 ring-slate-200 sm:w-44 border border-slate-200"
                         >
 
                             @foreach ($sortOptions as $value => $option)
@@ -916,21 +971,21 @@
 
                         @php
                             $submission = $item->submission;
-
-                            $image = $submission?->files
-                                ?->first(
-                                    fn ($file) => str_starts_with(
-                                        (string) $file->mime_type,
-                                        'image/'
-                                    )
-                                );
-
+                            $isManual = $item->submission_id === null;
                             $imageUrl = $item->cover_image_url;
+
+                            $sourceType = $isManual
+                                ? 'องค์ความรู้'
+                                : 'การแข่งขัน';
+
+                            $sourceDetail = $isManual
+                                ? ($item->category?->category_name ?? 'ไม่ระบุหมวดหมู่')
+                                : ($submission?->competition?->title ?? 'ไม่ระบุการแข่งขัน');
                         @endphp
 
 
                         <article
-                            class="group h-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-sm"
+                            class="km-reveal km-card-motion group h-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:border-emerald-200"
                         >
 
                             <a
@@ -939,7 +994,7 @@
                             >
 
                                 <div
-                                    class="aspect-[4/3] overflow-hidden bg-slate-100"
+                                    class="relative aspect-[4/3] overflow-hidden bg-slate-100 {{ $imageUrl ? 'km-image-frame is-loading' : 'km-empty-pattern' }}"
                                 >
 
                                     @if ($imageUrl)
@@ -947,16 +1002,32 @@
                                         <img
                                             src="{{ $imageUrl }}"
                                             alt="{{ $item->title }}"
-                                            class="h-full w-full object-cover"
+                                            class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                                             loading="lazy"
+                                            data-km-image
                                         >
 
                                     @else
 
-                                        <div
-                                            class="flex h-full items-center justify-center text-sm text-slate-400"
-                                        >
-                                            ไม่มีรูปภาพ
+                                        <div class="flex h-full flex-col items-center justify-center gap-2 text-slate-400">
+                                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/85 shadow-sm ring-1 ring-slate-200/80">
+                                                @if ($isManual)
+                                                    <svg class="h-6 w-6 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                                                    </svg>
+                                                @else
+                                                    <svg class="h-6 w-6 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                        <path d="M8 21h8M12 17v4"/>
+                                                        <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/>
+                                                        <path d="M7 6H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4"/>
+                                                        <path d="M17 6h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4"/>
+                                                    </svg>
+                                                @endif
+                                            </div>
+                                            <span class="text-xs font-medium">
+                                                {{ $isManual ? 'องค์ความรู้' : 'ผลงานการแข่งขัน' }}
+                                            </span>
                                         </div>
 
                                     @endif
@@ -966,11 +1037,32 @@
 
                                 <div class="flex flex-1 flex-col p-4">
 
-                                    <p
-                                        class="line-clamp-1 text-xs font-medium text-emerald-700"
-                                    >
-                                        {{ $submission?->competition?->title ?? 'ไม่ระบุการแข่งขัน' }}
-                                    </p>
+                                    <div class="flex items-center gap-2">
+                                        <span
+                                            class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $isManual ? 'bg-slate-100 text-slate-600' : 'bg-emerald-50 text-emerald-700' }}"
+                                        >
+                                            @if ($isManual)
+                                                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+                                                </svg>
+                                            @else
+                                                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <path d="M8 21h8"/>
+                                                    <path d="M12 17v4"/>
+                                                    <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/>
+                                                    <path d="M7 6H4a1 1 0 0 0-1 1v1a4 4 0 0 0 4 4"/>
+                                                    <path d="M17 6h3a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4"/>
+                                                </svg>
+                                            @endif
+
+                                            {{ $sourceType }}
+                                        </span>
+
+                                        <p class="min-w-0 line-clamp-1 text-xs font-medium text-slate-500">
+                                            {{ $sourceDetail }}
+                                        </p>
+                                    </div>
 
 
                                     <h3
@@ -980,7 +1072,7 @@
                                     </h3>
 
 
-                                    @if ($item->summary)
+                                    @if (! $isManual && $item->summary)
 
                                         <p
                                             class="mt-1.5 line-clamp-2 leading-5 text-slate-500 text-xs"
@@ -992,23 +1084,38 @@
 
 
                                     <div
-                                        class="mt-auto flex items-end justify-between border-t border-slate-100 pt-3"
+                                        class="mt-auto flex items-end justify-between gap-3 border-t border-slate-100 pt-3"
                                     >
+                                        <div class="min-w-0">
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-medium text-slate-400">
+                                                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <rect x="3" y="5" width="18" height="16" rx="2"/>
+                                                    <path d="M16 3v4M8 3v4M3 10h18"/>
+                                                </svg>
+                                                เผยแพร่เมื่อ
+                                            </span>
+                                            <span class="mt-0.5 block text-xs font-semibold text-slate-600">
+                                                {{ $item->published_at?->format('d/m/Y') ?? '-' }}
+                                            </span>
+                                        </div>
 
-                                        <span
-                                            class="text-xs font-medium text-slate-500"
-                                        >
-                                            คะแนนรวม
-                                        </span>
-
-                                        <span
-                                            class="text-base font-extrabold tabular-nums text-slate-800"
-                                        >
-                                            {{ $submission?->final_score !== null
-                                                ? number_format((float) $submission->final_score, 2)
-                                                : '-' }}
-                                        </span>
-
+                                        @if (! $isManual)
+                                            <div class="shrink-0 text-right">
+                                                <span class="inline-flex items-center justify-end gap-1 text-[10px] font-medium text-slate-400">
+                                                    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                        <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>
+                                                    </svg>
+                                                    คะแนนรวม
+                                                </span>
+                                                <span
+                                                    class="mt-0.5 block text-base font-extrabold tabular-nums text-slate-800"
+                                                >
+                                                    {{ $submission?->final_score !== null
+                                                        ? number_format((float) $submission->final_score, 2)
+                                                        : '-' }}
+                                                </span>
+                                            </div>
+                                        @endif
                                     </div>
 
                                 </div>
@@ -1033,7 +1140,7 @@
             @else
 
                 <div
-                    class="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-4 text-center shadow-sm"
+                    class="km-reveal km-empty-pattern rounded-xl border border-dashed border-slate-300 bg-white px-4 py-6 text-center shadow-sm"
                 >
 
                     <div
@@ -1113,48 +1220,7 @@
     </footer>
 
 </div>
-<script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const trigger = document.getElementById('sort-trigger');
-            const panel   = document.getElementById('sort-panel');
-            const chevron = document.getElementById('sort-chevron');
-            const label   = document.getElementById('sort-label');
-            const hidden  = document.getElementById('sort-value');
 
-            if (!trigger || !panel) {
-                console.error('sort-trigger หรือ sort-panel หาไม่เจอ');
-                return;
-            }
 
-            trigger.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                panel.classList.toggle('hidden');
-                chevron.classList.toggle('rotate-180');
-            });
-
-            document.querySelectorAll('.sort-option').forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const form = btn.closest('form');
-
-                    if (!form) {
-                        console.error('ปุ่มนี้ไม่ได้อยู่ใน <form>:', btn);
-                        return;
-                    }
-
-                    hidden.value = btn.dataset.value;
-                    label.textContent = btn.dataset.label;
-                    form.submit();
-                });
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!trigger.contains(e.target) && !panel.contains(e.target)) {
-                    panel.classList.add('hidden');
-                    chevron.classList.remove('rotate-180');
-                }
-            });
-        });
-    </script>
 
 @endsection

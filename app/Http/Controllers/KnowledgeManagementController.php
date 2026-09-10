@@ -19,12 +19,53 @@ class KnowledgeManagementController extends Controller
                 'submission.competition.category',
                 'submission.members',
                 'submission.files',
+                'submission.fieldValues.field',
             ]);
 
             abort_unless(
                 $knowledgeItem->submission && $knowledgeItem->submission->status !== 'disqualified',
                 404
             );
+
+            $submission = $knowledgeItem->submission;
+            $competition = $submission->competition;
+
+            if ($competition
+                && $competition->publish_scores
+                && $competition->result_announcement !== null
+                && $competition->resultReadiness()['ready'] === true) {
+                $rankedSubmissions = $competition->submissions()
+                    ->where('status', '!=', 'disqualified')
+                    ->orderByDesc('final_score')
+                    ->orderBy('id')
+                    ->get(['id', 'final_score']);
+
+                $lastScore = null;
+                $lastRank = 0;
+                $submissionRank = null;
+                $rankCounts = [];
+
+                // Match index(): competition ranks (1, 1, 3), comparing integer hundredths.
+                foreach ($rankedSubmissions as $index => $candidate) {
+                    $currentScore = (int) round((float) $candidate->final_score * 100);
+
+                    if ($lastScore === null || $currentScore !== $lastScore) {
+                        $lastRank = $index + 1;
+                        $lastScore = $currentScore;
+                    }
+
+                    $rankCounts[$lastRank] = ($rankCounts[$lastRank] ?? 0) + 1;
+
+                    if ((int) $candidate->id === (int) $submission->id) {
+                        $submissionRank = $lastRank;
+                    }
+                }
+
+                if ($submissionRank !== null && $submissionRank <= 3) {
+                    $submission->setAttribute('rank', $submissionRank);
+                    $submission->setAttribute('is_shared_rank', $rankCounts[$submissionRank] > 1);
+                }
+            }
         } else {
             $knowledgeItem->load('creator');
         }

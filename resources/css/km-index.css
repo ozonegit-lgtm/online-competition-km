@@ -1,0 +1,156 @@
+/* Public KM — Clean Motion */
+
+.km-reveal {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+        opacity 420ms cubic-bezier(.22, 1, .36, 1),
+        transform 420ms cubic-bezier(.22, 1, .36, 1);
+    will-change: opacity, transform;
+}
+
+.km-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.km-card-motion {
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        border-color 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .km-card-motion:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px -22px rgba(15, 23, 42, .35);
+    }
+}
+
+.km-podium-item {
+    opacity: 0;
+    transform: translateY(10px) scale(.96);
+    transform-origin: 50% 100%;
+    transition:
+        opacity 440ms cubic-bezier(.22, 1, .36, 1),
+        transform 520ms cubic-bezier(.22, 1, .36, 1);
+    transition-delay: var(--podium-delay, 0ms);
+    will-change: opacity, transform;
+}
+
+.km-podium-item.is-entered {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.km-ribbon-l {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 65%);
+}
+
+.km-ribbon-r {
+    clip-path: polygon(0 0, 100% 0, 100% 65%, 0 100%);
+}
+
+.km-image-frame {
+    position: relative;
+    isolation: isolate;
+}
+
+.km-image-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+        105deg,
+        rgba(241, 245, 249, .72) 10%,
+        rgba(255, 255, 255, .92) 28%,
+        rgba(241, 245, 249, .72) 46%
+    );
+    background-size: 220% 100%;
+    animation: km-shimmer 1.4s linear infinite;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+}
+
+.km-image-frame.is-loading::before {
+    opacity: 1;
+}
+
+.km-image-frame img[data-km-image] {
+    opacity: 1;
+    transition: opacity 260ms ease, transform 420ms ease;
+}
+
+.km-image-frame.is-loading img[data-km-image] {
+    opacity: 0;
+}
+
+@keyframes km-shimmer {
+    to { background-position-x: -220%; }
+}
+
+.km-empty-pattern {
+    background-color: rgb(248 250 252);
+    background-image:
+        radial-gradient(circle at 18% 24%, rgba(16, 185, 129, .08) 0 2px, transparent 2.5px),
+        radial-gradient(circle at 82% 72%, rgba(14, 165, 233, .06) 0 2px, transparent 2.5px);
+    background-size: 32px 32px, 38px 38px;
+}
+
+.km-sort-panel {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px) scale(.99);
+    transform-origin: top right;
+    pointer-events: none;
+    transition:
+        opacity 140ms ease,
+        transform 180ms cubic-bezier(.22, 1, .36, 1),
+        visibility 0s linear 180ms;
+}
+
+.km-sort-panel.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    transition-delay: 0s;
+}
+
+.km-search-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, .4);
+    border-top-color: white;
+    border-radius: 9999px;
+    animation: km-spin .7s linear infinite;
+}
+
+@keyframes km-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .km-reveal,
+    .km-podium-item,
+    .km-card-motion,
+    .km-sort-panel,
+    .km-image-frame::before,
+    .km-image-frame img[data-km-image] {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    .km-reveal,
+    .km-podium-item {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .km-image-frame.is-loading::before {
+        opacity: 0 !important;
+    }
+}

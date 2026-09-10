@@ -57,11 +57,51 @@ class KnowledgeItemFileAccessTest extends TestCase
         foreach (['draft', 'hidden'] as $status) {
             $item = $this->item($owner, $status);
             Storage::disk('local')->put($item->cover_image, 'cover');
-            $route = route('knowledge-items.cover', $item);
-            $this->actingAs($owner)->get($route)->assertOk();
-            $this->actingAs($super)->get($route)->assertOk();
-            $this->actingAs($other)->get($route)->assertNotFound();
-            $this->actingAs($judge)->get($route)->assertNotFound();
+            Storage::disk('local')->put($item->attachment_path, 'attachment');
+            foreach (['knowledge-items.cover', 'knowledge-items.attachment'] as $routeName) {
+                $route = route($routeName, $item);
+                foreach ([[$owner, 200], [$super, 200], [$other, 404], [$judge, 404]] as [$user, $expectedStatus]) {
+                    // Each identity represents a separate browser, including its password hash.
+                    $this->flushSession();
+                    auth()->forgetGuards();
+                    $this->actingAs($user)->get($route)->assertStatus($expectedStatus);
+                }
+            }
+        }
+    }
+
+    public function test_deactivated_users_with_existing_sessions_cannot_open_private_files(): void
+    {
+        $owner = $this->user('owner', 'Competition Admin');
+        $super = $this->user('super', 'Super Admin');
+
+        foreach ([$owner, $super] as $user) {
+            // Isolate users, but preserve this session across the deactivation below.
+            $this->flushSession();
+            auth()->forgetGuards();
+            $user->update(['is_active' => true]);
+            $privateItem = $this->item($owner, 'draft');
+            Storage::disk('local')->put($privateItem->cover_image, 'cover');
+            $this->withSession([auth()->guard('web')->getName() => $user->id]);
+            auth()->forgetGuards();
+            $this->get(route('knowledge-items.cover', $privateItem))->assertOk();
+            $this->assertAuthenticatedAs($user);
+
+            User::whereKey($user->id)->update(['is_active' => false]);
+            auth()->forgetGuards();
+
+            foreach (['draft', 'hidden', 'published'] as $status) {
+                $item = $this->item($owner, $status);
+                Storage::disk('local')->put($item->cover_image, 'cover');
+                Storage::disk('local')->put($item->attachment_path, 'attachment');
+
+                foreach (['knowledge-items.cover', 'knowledge-items.attachment'] as $routeName) {
+                    $this->get(route($routeName, $item))
+                        ->assertStatus($status === 'published' ? 200 : 404);
+                    $this->assertAuthenticatedAs($user);
+                    $this->assertFalse(auth()->user()->is_active);
+                }
+            }
         }
     }
 

@@ -106,6 +106,11 @@ class JudgeScoreSubmissionSafetyTest extends TestCase
         array $scores,
         array $comments = []
     ) {
+        if (auth()->id() !== $context['judge']->id) {
+            $this->flushSession();
+            auth()->forgetGuards();
+        }
+
         return $this->actingAs($context['judge'])->post(
             route('judge.judging-rooms.scores.submit', $context['session']),
             $this->scorePayload($context, $scores, $comments)

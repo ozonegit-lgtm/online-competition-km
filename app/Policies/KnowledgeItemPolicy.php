@@ -19,7 +19,7 @@ class KnowledgeItemPolicy
 
     public function view(User $user, KnowledgeItem $knowledgeItem): bool
     {
-        return $this->canManage($user, $knowledgeItem);
+        return $user->is_active && $this->canManage($user, $knowledgeItem);
     }
 
     public function update(User $user, KnowledgeItem $knowledgeItem): bool

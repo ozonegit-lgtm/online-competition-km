@@ -127,12 +127,17 @@ class UserManagementController extends Controller
         
 
         $validated['is_active'] = (bool) $validated['is_active'];
-        if (!empty($validated['password'])) {
-                $validated['password'] = Hash::make($validated['password']);
-            } else {
-                unset($validated['password']);
-            }
-            $user->update($validated);
+        $passwordChanged = ! empty($validated['password']);
+        if ($passwordChanged) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
+        $user->fill($validated);
+        if ($passwordChanged) {
+            $user->setRememberToken(null);
+        }
+        $user->save();
 
         return redirect()->route('superadmin.showUser', ['id' => $user->id])->with('success', 'แก้ไขข้อมูลผู้ใช้งานสำเร็จ');
             

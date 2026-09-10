@@ -129,6 +129,8 @@ class LegacyKnowledgeAttachmentMigrationTest extends TestCase
         $this->actingAs($owner)->delete(route('competition-admin.km.destroy', $item))->assertSessionHasErrors('attachment');
         $role = DB::table('roles')->insertGetId(['role_name' => 'Super Admin', 'display_name' => 'Super Admin']);
         $super = User::create(['role_id' => $role, 'username' => 'super', 'email' => 'super@example.com', 'password' => 'password', 'is_active' => true]);
+        $this->flushSession();
+        auth()->forgetGuards();
         $this->actingAs($super)->delete(route('superadmin.km.destroy', $item))->assertSessionHasErrors('attachment');
         Storage::disk('public')->assertExists($path);
         $this->assertDatabaseCount('knowledge_item_files', 1);

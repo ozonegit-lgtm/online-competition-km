@@ -131,6 +131,69 @@ class UserManagementTest extends TestCase
         $this->assertDatabaseCount('users', 0);
     }
 
+    public function test_changing_user_password_revokes_remember_token_and_old_session(): void
+    {
+        $admin = $this->createUser('super-admin', $this->superAdminRole);
+        $user = $this->createUser('target-user', $this->competitionAdminRole);
+
+        $user->forceFill([
+            'remember_token' => 'old-remember-token',
+        ])->save();
+
+        // Browser A: ผู้ใช้ login อยู่ก่อนถูกเปลี่ยนรหัสผ่าน
+        $this->actingAs($user)
+            ->get(route('competition-admin.dashboard'))
+            ->assertOk();
+
+        $oldSessionPasswordHash = session('password_hash_web');
+        $loginSessionKey = auth()->guard('web')->getName();
+
+        $this->assertNotNull($oldSessionPasswordHash);
+
+        // แยก Browser A ออกจาก Browser ของ Super Admin
+        $this->flushSession();
+        auth()->forgetGuards();
+
+        // Browser B: Super Admin เปลี่ยนรหัสผ่านของผู้ใช้
+        $this->actingAs($admin)
+            ->put(route('superadmin.updateUser', ['id' => $user->id]), [
+                'username' => $user->username,
+                'email' => $user->email,
+                'password' => 'new-password123',
+                'password_confirmation' => 'new-password123',
+                'role_id' => $user->role_id,
+                'is_active' => 1,
+            ])
+            ->assertRedirect(
+                route('superadmin.showUser', ['id' => $user->id])
+            );
+
+        $user->refresh();
+
+        $this->assertTrue(
+            Hash::check('new-password123', $user->password)
+        );
+
+        $this->assertNull($user->remember_token);
+
+        // ออกจาก Browser B
+        $this->flushSession();
+        auth()->forgetGuards();
+
+        // กลับมาจำลอง Browser A ด้วย session เก่าก่อนเปลี่ยน password
+        $this->withSession([
+            $loginSessionKey => $user->id,
+            'password_hash_web' => $oldSessionPasswordHash,
+        ]);
+
+        auth()->forgetGuards();
+
+        $this->get(route('competition-admin.dashboard'))
+            ->assertRedirect(route('login'));
+
+        $this->assertGuest();
+    }
+
     private function validPayload(array $overrides = []): array
     {
         return array_replace([

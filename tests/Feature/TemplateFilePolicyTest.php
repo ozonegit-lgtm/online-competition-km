@@ -179,6 +179,48 @@ class TemplateFilePolicyTest extends TestCase
         ]);
     }
 
+    public function test_form_builder_preserves_payloads_as_data_and_encodes_existing_fields_for_edit(): void
+    {
+        [$admin, $template] = $this->superAdminContext();
+        $payloads = [
+            '"><img src=x onerror=alert(1)>',
+            '"><svg onload=alert(1)>',
+            '<script>alert(1)</script>',
+            '\'"><script>alert(1)</script>',
+        ];
+        $fields = [$this->field([
+            'label' => $payloads[0],
+            'type' => 'checkbox',
+            'help' => $payloads[1],
+            'placeholder' => $payloads[3],
+            'options' => $payloads,
+        ])];
+
+        $this->actingAs($admin)->get(route('superadmin.templates.form-fields.create', $template))->assertOk();
+        $this->post(route('superadmin.templates.form-fields.store', $template), [
+            'fields' => json_encode($fields),
+        ])->assertSessionHasNoErrors()->assertRedirect(route('superadmin.templates.index'));
+
+        $stored = CompetitionTemplateFormField::where('template_id', $template->id)->sole();
+        $this->assertSame($payloads, $stored->options);
+        $this->assertSame($payloads[0], $stored->label);
+        $this->assertSame($payloads[1], $stored->help_text);
+        $this->assertSame($payloads[3], $stored->placeholder);
+
+        $response = $this->get(route('superadmin.templates.form-fields.edit', $template))->assertOk();
+        foreach ($payloads as $payload) {
+            $response->assertDontSee($payload, false)->assertSee(
+                json_encode($payload, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT),
+                false
+            );
+        }
+
+        $this->put(route('superadmin.templates.form-fields.update', $template), [
+            'fields' => json_encode($fields),
+        ])->assertSessionHasNoErrors()->assertRedirect(route('superadmin.templates.index'));
+        $this->assertSame($payloads, CompetitionTemplateFormField::where('template_id', $template->id)->sole()->options);
+    }
+
     private function superAdminContext(): array
     {
         $role = Role::firstOrCreate(

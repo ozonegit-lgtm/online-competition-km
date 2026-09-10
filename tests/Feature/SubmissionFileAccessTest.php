@@ -44,6 +44,8 @@ class SubmissionFileAccessTest extends TestCase
         ]);
 
         foreach ([$context['owner'], $super, $judge] as $user) {
+            $this->flushSession();
+            auth()->forgetGuards();
             $this->actingAs($user)
                 ->get(route('submission-files.show', $context['file']))
                 ->assertOk();
@@ -63,6 +65,8 @@ class SubmissionFileAccessTest extends TestCase
         ]);
 
         foreach ([$otherAdmin, $pendingJudge, $otherJudge] as $user) {
+            $this->flushSession();
+            auth()->forgetGuards();
             $this->actingAs($user)
                 ->get(route('submission-files.show', $context['file']))
                 ->assertNotFound();
@@ -110,6 +114,8 @@ class SubmissionFileAccessTest extends TestCase
             'submissions/missing.pdf',
         ] as $path) {
             $context = $this->context(['path' => $path, 'store' => false]);
+            $this->flushSession();
+            auth()->forgetGuards();
             $this->actingAs($context['owner'])
                 ->get(route('submission-files.show', $context['file']))
                 ->assertNotFound();
@@ -196,6 +202,8 @@ class SubmissionFileAccessTest extends TestCase
             $this->get(route($route, $item))->assertOk()->assertSee($item->cover_image_url, false);
         }
         $super = $this->user('super', 'Super Admin');
+        $this->flushSession();
+        auth()->forgetGuards();
         foreach (['superadmin.km.show', 'superadmin.km.edit'] as $route) {
             $this->actingAs($super)->get(route($route, $item))->assertOk()->assertSee($item->cover_image_url, false);
         }
