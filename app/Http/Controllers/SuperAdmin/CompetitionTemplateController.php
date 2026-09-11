@@ -8,6 +8,7 @@
     use Illuminate\Validation\Rule;
     use Illuminate\Support\Facades\Storage;
     use App\Models\CompetitionTemplateFormField;
+    use Throwable;
 
     class CompetitionTemplateController extends Controller
     {
@@ -111,19 +112,47 @@
 
         $validated['is_active'] = $request->boolean('is_active');
 
-        if ($request->hasFile('cover_image')) {
-            if ($template->cover_image) {
-                Storage::disk('public')->delete($template->cover_image);
+        $oldCoverImage = null;
+        $newCoverImage = null;
+        $deleteOldCover = false;
+
+        try {
+            if ($request->hasFile('cover_image')) {
+                $oldCoverImage = $template->cover_image;
+
+                $newCoverImage = $request
+                    ->file('cover_image')
+                    ->store('competition-templates', 'public');
+                $validated['cover_image'] = $newCoverImage;
+
+                $coverIsShared = $oldCoverImage
+                    && $template->competitions()
+                        ->where('cover_image', $oldCoverImage)
+                        ->exists();
+
+                $deleteOldCover = $oldCoverImage
+                    && !$coverIsShared
+                    && Str::startsWith($oldCoverImage, 'competition-templates/');
             }
 
-            $validated['cover_image'] = $request
-                ->file('cover_image')
-                ->store('competition-templates', 'public');
+            // อัปเดตตาราง competition_templates เท่านั้น
+            // การแก้ไข form fields ย้ายไปที่ CompetitionTemplateFormFieldController แล้ว
+            $template->update($validated);
+        } catch (Throwable $exception) {
+            if ($newCoverImage && Str::startsWith($newCoverImage, 'competition-templates/')) {
+                try {
+                    Storage::disk('public')->delete($newCoverImage);
+                } catch (Throwable $cleanupException) {
+                    report($cleanupException);
+                }
+            }
+
+            throw $exception;
         }
 
-        // อัปเดตตาราง competition_templates เท่านั้น
-        // การแก้ไข form fields ย้ายไปที่ CompetitionTemplateFormFieldController แล้ว
-        $template->update($validated);
+        if ($deleteOldCover) {
+            Storage::disk('public')->delete($oldCoverImage);
+        }
 
         return redirect()
             ->route('superadmin.templates.index')
@@ -135,10 +164,19 @@
      */
         public function destroy(CompetitionTemplate $template)
         {
-            if ($template->cover_image) {
-                Storage::disk('public')->delete($template->cover_image);
+            if ($template->competitions()->exists()) {
+                return redirect()
+                    ->route('superadmin.templates.index')
+                    ->with('error', 'ไม่สามารถลบ Template นี้ได้ เนื่องจากถูกใช้สร้างการแข่งขันแล้ว กรุณาปิดการใช้งาน Template แทน');
             }
+
+            $coverImage = $template->cover_image;
             $template->delete();
+
+            if ($coverImage && Str::startsWith($coverImage, 'competition-templates/')) {
+                Storage::disk('public')->delete($coverImage);
+            }
+
             return redirect()->route('superadmin.templates.index')->with('success', 'ลบ Template สำเร็จ');
         }
 

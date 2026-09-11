@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\CompetitionFormField;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Submission;
+use Throwable;
 
 class CompetitionController extends Controller
 {
@@ -70,14 +73,17 @@ class CompetitionController extends Controller
                 'result_announcement.after_or_equal' => 'วันประกาศผลต้องไม่น้อยกว่าวันสิ้นสุดการตัดสิน',
             ]);
 
-            DB::transaction(function () use ($validated) {
+            $competitionCoverPath = null;
+
+            try {
+                DB::transaction(function () use ($validated, &$competitionCoverPath) {
                 $template = null;
 
                 if (!empty($validated['template_id'])) {
                     $template = CompetitionTemplate::with(['formFields' => function ($query) {$query->orderBy('sort_order');},])->where('is_active', true)->findOrFail($validated['template_id']);
                 }
 
-               if ($template) {
+                if ($template) {
                     $hasActiveFields = $template->formFields
                         ->where('is_active', true)
                         ->isNotEmpty();
@@ -91,6 +97,27 @@ class CompetitionController extends Controller
                     }
                 }
 
+                if ($template?->cover_image) {
+                    $disk = Storage::disk('public');
+                    $extension = pathinfo($template->cover_image, PATHINFO_EXTENSION);
+                    $competitionCoverPath = 'competitions/'.Str::uuid()
+                        .($extension !== '' ? '.'.strtolower($extension) : '');
+
+                    try {
+                        $copied = $disk->exists($template->cover_image)
+                            && $disk->copy($template->cover_image, $competitionCoverPath);
+                    } catch (Throwable $exception) {
+                        report($exception);
+                        $copied = false;
+                    }
+
+                    if (!$copied) {
+                        throw ValidationException::withMessages([
+                            'template_id' => ['ไม่สามารถคัดลอกรูปปกจาก Template ได้ กรุณาตรวจสอบไฟล์รูปปกของ Template'],
+                        ]);
+                    }
+                }
+
                 $competition = Competition::create([
                     'category_id' => $validated['category_id'],
                     'template_id' => $template?->id,
@@ -98,7 +125,7 @@ class CompetitionController extends Controller
                     'title' => $validated['title'],
                     'description' => ($validated['description'] ?? null)
                         ?: $template?->default_description,
-                    'cover_image' => $template?->cover_image,
+                    'cover_image' => $competitionCoverPath,
                     'competition_type' => $validated['competition_type'],
                     'visibility' => $validated['visibility'],
                     'registration_start' => $validated['registration_start'],
@@ -131,7 +158,18 @@ class CompetitionController extends Controller
                         ]);
                     }
                 }
-            });
+                });
+            } catch (Throwable $exception) {
+                if ($competitionCoverPath) {
+                    try {
+                        Storage::disk('public')->delete($competitionCoverPath);
+                    } catch (Throwable $cleanupException) {
+                        report($cleanupException);
+                    }
+                }
+
+                throw $exception;
+            }
             return redirect()->route('competition-admin.competitions.index')->with('success', 'สร้างการแข่งขันและฟอร์มรับผลงานสำเร็จ');
         }
 
@@ -175,8 +213,20 @@ class CompetitionController extends Controller
 
             $competition->load('template');
 
-            $categories = CompetitionCategory::query()->where('is_active', true)->orderBy('category_name', 'asc')->get();
-            $templates = CompetitionTemplate::query()->where('is_active', true)->orderBy('template_name', 'asc')->get();
+            $categories = CompetitionCategory::query()
+                ->where(function ($query) use ($competition) {
+                    $query->where('is_active', true)
+                        ->orWhere('id', $competition->category_id);
+                })
+                ->orderBy('category_name', 'asc')
+                ->get();
+            $templates = CompetitionTemplate::query()
+                ->where(function ($query) use ($competition) {
+                    $query->where('is_active', true)
+                        ->orWhere('id', $competition->template_id);
+                })
+                ->orderBy('template_name', 'asc')
+                ->get();
             return view('competition-admin.competitions.edit', compact('competition', 'categories', 'templates'));
         }
 
@@ -187,15 +237,26 @@ class CompetitionController extends Controller
             403, 'คุณไม่มีสิทธิ์แก้ไขการแข่งขันนี้'
         );
 
-        $validated = $request->validate([
-                'category_id' => ['required','integer','exists:competition_categories,id',],
-                'template_id' => 
+        $templateRules = $competition->template_id === null
+            ? ['nullable', 'integer', Rule::in([null])]
+            : [
+                'required',
+                'integer',
+                Rule::exists('competition_templates', 'id'),
+                Rule::in([$competition->template_id]),
+            ];
 
-                [
-                    'required','integer',
-                    Rule::exists('competition_templates', 'id'),
-                    Rule::in([$competition->template_id]),
+        $validated = $request->validate([
+                'category_id' => [
+                    'required',
+                    'integer',
+                    Rule::exists('competition_categories', 'id')
+                        ->where(function ($query) use ($competition) {
+                            $query->where('is_active', true)
+                                ->orWhere('id', $competition->category_id);
+                        }),
                 ],
+                'template_id' => $templateRules,
 
                 'title' => ['required','string','max:255',],
                 'description' => ['nullable', 'string',],
@@ -208,7 +269,6 @@ class CompetitionController extends Controller
                 'judging_start' => ['required','date','after_or_equal:registration_end',], 
                 'judging_end' => ['required','date','after_or_equal:judging_start',],
                 'result_announcement' => ['required','date','after_or_equal:judging_end',],
-                'status' => ['required', 'in:open,closed'],
             ], [
                 'category_id.required' => 'กรุณาเลือกหมวดหมู่การแข่งขัน',
                 'category_id.exists' => 'ไม่พบหมวดหมู่การแข่งขันที่เลือก',
@@ -233,8 +293,6 @@ class CompetitionController extends Controller
                 'judging_end.after_or_equal' => 'วันสิ้นสุดการตัดสินต้องไม่อยู่ก่อนวันเริ่มตัดสิน',
                 'result_announcement.required' => 'กรุณาระบุวันประกาศผล',
                 'result_announcement.after_or_equal' => 'วันประกาศผลต้องไม่อยู่ก่อนวันสิ้นสุดการตัดสิน',
-                'status.required' => 'กรุณาเลือกสถานะการแข่งขัน',
-                'status.in' => 'สถานะการแข่งขันไม่ถูกต้อง',
             ]);
 
                 // แปลงค่าจาก Checkbox เป็น true/false
@@ -244,15 +302,38 @@ class CompetitionController extends Controller
                 }
                 // จัดการภาพปกใหม่
                 $oldCoverImage = $competition->cover_image;
-                if ($request->hasFile('cover_image')) {
-                    $validated['cover_image'] = $request
-                        ->file('cover_image')
-                        ->store('competitions', 'public');
+                $newCoverImage = null;
+
+                try {
+                    if ($request->hasFile('cover_image')) {
+                        $newCoverImage = $request
+                            ->file('cover_image')
+                            ->store('competitions', 'public');
+                        $validated['cover_image'] = $newCoverImage;
+                    }
+
+                    // อัปเดตฐานข้อมูล
+                    $competition->update($validated);
+                } catch (Throwable $exception) {
+                    if ($newCoverImage && Str::startsWith($newCoverImage, 'competitions/')) {
+                        try {
+                            Storage::disk('public')->delete($newCoverImage);
+                        } catch (Throwable $cleanupException) {
+                            report($cleanupException);
+                        }
+                    }
+
+                    throw $exception;
                 }
-                // อัปเดตฐานข้อมูล
-                $competition->update($validated);
+
                 // ลบภาพเดิมหลังจากอัปเดตสำเร็จ
-                if (isset($validated['cover_image']) &&$oldCoverImage &&Storage::disk('public')->exists($oldCoverImage)) {
+                if (
+                    $newCoverImage
+                    && $oldCoverImage
+                    && Str::startsWith($oldCoverImage, 'competitions/')
+                    && !Competition::query()->where('cover_image', $oldCoverImage)->exists()
+                    && Storage::disk('public')->exists($oldCoverImage)
+                ) {
                     Storage::disk('public')->delete($oldCoverImage);
                 }
 
@@ -285,6 +366,13 @@ class CompetitionController extends Controller
                 ->with('error', 'ไม่สามารถลบการแข่งขันนี้ได้ เนื่องจากมีข้อมูลผลงาน การตัดสิน หรือรางวัลที่เกี่ยวข้อง');
         }
 
+        $coverImage = $competition->cover_image;
+        $coverIsShared = $coverImage
+            && Competition::query()
+                ->whereKeyNot($competition->getKey())
+                ->where('cover_image', $coverImage)
+                ->exists();
+
         try {
             $competition->delete();
         } catch (QueryException $exception) {
@@ -293,6 +381,18 @@ class CompetitionController extends Controller
             return redirect()
                 ->route('competition-admin.competitions.index')
                 ->with('error', 'ไม่สามารถลบการแข่งขันนี้ได้ เนื่องจากมีข้อมูลที่เกี่ยวข้อง');
+        }
+
+        if (
+            $coverImage
+            && !$coverIsShared
+            && Str::startsWith($coverImage, 'competitions/')
+        ) {
+            try {
+                Storage::disk('public')->delete($coverImage);
+            } catch (Throwable $exception) {
+                report($exception);
+            }
         }
 
         return redirect()

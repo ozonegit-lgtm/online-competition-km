@@ -151,9 +151,13 @@
         $coverUrl = null;
 
         if ($coverImage) {
-            $coverUrl = \Illuminate\Support\Str::startsWith($coverImage, ['http://', 'https://'])
-                ? $coverImage
-                : \Illuminate\Support\Facades\Storage::disk('public')->url($coverImage);
+            $isRemoteCover = \Illuminate\Support\Str::startsWith($coverImage, ['http://', 'https://']);
+
+            if ($isRemoteCover || \Illuminate\Support\Facades\Storage::disk('public')->exists($coverImage)) {
+                $coverUrl = $isRemoteCover
+                    ? $coverImage
+                    : \Illuminate\Support\Facades\Storage::disk('public')->url($coverImage);
+            }
         }
 
         $displayFields = $competition->formFields->isNotEmpty()

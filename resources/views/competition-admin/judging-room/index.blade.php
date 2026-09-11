@@ -45,15 +45,20 @@
                     $coverImage = $competition->cover_image
                         ?: $competition->template?->cover_image;
 
-                    $coverUrl = $coverImage
-                        ? (\Illuminate\Support\Str::startsWith(
+                    $coverUrl = null;
+
+                    if ($coverImage) {
+                        $isRemoteCover = \Illuminate\Support\Str::startsWith(
                             $coverImage,
                             ['http://', 'https://']
-                        )
-                            ? $coverImage
-                            : \Illuminate\Support\Facades\Storage::disk('public')
-                                ->url($coverImage))
-                        : null;
+                        );
+
+                        if ($isRemoteCover || \Illuminate\Support\Facades\Storage::disk('public')->exists($coverImage)) {
+                            $coverUrl = $isRemoteCover
+                                ? $coverImage
+                                : \Illuminate\Support\Facades\Storage::disk('public')->url($coverImage);
+                        }
+                    }
 
                     $templateTitle = $competition->template?->template_name
                         ?? 'ไม่ได้ระบุแบบฟอร์ม';

@@ -79,6 +79,19 @@
                         'upcoming' => 'bg-amber-100 text-amber-700',
                         'waiting_result' => 'bg-slate-100 text-slate-700',
                     ];
+
+                    $coverImage = $competition->cover_image;
+                    $coverUrl = null;
+
+                    if ($coverImage) {
+                        $isRemoteCover = \Illuminate\Support\Str::startsWith($coverImage, ['http://', 'https://']);
+
+                        if ($isRemoteCover || \Illuminate\Support\Facades\Storage::disk('public')->exists($coverImage)) {
+                            $coverUrl = $isRemoteCover
+                                ? $coverImage
+                                : \Illuminate\Support\Facades\Storage::disk('public')->url($coverImage);
+                        }
+                    }
                 @endphp
 
                 <article
@@ -88,10 +101,10 @@
                     {{-- รูปปก --}}
                     <div class="relative h-28 w-full shrink-0 overflow-hidden bg-slate-100 sm:h-32">
 
-                        @if ($competition->cover_image)
+                        @if ($coverUrl)
 
                             <img
-                                src="{{ asset('storage/' . $competition->cover_image) }}"
+                                src="{{ $coverUrl }}"
                                 alt="ภาพปก {{ $competition->title }}"
                                 class="h-full w-full object-cover"
                                 loading="lazy"

@@ -24,9 +24,13 @@
         $currentCoverUrl = null;
 
         if ($currentCover) {
-            $currentCoverUrl = \Illuminate\Support\Str::startsWith($currentCover, ['http://', 'https://'])
-                ? $currentCover
-                : \Illuminate\Support\Facades\Storage::disk('public')->url($currentCover);
+            $isRemoteCover = \Illuminate\Support\Str::startsWith($currentCover, ['http://', 'https://']);
+
+            if ($isRemoteCover || \Illuminate\Support\Facades\Storage::disk('public')->exists($currentCover)) {
+                $currentCoverUrl = $isRemoteCover
+                    ? $currentCover
+                    : \Illuminate\Support\Facades\Storage::disk('public')->url($currentCover);
+            }
         }
 
         $dateValue = function ($date) {
@@ -291,19 +295,19 @@
                 <div class="mt-4 grid gap-4 lg:grid-cols-2">
                     <div>
                         <label for="status" class="block text-sm font-semibold text-slate-700">
-                            สถานะการแข่งขัน <span class="text-red-500">*</span>
+                            สถานะการแข่งขัน
                         </label>
-                        <select id="status" name="status" required
+                        <select id="status" disabled
                             class="mt-2 w-full rounded-xl border bg-slate-50 text-slate-800 outline-none transition focus:bg-white focus:ring-4 {{ $errors->has('status') ? 'border-red-400 focus:border-red-500 focus:ring-red-100' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-100' }} text-sm py-2 h-10 px-3">
 
-
-                            <option value="open" @selected(old('status', $competition->status) === 'open')>เปิดรับผลงาน</option>
-                            <option value="closed" @selected(old('status', $competition->status) === 'closed')>ปิดรับผลงาน</option>
-
+                            <option value="draft" @selected($competition->status === 'draft')>ฉบับร่าง</option>
+                            <option value="open" @selected($competition->status === 'open')>เปิดรับผลงาน</option>
+                            <option value="closed" @selected($competition->status === 'closed')>ปิดรับผลงาน</option>
+                            <option value="judging" @selected($competition->status === 'judging')>กำลังตัดสิน</option>
+                            <option value="completed" @selected($competition->status === 'completed')>เสร็จสิ้น</option>
+                            <option value="archived" @selected($competition->status === 'archived')>เก็บถาวร</option>
                         </select>
-                        @error('status')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                        <p class="mt-2 text-xs text-slate-500">สถานะถูกควบคุมโดยขั้นตอนการรับผลงานและการตัดสิน</p>
                     </div>
 
                 </div>
