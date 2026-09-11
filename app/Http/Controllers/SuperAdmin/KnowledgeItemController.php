@@ -244,6 +244,7 @@ class KnowledgeItemController extends Controller
             'creator:id,username',
             'category:id,category_name,is_active',
             'submission.competition:id,title',
+            'submission.files',
         ]);
 
         return view('superadmin.km.show', compact('knowledgeItem'));

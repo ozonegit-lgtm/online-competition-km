@@ -14,6 +14,19 @@ class KnowledgeItemFileController extends Controller
     {
         $this->authorizeAccess($knowledgeItem);
         $path = $knowledgeItem->cover_image;
+        if (! $path && $knowledgeItem->submission_id === null) {
+            $attachmentMedia = $knowledgeItem->attachmentMedia();
+            abort_unless($attachmentMedia['is_image'], 404);
+
+            return $this->serve(
+                $knowledgeItem,
+                $knowledgeItem->attachment_path,
+                'knowledge-items/attachments/',
+                null,
+                'inline'
+            );
+        }
+
         if (! $path || str_starts_with($path, 'submissions/')) {
             $files = $knowledgeItem->submission?->files();
             $file = $path

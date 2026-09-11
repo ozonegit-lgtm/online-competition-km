@@ -99,6 +99,182 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
         $this->actingAs($super)->get(route('superadmin.km.index'))->assertViewHas('knowledgeItems', fn ($items) => $items->count() === 15 && $items->hasPages());
     }
 
+    public function test_manual_km_cover_takes_priority_over_image_attachment(): void
+    {
+        $super = $this->user('super', 'Super Admin');
+        $category = $this->category();
+        $coverPath = 'knowledge-items/covers/priority.png';
+        $attachmentPath = 'knowledge-items/attachments/fallback.png';
+        Storage::disk('local')->put($coverPath, $this->pngContents());
+        Storage::disk('local')->put($attachmentPath, $this->pngContents());
+        $item = $this->item($super->id, $category, [
+            'cover_image' => $coverPath,
+            'attachment_path' => $attachmentPath,
+            'attachment_original_name' => 'fallback.png',
+        ]);
+
+        foreach (['superadmin.km.index', 'superadmin.km.show'] as $route) {
+            $this->actingAs($super)
+                ->get(route($route, $route === 'superadmin.km.show' ? $item : []))
+                ->assertOk()
+                ->assertSee('data-km-media="cover"', false)
+                ->assertDontSee('ใช้รูปจากไฟล์แนบ');
+        }
+    }
+
+    public function test_manual_km_image_attachments_use_secure_cover_fallback(): void
+    {
+        $super = $this->user('super', 'Super Admin');
+        $category = $this->category();
+
+        foreach (['jpg', 'jpeg', 'png', 'webp'] as $extension) {
+            $path = "knowledge-items/attachments/image.{$extension}";
+            Storage::disk('local')->put($path, $this->pngContents());
+            $item = $this->item($super->id, $category, [
+                'attachment_path' => $path,
+                'attachment_original_name' => "image.{$extension}",
+            ]);
+
+            $this->assertTrue($item->attachmentMedia()['is_image']);
+            $previewUrl = route('knowledge-items.cover', $item);
+            $this->actingAs($super)
+                ->get(route('superadmin.km.show', $item))
+                ->assertOk()
+                ->assertSee('data-km-media="attachment-image"', false)
+                ->assertSee('src="'.$previewUrl.'"', false)
+                ->assertSee('ใช้รูปจากไฟล์แนบ');
+            $this->actingAs($super)
+                ->get($previewUrl)
+                ->assertOk();
+        }
+
+        $this->actingAs($super)
+            ->get(route('superadmin.km.index'))
+            ->assertOk()
+            ->assertSee('data-km-media="attachment-image"', false)
+            ->assertSee('data-km-card-grid', false)
+            ->assertSee('md:grid-cols-2', false)
+            ->assertSee('xl:grid-cols-3', false);
+    }
+
+    public function test_manual_km_documents_show_sanitized_file_types_without_image_tags(): void
+    {
+        $super = $this->user('super', 'Super Admin');
+        $category = $this->category();
+        $items = [];
+
+        foreach (['pdf', 'doc', 'docx', 'ppt', 'pptx', 'zip'] as $extension) {
+            $path = "knowledge-items/attachments/document.{$extension}";
+            Storage::disk('local')->put($path, "document {$extension}");
+            $items[$extension] = $this->item($super->id, $category, [
+                'attachment_path' => $path,
+                'attachment_original_name' => "document.{$extension}",
+            ]);
+        }
+
+        $index = $this->actingAs($super)
+            ->get(route('superadmin.km.index'))
+            ->assertOk();
+
+        foreach ($items as $extension => $item) {
+            $type = strtoupper($extension);
+            $index
+                ->assertSee('data-file-type="'.$type.'"', false)
+                ->assertDontSee('src="'.route('knowledge-items.attachment', $item).'"', false);
+            $this->actingAs($super)
+                ->get(route('superadmin.km.show', $item))
+                ->assertOk()
+                ->assertSee('data-file-type="'.$type.'"', false)
+                ->assertSee("ไฟล์แนบเป็นเอกสาร {$type}")
+                ->assertDontSee('src="'.route('knowledge-items.attachment', $item).'"', false);
+        }
+    }
+
+    public function test_manual_km_without_media_and_missing_image_attachment_use_empty_placeholder(): void
+    {
+        $super = $this->user('super', 'Super Admin');
+        $category = $this->category();
+        $emptyItem = $this->item($super->id, $category);
+        $missingItem = $this->item($super->id, $category, [
+            'attachment_path' => 'knowledge-items/attachments/missing.png',
+            'attachment_original_name' => 'missing.png',
+        ]);
+
+        $this->assertNull($emptyItem->cover_image_url);
+        $this->assertNull($missingItem->cover_image_url);
+
+        foreach ([$emptyItem, $missingItem] as $item) {
+            $this->actingAs($super)
+                ->get(route('superadmin.km.show', $item))
+                ->assertOk()
+                ->assertSee('data-km-media="empty"', false)
+                ->assertDontSee('data-km-media="attachment-image"', false);
+        }
+
+        $this->actingAs($super)
+            ->get(route('superadmin.km.index'))
+            ->assertOk()
+            ->assertSee('data-km-media="empty"', false);
+    }
+
+    public function test_competition_km_keeps_cover_then_submission_image_fallback(): void
+    {
+        $super = $this->user('super', 'Super Admin');
+        $owner = $this->user('owner', 'Competition Admin');
+        $category = $this->category();
+        $competition = $this->competition($owner, $category);
+        $submission = $this->submission($competition);
+        JudgingSession::create([
+            'competition_id' => $competition->id,
+            'controller_user_id' => $owner->id,
+            'status' => 'ended',
+            'started_at' => now()->subHour(),
+            'ended_at' => now(),
+        ]);
+        SubmissionFile::create([
+            'submission_id' => $submission->id,
+            'original_name' => 'primary.pdf',
+            'stored_name' => 'primary.pdf',
+            'file_path' => "submissions/{$competition->id}/{$submission->submission_code}/primary.pdf",
+            'file_extension' => 'pdf',
+            'mime_type' => 'application/pdf',
+            'file_size' => 10,
+            'is_primary' => true,
+        ]);
+        $image = SubmissionFile::create([
+            'submission_id' => $submission->id,
+            'original_name' => 'image.png',
+            'stored_name' => 'image.png',
+            'file_path' => "submissions/{$competition->id}/{$submission->submission_code}/image.png",
+            'file_extension' => 'png',
+            'mime_type' => 'image/png',
+            'file_size' => 10,
+            'is_primary' => false,
+        ]);
+        Storage::disk('local')->put($image->file_path, $this->pngContents());
+        $item = $this->item($owner->id, $category, [
+            'submission_id' => $submission->id,
+        ]);
+
+        foreach (['superadmin.km.index', 'superadmin.km.show'] as $route) {
+            $this->actingAs($super)
+                ->get(route($route, $route === 'superadmin.km.show' ? $item : []))
+                ->assertOk()
+                ->assertSee('data-km-media="submission-image"', false)
+                ->assertSee('src="'.$image->file_url.'"', false);
+        }
+
+        $coverPath = 'knowledge-items/covers/competition-cover.png';
+        Storage::disk('local')->put($coverPath, $this->pngContents());
+        $item->update(['cover_image' => $coverPath]);
+
+        $this->actingAs($super)
+            ->get(route('superadmin.km.index'))
+            ->assertOk()
+            ->assertSee('data-km-media="cover"', false)
+            ->assertSee('src="'.$item->cover_image_url.'"', false);
+    }
+
     public function test_store_creates_secure_manual_item_with_random_files(): void
     {
         $super = $this->user('super', 'Super Admin');
@@ -325,7 +501,12 @@ class SuperAdminKnowledgeItemCrudTest extends TestCase
 
     private function png(string $name): UploadedFile
     {
-        return $this->upload($name, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='));
+        return $this->upload($name, $this->pngContents());
+    }
+
+    private function pngContents(): string
+    {
+        return base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=');
     }
 
     private function pdf(string $name): UploadedFile

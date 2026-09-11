@@ -13,6 +13,7 @@ use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class KnowledgeManagementPublicationTest extends TestCase
@@ -239,6 +240,80 @@ class KnowledgeManagementPublicationTest extends TestCase
         $this->get(route('home'))->assertOk()
             ->assertViewHas('knowledgeItems', fn ($items) => ! $items->contains('id', $item->id))
             ->assertViewHas('featuredItems', fn ($items) => ! $items->contains('id', $item->id));
+    }
+
+    public function test_public_manual_km_uses_secure_image_attachment_fallback(): void
+    {
+        Storage::fake('local');
+        $context = $this->context();
+        $path = 'knowledge-items/attachments/manual-image.png';
+        Storage::disk('local')->put($path, $this->pngContents());
+        $item = KnowledgeItem::create([
+            'category_id' => $context['competition']->category_id,
+            'created_by' => $context['owner']->id,
+            'title' => 'Published manual image attachment',
+            'attachment_path' => $path,
+            'attachment_original_name' => 'manual-image.png',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+        $previewUrl = route('knowledge-items.cover', $item);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('data-km-media="attachment-image"', false)
+            ->assertSee('src="'.$previewUrl.'"', false)
+            ->assertDontSee('/storage/knowledge-items/', false);
+        $this->get($previewUrl)->assertOk();
+    }
+
+    public function test_public_manual_km_document_uses_type_placeholder(): void
+    {
+        Storage::fake('local');
+        $context = $this->context();
+        $path = 'knowledge-items/attachments/manual-document.docx';
+        Storage::disk('local')->put($path, 'docx document');
+        $item = KnowledgeItem::create([
+            'category_id' => $context['competition']->category_id,
+            'created_by' => $context['owner']->id,
+            'title' => 'Published manual DOCX attachment',
+            'attachment_path' => $path,
+            'attachment_original_name' => 'manual-document.docx',
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('data-km-media="document"', false)
+            ->assertSee('data-file-type="DOCX"', false)
+            ->assertDontSee('src="'.route('knowledge-items.attachment', $item).'"', false)
+            ->assertDontSee('src="'.route('knowledge-items.cover', $item).'"', false);
+    }
+
+    public function test_manual_media_fallback_does_not_expose_draft_or_hidden_items(): void
+    {
+        Storage::fake('local');
+        $context = $this->context();
+        $path = 'knowledge-items/attachments/private-image.png';
+        Storage::disk('local')->put($path, $this->pngContents());
+
+        foreach (['draft', 'hidden'] as $status) {
+            $item = KnowledgeItem::create([
+                'category_id' => $context['competition']->category_id,
+                'created_by' => $context['owner']->id,
+                'title' => "Private manual {$status}",
+                'attachment_path' => $path,
+                'attachment_original_name' => 'private-image.png',
+                'status' => $status,
+            ]);
+
+            $this->get(route('home'))
+                ->assertOk()
+                ->assertDontSee($item->title)
+                ->assertDontSee(route('knowledge-items.cover', $item), false);
+            $this->get(route('knowledge-items.cover', $item))->assertNotFound();
+        }
     }
 
     public function test_result_image_access_tracks_publication_and_judging_views_use_routes(): void
@@ -477,5 +552,10 @@ class KnowledgeManagementPublicationTest extends TestCase
             'password' => 'password',
             'is_active' => true,
         ]);
+    }
+
+    private function pngContents(): string
+    {
+        return base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=');
     }
 }

@@ -4,6 +4,47 @@
 
 @section('content')
 <div class="min-h-screen bg-slate-50">
+    @php
+        $resolveKmMedia = static function ($item): array {
+            if ($item->cover_image) {
+                return [
+                    'url' => $item->cover_image_url,
+                    'kind' => 'cover',
+                    'document_type' => null,
+                ];
+            }
+
+            if ($item->submission_id === null) {
+                $attachmentMedia = $item->attachmentMedia();
+
+                return [
+                    'url' => $attachmentMedia['is_image']
+                        ? route('knowledge-items.cover', $item)
+                        : null,
+                    'kind' => $attachmentMedia['is_image']
+                        ? 'attachment-image'
+                        : ($attachmentMedia['exists'] ? 'document' : 'empty'),
+                    'document_type' => $attachmentMedia['exists'] && ! $attachmentMedia['is_image']
+                        ? $attachmentMedia['type']
+                        : null,
+                ];
+            }
+
+            $submissionImage = $item->submission?->files
+                ?->filter(fn ($file) => str_starts_with((string) $file->mime_type, 'image/'))
+                ->sortBy([
+                    ['is_primary', 'desc'],
+                    ['id', 'asc'],
+                ])
+                ->first();
+
+            return [
+                'url' => $submissionImage?->file_url,
+                'kind' => $submissionImage ? 'submission-image' : 'empty',
+                'document_type' => null,
+            ];
+        };
+    @endphp
 
     {{-- =========================================================
         HERO
@@ -659,7 +700,8 @@
                         @php
                             $submission = $item->submission;
                             $isManual = $item->submission_id === null;
-                            $imageUrl = $item->cover_image_url;
+                            $media = $resolveKmMedia($item);
+                            $imageUrl = $media['url'];
 
                             $sourceType = $isManual
                                 ? 'องค์ความรู้'
@@ -683,12 +725,29 @@
                                     @if ($imageUrl)
 
                                         <img
+                                            data-km-media="{{ $media['kind'] }}"
                                             src="{{ $imageUrl }}"
                                             alt="{{ $item->title }}"
                                             class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                                             loading="lazy"
                                             data-km-image
                                         >
+
+                                    @elseif ($media['document_type'])
+
+                                        <div data-km-media="document" data-file-type="{{ $media['document_type'] }}" class="flex h-full flex-col items-center justify-center gap-2 text-slate-500">
+                                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/80 shadow-sm ring-1 ring-slate-200/80">
+                                                <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                    <path d="M6 2h9l3 3v17H6z"/>
+                                                    <path d="M14 2v4h4"/>
+                                                    <path d="M9 13h6M9 17h4"/>
+                                                </svg>
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="text-sm font-bold text-slate-700">{{ $media['document_type'] }}</p>
+                                                <p class="mt-0.5 text-xs">เอกสารแนบ</p>
+                                            </div>
+                                        </div>
 
                                     @else
 
@@ -972,7 +1031,8 @@
                         @php
                             $submission = $item->submission;
                             $isManual = $item->submission_id === null;
-                            $imageUrl = $item->cover_image_url;
+                            $media = $resolveKmMedia($item);
+                            $imageUrl = $media['url'];
 
                             $sourceType = $isManual
                                 ? 'องค์ความรู้'
@@ -1000,12 +1060,29 @@
                                     @if ($imageUrl)
 
                                         <img
+                                            data-km-media="{{ $media['kind'] }}"
                                             src="{{ $imageUrl }}"
                                             alt="{{ $item->title }}"
                                             class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                                             loading="lazy"
                                             data-km-image
                                         >
+
+                                    @elseif ($media['document_type'])
+
+                                        <div data-km-media="document" data-file-type="{{ $media['document_type'] }}" class="flex h-full flex-col items-center justify-center gap-2 text-slate-500">
+                                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/85 shadow-sm ring-1 ring-slate-200/80">
+                                                <svg class="h-6 w-6 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                    <path d="M6 2h9l3 3v17H6z"/>
+                                                    <path d="M14 2v4h4"/>
+                                                    <path d="M9 13h6M9 17h4"/>
+                                                </svg>
+                                            </div>
+                                            <div class="text-center">
+                                                <p class="text-sm font-bold text-slate-700">{{ $media['document_type'] }}</p>
+                                                <p class="mt-0.5 text-xs">เอกสารแนบ</p>
+                                            </div>
+                                        </div>
 
                                     @else
 

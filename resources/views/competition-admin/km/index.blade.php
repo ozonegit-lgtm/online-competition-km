@@ -312,7 +312,7 @@
     </div>
 
     {{-- CARDS --}}
-    <div class="grid gap-3 xl:grid-cols-2">
+    <div data-km-card-grid class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
 
         {{-- MANUAL KNOWLEDGE --}}
         @foreach($knowledgeItems as $item)
@@ -331,24 +331,66 @@
                         'class' => 'bg-slate-100 text-slate-600',
                     ],
                 };
+                $attachmentMedia = $item->attachmentMedia();
+                $mediaUrl = $item->cover_image
+                    ? $item->cover_image_url
+                    : ($attachmentMedia['is_image']
+                        ? route('knowledge-items.cover', $item)
+                        : null);
+                $mediaKind = $item->cover_image
+                    ? 'cover'
+                    : ($attachmentMedia['is_image'] ? 'attachment-image' : null);
             @endphp
 
             <article class="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md">
-                <div class="flex flex-1 flex-col p-4">
+                <div class="relative h-32 overflow-hidden bg-slate-100">
+                    @if($mediaUrl)
+                        <img
+                            data-km-media="{{ $mediaKind }}"
+                            src="{{ $mediaUrl }}"
+                            alt="{{ $item->title }}"
+                            class="h-full w-full object-cover"
+                            loading="lazy"
+                        >
+                    @elseif($attachmentMedia['exists'])
+                        <div data-km-media="document" data-file-type="{{ $attachmentMedia['type'] }}" class="flex h-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-50 to-slate-100 p-4 text-center">
+                            <svg class="h-9 w-9 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                <path d="M6 2h9l3 3v17H6z"/>
+                                <path d="M14 2v4h4"/>
+                                <path d="M9 13h6M9 17h4"/>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-bold text-slate-700">{{ $attachmentMedia['type'] }}</p>
+                                <p class="mt-0.5 text-xs text-slate-500">เอกสารแนบ</p>
+                            </div>
+                        </div>
+                    @else
+                        <div data-km-media="empty" class="flex h-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-50 to-slate-100 p-4 text-center text-slate-400">
+                            <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="16" rx="2"/>
+                                <circle cx="8.5" cy="9" r="1.5"/>
+                                <path d="m4 17 5-5 4 4 2-2 5 4"/>
+                            </svg>
+                            <p class="text-xs font-medium">ไม่มีรูปปกหรือไฟล์แนบ</p>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="flex flex-1 flex-col p-3">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
+                        <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
                             <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5Z"/>
                             </svg>
                             องค์ความรู้
                         </span>
 
-                        <span class="rounded-full px-2.5 py-1 text-[11px] font-semibold {{ $statusConfig['class'] }}">
+                        <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $statusConfig['class'] }}">
                             {{ $statusConfig['label'] }}
                         </span>
 
                         @if($item->is_featured)
-                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700">
+                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
                                 <svg class="h-3.5 w-3.5 fill-amber-400" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="m12 2.7 2.85 5.78 6.38.93-4.62 4.5 1.09 6.35L12 17.26l-5.7 3 1.09-6.35-4.62-4.5 6.38-.93L12 2.7Z"/>
                                 </svg>
@@ -357,17 +399,17 @@
                         @endif
                     </div>
 
-                    <h3 class="mt-3 line-clamp-2 text-base font-semibold leading-6 text-slate-900 transition group-hover:text-blue-700">
+                    <h3 class="mt-2 line-clamp-2 text-sm font-semibold leading-5 text-slate-900 transition group-hover:text-blue-700">
                         {{ $item->title }}
                     </h3>
 
                     @if($item->summary)
-                        <p class="mt-1.5 line-clamp-2 text-xs leading-5 text-slate-500">
+                        <p class="mt-1 line-clamp-2 text-xs leading-4 text-slate-500">
                             {{ $item->summary }}
                         </p>
                     @endif
 
-                    <div class="mt-3 grid grid-cols-2 gap-3 rounded-xl bg-slate-50 px-3 py-3">
+                    <div class="mt-2 grid grid-cols-2 gap-2 rounded-xl bg-slate-50 px-2.5 py-2">
                         <div class="min-w-0">
                             <p class="flex items-center gap-1 text-[10px] font-medium text-slate-400">
                                 <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -421,7 +463,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-auto grid grid-cols-2 gap-1.5 border-t border-slate-100 pt-3 sm:grid-cols-3">
+                    <div class="mt-auto grid grid-cols-2 gap-1.5 border-t border-slate-100 pt-2 sm:grid-cols-3">
                         @can('view', $item)
                             <a
                                 href="{{ route('competition-admin.km.show', $item) }}"
@@ -546,27 +588,59 @@
                         'class' => 'bg-slate-100 text-slate-600',
                     ],
                 };
+                $submissionImage = $submission->files
+                    ->filter(fn ($file) => str_starts_with((string) $file->mime_type, 'image/'))
+                    ->sortBy([
+                        ['is_primary', 'desc'],
+                        ['id', 'asc'],
+                    ])
+                    ->first();
+                $mediaUrl = $knowledgeItem?->cover_image
+                    ? $knowledgeItem->cover_image_url
+                    : $submissionImage?->file_url;
+                $mediaKind = $knowledgeItem?->cover_image ? 'cover' : 'submission-image';
             @endphp
 
             <article
                 id="km-submission-{{ $submission->id }}"
                 class="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md"
             >
-                <div class="flex flex-1 flex-col p-4">
+                <div class="relative h-32 overflow-hidden bg-slate-100">
+                    @if($mediaUrl)
+                        <img
+                            data-km-media="{{ $mediaKind }}"
+                            src="{{ $mediaUrl }}"
+                            alt="{{ $submission->project_title }}"
+                            class="h-full w-full object-cover"
+                            loading="lazy"
+                        >
+                    @else
+                        <div data-km-media="empty" class="flex h-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-50 to-slate-100 p-4 text-center text-slate-400">
+                            <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="16" rx="2"/>
+                                <circle cx="8.5" cy="9" r="1.5"/>
+                                <path d="m4 17 5-5 4 4 2-2 5 4"/>
+                            </svg>
+                            <p class="text-xs font-medium">ไม่มีรูปผลงาน</p>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="flex flex-1 flex-col p-3">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-2.5 py-1 text-[11px] font-semibold text-violet-700">
+                        <span class="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-semibold text-violet-700">
                             <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4ZM5 6H3v2a4 4 0 0 0 4 4M19 6h2v2a4 4 0 0 1-4 4"/>
                             </svg>
                             การแข่งขัน
                         </span>
 
-                        <span class="rounded-full px-2.5 py-1 text-[11px] font-semibold {{ $statusConfig['class'] }}">
+                        <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $statusConfig['class'] }}">
                             {{ $statusConfig['label'] }}
                         </span>
 
                         @if($knowledgeItem?->is_featured)
-                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700">
+                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
                                 <svg class="h-3.5 w-3.5 fill-amber-400" viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="m12 2.7 2.85 5.78 6.38.93-4.62 4.5 1.09 6.35L12 17.26l-5.7 3 1.09-6.35-4.62-4.5 6.38-.93L12 2.7Z"/>
                                 </svg>
@@ -575,7 +649,7 @@
                         @endif
                     </div>
 
-                    <h3 class="mt-3 line-clamp-2 text-base font-semibold leading-6 text-slate-900 transition group-hover:text-violet-700">
+                    <h3 class="mt-2 line-clamp-2 text-sm font-semibold leading-5 text-slate-900 transition group-hover:text-violet-700">
                         {{ $submission->project_title }}
                     </h3>
 
@@ -588,12 +662,12 @@
                     </p>
 
                     @if($submission->project_description)
-                        <p class="mt-1.5 line-clamp-2 text-xs leading-5 text-slate-500">
+                        <p class="mt-1 line-clamp-2 text-xs leading-4 text-slate-500">
                             {{ $submission->project_description }}
                         </p>
                     @endif
 
-                    <div class="mt-3 grid grid-cols-2 gap-3 rounded-xl bg-slate-50 px-3 py-3">
+                    <div class="mt-2 grid grid-cols-2 gap-2 rounded-xl bg-slate-50 px-2.5 py-2">
                         <div class="min-w-0">
                             <p class="flex items-center gap-1 text-[10px] font-medium text-slate-400">
                                 <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -648,7 +722,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-auto grid grid-cols-2 gap-1.5 border-t border-slate-100 pt-3 sm:grid-cols-3">
+                    <div class="mt-auto grid grid-cols-2 gap-1.5 border-t border-slate-100 pt-2 sm:grid-cols-3">
                         @if($knowledgeItem)
                             @can('view', $knowledgeItem)
                                 <a
@@ -713,7 +787,7 @@
 
         {{-- EMPTY --}}
         @if(!$hasKnowledgeItems && !$hasSubmissions)
-            <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center shadow-sm xl:col-span-2">
+            <div class="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center shadow-sm md:col-span-2 xl:col-span-3">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-16Z"/>

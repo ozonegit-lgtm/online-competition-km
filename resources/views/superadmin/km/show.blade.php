@@ -25,6 +25,28 @@
 @section('content')
     @php
         $isCompetition = $knowledgeItem->submission_id !== null;
+        $attachmentMedia = ! $isCompetition
+            ? $knowledgeItem->attachmentMedia()
+            : ['exists' => false, 'is_image' => false, 'type' => 'FILE'];
+        $submissionImage = $isCompetition
+            ? $knowledgeItem->submission?->files
+                ?->filter(fn ($file) => str_starts_with((string) $file->mime_type, 'image/'))
+                ->sortBy([
+                    ['is_primary', 'desc'],
+                    ['id', 'asc'],
+                ])
+                ->first()
+            : null;
+        $coverUrl = $knowledgeItem->cover_image
+            ? $knowledgeItem->cover_image_url
+            : ($isCompetition
+                ? $submissionImage?->file_url
+                : ($attachmentMedia['is_image']
+                    ? route('knowledge-items.cover', $knowledgeItem)
+                    : null));
+        $mediaKind = $knowledgeItem->cover_image
+            ? 'cover'
+            : ($isCompetition ? 'submission-image' : 'attachment-image');
 
         $statusLabel = match ($knowledgeItem->status) {
             'published' => 'เผยแพร่แล้ว',
@@ -327,20 +349,35 @@
                         </div>
                     </div>
 
-                    @if ($knowledgeItem->cover_image)
-                        @php
-                            $coverUrl = $knowledgeItem->cover_image_url;
-                        @endphp
-
+                    @if ($coverUrl)
                         <div class="flex min-h-[180px] items-center justify-center bg-slate-50 p-4 sm:min-h-[240px] sm:p-5">
                             <img
+                                data-km-media="{{ $mediaKind }}"
                                 src="{{ $coverUrl }}"
                                 alt="{{ $knowledgeItem->title }}"
                                 class="max-h-[360px] w-auto max-w-full rounded-xl object-contain shadow-sm"
                             >
                         </div>
+                        @if(! $knowledgeItem->cover_image)
+                            <div class="border-t border-slate-100 bg-slate-50 px-4 py-2 text-xs text-slate-500 sm:px-5">
+                                {{ $isCompetition ? 'ใช้รูปจากไฟล์ผลงาน' : 'ใช้รูปจากไฟล์แนบ' }}
+                            </div>
+                        @endif
+                    @elseif(! $isCompetition && $attachmentMedia['exists'])
+                        <div data-km-media="document" data-file-type="{{ $attachmentMedia['type'] }}" class="flex min-h-[180px] flex-col items-center justify-center gap-3 bg-slate-50 p-5 text-center sm:min-h-[240px]">
+                            <svg class="h-11 w-11 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                <path d="M6 2h9l3 3v17H6z"/>
+                                <path d="M14 2v4h4"/>
+                                <path d="M9 13h6M9 17h4"/>
+                            </svg>
+                            <div>
+                                <p class="text-base font-bold text-slate-700">{{ $attachmentMedia['type'] }}</p>
+                                <p class="mt-1 text-xs font-semibold text-slate-500">ไม่มีรูปปก</p>
+                                <p class="mt-0.5 text-xs text-slate-400">ไฟล์แนบเป็นเอกสาร {{ $attachmentMedia['type'] }}</p>
+                            </div>
+                        </div>
                     @else
-                        <div class="flex items-center gap-3 bg-slate-50 px-4 py-5 text-slate-400 sm:px-5">
+                        <div data-km-media="empty" class="flex items-center gap-3 bg-slate-50 px-4 py-5 text-slate-400 sm:px-5">
                             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white ring-1 ring-slate-200">
                                 <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                     <rect x="3" y="4" width="18" height="16" rx="2"/>
