@@ -239,7 +239,7 @@
                     name="cover_image"
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    class="mt-4 block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-white p-2 text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-emerald-700 hover:border-emerald-300 hover:file:bg-emerald-100 focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
+                    class="mt-4 block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-white p-2 text-xs text-slate-500 file:mr-3 file:h-8 file:cursor-pointer file:rounded-lg file:border-0 file:bg-emerald-50 file:px-3 file:py-0 file:text-xs file:font-semibold file:text-emerald-700 hover:border-emerald-300 hover:file:bg-emerald-100 focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
                 >
 
                 @error('cover_image')
@@ -307,7 +307,7 @@
                     name="attachment"
                     type="file"
                     accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.ppt,.pptx,.zip"
-                    class="mt-4 block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-white p-2 text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-blue-700 hover:border-blue-300 hover:file:bg-blue-100 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                    class="mt-4 block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-white p-2 text-xs text-slate-500 file:mr-3 file:h-8 file:cursor-pointer file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-0 file:text-xs file:font-semibold file:text-blue-700 hover:border-blue-300 hover:file:bg-blue-100 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
                 >
 
                 @error('attachment')

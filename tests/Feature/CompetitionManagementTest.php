@@ -7,6 +7,7 @@ use App\Models\CompetitionCategory;
 use App\Models\CompetitionTemplate;
 use App\Models\CompetitionTemplateFormField;
 use App\Models\Role;
+use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -191,6 +192,58 @@ class CompetitionManagementTest extends TestCase
             'title' => 'Owner Updated Competition',
             'created_by' => $owner->id,
         ]);
+    }
+
+    public function test_competition_admin_can_delete_own_competition_without_dependent_data(): void
+    {
+        [$admin, $category, $template] = $this->context('admin');
+        $competition = $this->competition($admin, $category, $template);
+
+        $this->actingAs($admin)
+            ->delete(route('competition-admin.competitions.destroy', $competition))
+            ->assertRedirect(route('competition-admin.competitions.index'))
+            ->assertSessionHas('success', 'ลบการแข่งขันเรียบร้อยแล้ว');
+
+        $this->assertDatabaseMissing('competitions', ['id' => $competition->id]);
+    }
+
+    public function test_competition_admin_cannot_delete_another_admins_competition(): void
+    {
+        [$owner, $category, $template] = $this->context('owner');
+        $otherAdmin = $this->user('other-admin');
+        $competition = $this->competition($owner, $category, $template);
+
+        $this->actingAs($otherAdmin)
+            ->delete(route('competition-admin.competitions.destroy', $competition))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('competitions', ['id' => $competition->id]);
+    }
+
+    public function test_competition_with_dependent_data_is_not_deleted_or_returned_as_500(): void
+    {
+        [$admin, $category, $template] = $this->context('admin');
+        $competition = $this->competition($admin, $category, $template);
+        $submission = Submission::create([
+            'competition_id' => $competition->id,
+            'submission_code' => 'SUB-DELETE-BLOCK',
+            'project_title' => 'Protected submission',
+            'contact_name' => 'Test Owner',
+            'contact_email' => 'owner@example.com',
+            'contact_phone' => '0800000000',
+            'status' => 'submitted',
+            'submitted_at' => now(),
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->delete(route('competition-admin.competitions.destroy', $competition));
+
+        $response
+            ->assertRedirect(route('competition-admin.competitions.index'))
+            ->assertSessionHas('error');
+        $this->assertNotSame(500, $response->getStatusCode());
+        $this->assertDatabaseHas('competitions', ['id' => $competition->id]);
+        $this->assertDatabaseHas('submissions', ['id' => $submission->id]);
     }
 
     private function context(string $username, bool $withField = true): array

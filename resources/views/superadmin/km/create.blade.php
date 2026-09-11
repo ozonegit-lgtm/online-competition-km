@@ -88,13 +88,13 @@
                     ตรวจสอบข้อมูลให้ครบถ้วนก่อนบันทึก
                 </p>
 
-                <div class="flex flex-col gap-2 sm:flex-row">
+                <div class="flex flex-col gap-1.5 sm:flex-row">
                     <a
                         href="{{ route('superadmin.km.index') }}"
-                        class="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-600 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-200/60"
+                        class="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300"
                     >
                         <svg
-                            class="h-4 w-4"
+                            class="h-3.5 w-3.5"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -109,10 +109,10 @@
 
                     <button
                         type="submit"
-                        class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/20"
+                        class="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                     >
                         <svg
-                            class="h-4 w-4"
+                            class="h-3.5 w-3.5"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"

@@ -30,7 +30,7 @@ services:
       - competition_km_network
 
   db:
-    image: mariadb:10.4
+    image: mariadb:11.4.13
     container_name: competition_km_db
     restart: unless-stopped
     ports:
@@ -41,7 +41,7 @@ services:
       MARIADB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD in .env}
     volumes:
-      - competition_km_db_data:/var/lib/mysql
+      - competition_km_db_data_114:/var/lib/mysql
     healthcheck:
       test:
         [
@@ -90,5 +90,6 @@ networks:
 
 volumes:
   competition_km_db_data:
+  competition_km_db_data_114:
   competition_km_node_modules:
   competition_km_vendor:

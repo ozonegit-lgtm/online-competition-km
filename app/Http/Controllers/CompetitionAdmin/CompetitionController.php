@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CompetitionFormField;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Submission;
@@ -268,6 +269,34 @@ class CompetitionController extends Controller
 
     public function destroy(Competition $competition)
     {
-        //
+        abort_unless(
+            (int) $competition->created_by === (int) Auth::id(),
+            403
+        );
+
+        if (
+            $competition->submissions()->exists()
+            || $competition->judgeAssignments()->exists()
+            || $competition->judgingSession()->exists()
+            || $competition->awards()->exists()
+        ) {
+            return redirect()
+                ->route('competition-admin.competitions.index')
+                ->with('error', 'ไม่สามารถลบการแข่งขันนี้ได้ เนื่องจากมีข้อมูลผลงาน การตัดสิน หรือรางวัลที่เกี่ยวข้อง');
+        }
+
+        try {
+            $competition->delete();
+        } catch (QueryException $exception) {
+            report($exception);
+
+            return redirect()
+                ->route('competition-admin.competitions.index')
+                ->with('error', 'ไม่สามารถลบการแข่งขันนี้ได้ เนื่องจากมีข้อมูลที่เกี่ยวข้อง');
+        }
+
+        return redirect()
+            ->route('competition-admin.competitions.index')
+            ->with('success', 'ลบการแข่งขันเรียบร้อยแล้ว');
     }
 }

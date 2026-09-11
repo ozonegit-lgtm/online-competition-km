@@ -69,4 +69,18 @@ fi
 
 echo 'Laravel runtime directories are ready.'
 
+if [ "${APP_OPTIMIZE:-false}" = "true" ]; then
+    if [ "${APP_ENV:-}" != "production" ]; then
+        echo 'APP_OPTIMIZE=true is only allowed with APP_ENV=production.' >&2
+        exit 1
+    fi
+
+    echo 'Rebuilding Laravel production caches...'
+    php artisan optimize --no-ansi
+
+    if [ "$(id -u)" -eq 0 ]; then
+        chown -R www-data:www-data /var/www/html/storage/framework /var/www/html/bootstrap/cache
+    fi
+fi
+
 exec /usr/local/bin/docker-php-entrypoint "$@"
