@@ -103,6 +103,44 @@ class CompetitionManagementTest extends TestCase
         ]);
     }
 
+    public function test_update_rejects_equal_registration_start_and_end(): void
+    {
+        [$admin, $category, $template] = $this->context('equal-registration');
+        $competition = $this->competition($admin, $category, $template);
+
+        $this->actingAs($admin)->put(
+            route('competition-admin.competitions.update', $competition),
+            $this->updatePayload($competition, $category, [
+                'registration_start' => '2026-09-01 09:00:00',
+                'registration_end' => '2026-09-01 09:00:00',
+            ])
+        )->assertSessionHasErrors('registration_end');
+
+        $this->assertSame(
+            '2026-09-02 09:00:00',
+            $competition->fresh()->registration_end->format('Y-m-d H:i:s')
+        );
+    }
+
+    public function test_update_rejects_equal_judging_start_and_end(): void
+    {
+        [$admin, $category, $template] = $this->context('equal-judging');
+        $competition = $this->competition($admin, $category, $template);
+
+        $this->actingAs($admin)->put(
+            route('competition-admin.competitions.update', $competition),
+            $this->updatePayload($competition, $category, [
+                'judging_start' => '2026-09-02 09:00:00',
+                'judging_end' => '2026-09-02 09:00:00',
+            ])
+        )->assertSessionHasErrors('judging_end');
+
+        $this->assertSame(
+            '2026-09-03 09:00:00',
+            $competition->fresh()->judging_end->format('Y-m-d H:i:s')
+        );
+    }
+
     public function test_competition_admin_cannot_update_another_admins_competition(): void
     {
         [$owner, $category, $template] = $this->context('owner');

@@ -50,6 +50,116 @@ class SubmissionTest extends TestCase
         $this->assertSame('0812345678', $submission->contact_phone);
     }
 
+    public function test_project_description_is_optional_and_persists_when_submitted(): void
+    {
+        $competition = $this->competition();
+        $this->field($competition, ['is_required' => false]);
+
+        $this->submit($competition, [
+            'project_description' => 'A detailed description of the project.',
+        ])->assertRedirect();
+
+        $this->assertSame(
+            'A detailed description of the project.',
+            Submission::sole()->project_description
+        );
+
+        $otherCompetition = $this->competition();
+        $this->field($otherCompetition, ['is_required' => false]);
+        $this->submit($otherCompetition)->assertRedirect();
+        $this->assertNull(
+            Submission::where('competition_id', $otherCompetition->id)->sole()->project_description
+        );
+    }
+
+    public function test_oversized_project_description_is_rejected_and_preserved_as_old_input(): void
+    {
+        $competition = $this->competition();
+        $this->field($competition, ['is_required' => false]);
+        $description = str_repeat('x', 10001);
+
+        $this->from(route('competitions.submissions.create', $competition))
+            ->submit($competition, ['project_description' => $description])
+            ->assertSessionHasErrors('project_description')
+            ->assertSessionHasInput('project_description', $description);
+
+        $this->assertDatabaseCount('submissions', 0);
+    }
+
+    public function test_team_competition_persists_multiple_members(): void
+    {
+        $competition = $this->competition();
+        $competition->update(['competition_type' => 'team']);
+        $this->field($competition, ['is_required' => false]);
+
+        $this->submit($competition, [
+            'team_name' => 'Innovation Team',
+            'members' => [
+                [
+                    'fullname' => 'Leader One',
+                    'email' => 'leader@example.com',
+                    'phone' => '0812345678',
+                    'organization' => 'Example Org',
+                    'position' => 'Lead',
+                    'is_team_leader' => true,
+                ],
+                [
+                    'fullname' => 'Member Two',
+                    'email' => null,
+                    'phone' => null,
+                    'organization' => null,
+                    'position' => null,
+                    'is_team_leader' => false,
+                ],
+            ],
+        ])->assertRedirect();
+
+        $submission = Submission::sole();
+        $this->assertCount(2, $submission->members);
+        $this->assertDatabaseHas('submission_members', [
+            'submission_id' => $submission->id,
+            'fullname' => 'Leader One',
+            'email' => 'leader@example.com',
+            'is_team_leader' => true,
+        ]);
+        $this->assertDatabaseHas('submission_members', [
+            'submission_id' => $submission->id,
+            'fullname' => 'Member Two',
+            'is_team_leader' => false,
+        ]);
+    }
+
+    public function test_individual_competition_does_not_require_or_persist_members(): void
+    {
+        $competition = $this->competition();
+        $this->field($competition, ['is_required' => false]);
+
+        $this->submit($competition, [
+            'members' => [['fullname' => 'Forged Member']],
+        ])->assertRedirect();
+
+        $this->assertDatabaseCount('submissions', 1);
+        $this->assertDatabaseCount('submission_members', 0);
+    }
+
+    public function test_invalid_team_member_rejects_entire_submission_without_partial_members(): void
+    {
+        $competition = $this->competition();
+        $competition->update(['competition_type' => 'team']);
+        $this->field($competition, ['is_required' => false]);
+
+        $this->submit($competition, [
+            'team_name' => 'Invalid Team',
+            'members' => [
+                ['fullname' => 'Valid Member'],
+                ['fullname' => '', 'email' => 'not-an-email'],
+            ],
+        ])->assertSessionHasErrors(['members.1.fullname', 'members.1.email']);
+
+        $this->assertDatabaseCount('submissions', 0);
+        $this->assertDatabaseCount('submission_members', 0);
+    }
+
     public function test_required_dynamic_field_is_rejected_when_missing(): void
     {
         $competition = $this->competition();

@@ -654,6 +654,29 @@
                                     </span>
                                 </div>
 
+                                @if ($session->isLive() || $session->isPaused())
+                                    <div
+                                        id="presentation-state-controls"
+                                        data-state-url="{{ route('competition-admin.competitions.judging-room.state', $competition) }}"
+                                        data-current-file-id="{{ $session->current_file_id }}"
+                                        class="grid gap-3 border-b border-slate-200 bg-white p-3 sm:grid-cols-3"
+                                    >
+                                        <label class="text-xs font-semibold text-slate-600">
+                                            หน้า
+                                            <input id="presentation-page" type="number" min="1" value="{{ $session->current_page }}" class="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3">
+                                        </label>
+                                        <label class="text-xs font-semibold text-slate-600">
+                                            ตำแหน่งเลื่อน (0–100%)
+                                            <input id="presentation-scroll" type="range" min="0" max="1" step="0.01" value="{{ $session->scroll_progress }}" class="mt-2 w-full">
+                                        </label>
+                                        <label class="text-xs font-semibold text-slate-600">
+                                            Zoom
+                                            <input id="presentation-zoom" type="number" min="0.25" max="5" step="0.05" value="{{ $session->zoom }}" class="mt-1 h-9 w-full rounded-lg border border-slate-300 px-3">
+                                        </label>
+                                        <p id="presentation-state-message" class="text-xs text-slate-500 sm:col-span-3" aria-live="polite"></p>
+                                    </div>
+                                @endif
+
                                 @if ($fileUrl && $isImage)
 
                                     <div class="flex min-h-[320px] items-center justify-center overflow-hidden bg-slate-100 p-3 sm:min-h-[460px] sm:p-4">
@@ -1080,6 +1103,16 @@
                                                         </span>
                                                     @endif
 
+                                                    @if (($session->isLive() || $session->isPaused()) && ! $isCurrentFile)
+                                                        <button
+                                                            type="button"
+                                                            data-presentation-file="{{ $file->id }}"
+                                                            class="mt-2 inline-flex h-8 items-center rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700"
+                                                        >
+                                                            แสดงไฟล์นี้ให้กรรมการ
+                                                        </button>
+                                                    @endif
+
                                                 </div>
 
                                             </div>
@@ -1370,4 +1403,59 @@
         </div>
 
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const controls = document.getElementById('presentation-state-controls');
+            if (!controls) return;
+
+            const pageInput = document.getElementById('presentation-page');
+            const scrollInput = document.getElementById('presentation-scroll');
+            const zoomInput = document.getElementById('presentation-zoom');
+            const message = document.getElementById('presentation-state-message');
+            let currentFileId = controls.dataset.currentFileId || null;
+            let timer;
+
+            const updateState = async () => {
+                message.textContent = 'กำลังบันทึก...';
+                try {
+                    const response = await fetch(controls.dataset.stateUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({
+                            current_file_id: currentFileId ? Number(currentFileId) : null,
+                            current_page: Number(pageInput.value),
+                            scroll_progress: Number(scrollInput.value),
+                            zoom: Number(zoomInput.value),
+                        }),
+                    });
+
+                    if (!response.ok) throw new Error('state update failed');
+                    message.textContent = 'บันทึกสถานะการนำเสนอแล้ว';
+                } catch (error) {
+                    message.textContent = 'บันทึกสถานะไม่สำเร็จ กรุณาลองใหม่';
+                }
+            };
+
+            const scheduleUpdate = () => {
+                window.clearTimeout(timer);
+                timer = window.setTimeout(updateState, 250);
+            };
+
+            pageInput.addEventListener('change', scheduleUpdate);
+            zoomInput.addEventListener('input', scheduleUpdate);
+            scrollInput.addEventListener('input', scheduleUpdate);
+            document.querySelectorAll('[data-presentation-file]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    currentFileId = button.dataset.presentationFile;
+                    updateState().then(() => window.location.reload());
+                });
+            });
+        });
+    </script>
 @endsection

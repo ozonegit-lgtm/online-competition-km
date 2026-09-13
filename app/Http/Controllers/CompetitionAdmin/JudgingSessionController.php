@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Score;
+use App\Models\SubmissionFile;
+use Illuminate\Validation\ValidationException;
 
 class JudgingSessionController extends Controller
 {
@@ -112,6 +114,13 @@ class JudgingSessionController extends Controller
 
             $session = $this->getSession($competition);
 
+            if ($session->status !== JudgingSession::STATUS_WAITING) {
+                return back()->with(
+                    'error',
+                    'เริ่ม Live ได้เฉพาะห้องที่ยังรอเริ่มการตัดสิน'
+                );
+            }
+
             if (! $competition->rubrics()
         ->where('is_active', true)
         ->exists()) {
@@ -211,7 +220,6 @@ class JudgingSessionController extends Controller
                 'zoom' => 1,
                 'state_version' => $session->state_version + 1,
                 'started_at' => $session->started_at ?? now(),
-                'ended_at' => null,
             ]);
 
             $submission->update([
@@ -307,13 +315,10 @@ class JudgingSessionController extends Controller
 
         $session = $this->getSession($competition);
 
-        if (
-            $session->isEnded() ||
-            $session->isClosed()
-        ) {
+        if (! $session->isLive() && ! $session->isPaused()) {
             return back()->with(
                 'error',
-                'ไม่สามารถเปลี่ยนผลงานในห้องที่จบหรือปิดแล้ว'
+                'เปลี่ยนผลงานได้เฉพาะห้องที่กำลัง Live หรือหยุดชั่วคราว'
             );
         }
 
@@ -341,6 +346,77 @@ class JudgingSessionController extends Controller
             'success',
             'เปลี่ยนผลงานที่กำลังตัดสินแล้ว'
         );
+    }
+
+    public function updatePresentationState(
+        Request $request,
+        Competition $competition
+    ) {
+        $this->authorizeCompetition($competition);
+
+        $validated = $request->validate([
+            'current_file_id' => ['nullable', 'integer'],
+            'current_page' => ['required', 'integer', 'min:1'],
+            'scroll_progress' => ['required', 'numeric', 'between:0,1'],
+            'zoom' => ['required', 'numeric', 'between:0.25,5'],
+        ]);
+
+        $session = DB::transaction(function () use ($competition, $validated) {
+            $session = JudgingSession::query()
+                ->where('competition_id', $competition->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (! $session->isLive() && ! $session->isPaused()) {
+                throw ValidationException::withMessages([
+                    'state' =>
+                        'อัปเดตการนำเสนอได้เฉพาะห้องที่กำลัง Live หรือหยุดชั่วคราว',
+                ]);
+            }
+
+            $currentSubmissionId = $session->current_submission_id;
+            abort_unless(
+                $currentSubmissionId
+                && $competition->submissions()->whereKey($currentSubmissionId)->exists(),
+                422,
+                'ผลงานปัจจุบันไม่อยู่ในการแข่งขันนี้'
+            );
+
+            if ($validated['current_file_id'] !== null) {
+                $validFile = SubmissionFile::query()
+                    ->whereKey($validated['current_file_id'])
+                    ->where('submission_id', $currentSubmissionId)
+                    ->exists();
+
+                abort_unless(
+                    $validFile,
+                    422,
+                    'ไฟล์ที่เลือกไม่ได้อยู่ในผลงานปัจจุบัน'
+                );
+            }
+
+            $session->update([
+                'current_file_id' => $validated['current_file_id'],
+                'current_page' => $validated['current_page'],
+                'scroll_progress' => $validated['scroll_progress'],
+                'zoom' => $validated['zoom'],
+                'state_version' => (int) $session->state_version + 1,
+            ]);
+
+            return $session->fresh();
+        });
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'current_file_id' => $session->current_file_id,
+                'current_page' => $session->current_page,
+                'scroll_progress' => (float) $session->scroll_progress,
+                'zoom' => (float) $session->zoom,
+                'state_version' => $session->state_version,
+            ]);
+        }
+
+        return back()->with('success', 'อัปเดตสถานะการนำเสนอแล้ว');
     }
 
     /**

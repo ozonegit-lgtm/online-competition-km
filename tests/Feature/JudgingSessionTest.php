@@ -8,6 +8,7 @@ use App\Models\JudgingSession;
 use App\Models\Rubric;
 use App\Models\Score;
 use App\Models\Submission;
+use App\Models\SubmissionFile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -66,6 +67,203 @@ class JudgingSessionTest extends TestCase
         $response->assertSessionHas('error');
         $this->assertNotSame(500, $response->getStatusCode());
         $this->assertSame('waiting', JudgingSession::sole()->status);
+    }
+
+    public function test_only_waiting_session_can_start_and_invalid_restart_preserves_end_time(): void
+    {
+        foreach (['live', 'paused', 'ended', 'closed'] as $status) {
+            $context = $this->context();
+            $endedAt = in_array($status, ['ended', 'closed'], true)
+                ? now()->subMinute()
+                : null;
+            $context['session']->update([
+                'status' => $status,
+                'started_at' => now()->subHour(),
+                'ended_at' => $endedAt,
+            ]);
+
+            $this->flushSession();
+            $this->start($context)->assertSessionHas('error');
+
+            $session = $context['session']->fresh();
+            $this->assertSame($status, $session->status);
+            if ($endedAt) {
+                $this->assertSame(
+                    $endedAt->format('Y-m-d H:i:s'),
+                    $session->ended_at->format('Y-m-d H:i:s')
+                );
+            }
+        }
+    }
+
+    public function test_submission_selection_is_allowed_only_while_live_or_paused(): void
+    {
+        foreach (['waiting', 'live', 'paused', 'ended', 'closed'] as $status) {
+            $context = $this->context();
+            $nextSubmission = $this->submission($context['competition'], 'submitted');
+            $context['session']->update([
+                'status' => $status,
+                'started_at' => $status === 'waiting' ? null : now(),
+            ]);
+            $originalVersion = (int) $context['session']->fresh()->state_version;
+
+            $this->flushSession();
+            $response = $this->actingAs($context['owner'])->put(
+                route(
+                    'competition-admin.competitions.judging-room.submission',
+                    $context['competition']
+                ),
+                ['submission_id' => $nextSubmission->id]
+            );
+
+            if (in_array($status, ['live', 'paused'], true)) {
+                $response->assertSessionHas('success');
+                $this->assertSame(
+                    $nextSubmission->id,
+                    $context['session']->fresh()->current_submission_id
+                );
+                $this->assertSame('under_review', $nextSubmission->fresh()->status);
+                $this->assertSame($originalVersion + 1, $context['session']->fresh()->state_version);
+            } else {
+                $response->assertSessionHas('error');
+                $this->assertNull($context['session']->fresh()->current_submission_id);
+                $this->assertSame('submitted', $nextSubmission->fresh()->status);
+                $this->assertSame($originalVersion, $context['session']->fresh()->state_version);
+            }
+        }
+    }
+
+    public function test_owner_can_update_presentation_state_during_live_and_paused(): void
+    {
+        foreach (['live', 'paused'] as $status) {
+            $context = $this->context();
+            $file = $this->submissionFile($context['submission']);
+            $context['session']->update([
+                'status' => $status,
+                'started_at' => now(),
+                'current_submission_id' => $context['submission']->id,
+                'current_file_id' => null,
+                'state_version' => 4,
+            ]);
+
+            $this->flushSession();
+            $this->actingAs($context['owner'])->putJson(
+                route('competition-admin.competitions.judging-room.state', $context['competition']),
+                [
+                    'current_file_id' => $file->id,
+                    'current_page' => 3,
+                    'scroll_progress' => 0.625,
+                    'zoom' => 1.75,
+                ]
+            )->assertOk()->assertJson([
+                'current_file_id' => $file->id,
+                'current_page' => 3,
+                'scroll_progress' => 0.625,
+                'zoom' => 1.75,
+                'state_version' => 5,
+            ]);
+
+            $session = $context['session']->fresh();
+            $this->assertSame($file->id, $session->current_file_id);
+            $this->assertSame(3, $session->current_page);
+            $this->assertSame(5, $session->state_version);
+        }
+    }
+
+    public function test_presentation_state_update_rejects_invalid_states_without_changes(): void
+    {
+        foreach (['waiting', 'ended', 'closed'] as $status) {
+            $context = $this->context();
+            $file = $this->submissionFile($context['submission']);
+            $context['session']->update([
+                'status' => $status,
+                'started_at' => $status === 'waiting' ? null : now(),
+                'current_submission_id' => $context['submission']->id,
+                'current_file_id' => $file->id,
+                'current_page' => 2,
+                'state_version' => 7,
+            ]);
+
+            $this->flushSession();
+            $this->actingAs($context['owner'])->putJson(
+                route('competition-admin.competitions.judging-room.state', $context['competition']),
+                [
+                    'current_file_id' => null,
+                    'current_page' => 9,
+                    'scroll_progress' => 0.9,
+                    'zoom' => 2,
+                ]
+            )->assertUnprocessable()->assertJsonValidationErrors('state');
+
+            $session = $context['session']->fresh();
+            $this->assertSame($file->id, $session->current_file_id);
+            $this->assertSame(2, $session->current_page);
+            $this->assertSame(7, $session->state_version);
+        }
+    }
+
+    public function test_presentation_state_rejects_other_admin_and_unrelated_files(): void
+    {
+        $context = $this->context();
+        $otherContext = $this->context();
+        $otherAdmin = $this->user('other-admin', 'Competition Admin');
+        $sameCompetitionOtherSubmission = $this->submission($context['competition'], 'submitted');
+        $sameCompetitionOtherFile = $this->submissionFile($sameCompetitionOtherSubmission);
+        $otherCompetitionFile = $this->submissionFile($otherContext['submission']);
+        $context['session']->update([
+            'status' => 'live',
+            'started_at' => now(),
+            'current_submission_id' => $context['submission']->id,
+            'state_version' => 2,
+        ]);
+        $payload = [
+            'current_page' => 1,
+            'scroll_progress' => 0,
+            'zoom' => 1,
+        ];
+
+        $this->actingAs($otherAdmin)->putJson(
+            route('competition-admin.competitions.judging-room.state', $context['competition']),
+            $payload + ['current_file_id' => null]
+        )->assertForbidden();
+
+        foreach ([$sameCompetitionOtherFile, $otherCompetitionFile] as $file) {
+            $this->flushSession();
+            $this->actingAs($context['owner'])->putJson(
+                route('competition-admin.competitions.judging-room.state', $context['competition']),
+                $payload + ['current_file_id' => $file->id]
+            )->assertUnprocessable();
+        }
+
+        $this->assertNull($context['session']->fresh()->current_file_id);
+        $this->assertSame(2, $context['session']->fresh()->state_version);
+    }
+
+    public function test_judge_state_endpoint_returns_updated_presentation_state(): void
+    {
+        $context = $this->context();
+        $file = $this->submissionFile($context['submission']);
+        $context['session']->update([
+            'status' => 'live',
+            'started_at' => now(),
+            'current_submission_id' => $context['submission']->id,
+            'current_file_id' => $file->id,
+            'current_page' => 4,
+            'scroll_progress' => 0.5,
+            'zoom' => 2,
+            'state_version' => 8,
+        ]);
+
+        $this->actingAs($context['judge'])->getJson(
+            route('judge.judging-rooms.state', $context['session'])
+        )->assertOk()->assertJson([
+            'current_submission_id' => $context['submission']->id,
+            'current_file_id' => $file->id,
+            'current_page' => 4,
+            'scroll_progress' => 0.5,
+            'zoom' => 2,
+            'state_version' => 8,
+        ]);
     }
 
     public function test_live_session_can_pause_without_deleting_judging_data(): void
@@ -334,6 +532,20 @@ class JudgingSessionTest extends TestCase
             'contact_phone' => '0800000000',
             'status' => $status,
             'submitted_at' => now(),
+        ]);
+    }
+
+    private function submissionFile(Submission $submission): SubmissionFile
+    {
+        return SubmissionFile::create([
+            'submission_id' => $submission->id,
+            'original_name' => 'presentation.pdf',
+            'stored_name' => uniqid().'.pdf',
+            'file_path' => "submissions/{$submission->competition_id}/{$submission->submission_code}/presentation.pdf",
+            'file_extension' => 'pdf',
+            'mime_type' => 'application/pdf',
+            'file_size' => 100,
+            'is_primary' => true,
         ]);
     }
 

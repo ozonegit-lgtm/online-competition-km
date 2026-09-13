@@ -265,9 +265,9 @@ class CompetitionController extends Controller
                 'visibility' => ['required', 'in:public,private',],
                 'access_code' => ['nullable','required_if:visibility,private','string', 'max:100',],
                 'registration_start' => [ 'required','date',],
-                'registration_end' => ['required','date','after_or_equal:registration_start',],
+                'registration_end' => ['required','date','after:registration_start',],
                 'judging_start' => ['required','date','after_or_equal:registration_end',], 
-                'judging_end' => ['required','date','after_or_equal:judging_start',],
+                'judging_end' => ['required','date','after:judging_start',],
                 'result_announcement' => ['required','date','after_or_equal:judging_end',],
             ], [
                 'category_id.required' => 'กรุณาเลือกหมวดหมู่การแข่งขัน',

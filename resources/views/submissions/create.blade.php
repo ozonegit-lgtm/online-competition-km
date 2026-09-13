@@ -354,6 +354,43 @@
                                 </p>
                             @enderror
                         </div>
+
+                        @php
+                            $oldMembers = old('members', [[
+                                'fullname' => '', 'email' => '', 'phone' => '',
+                                'organization' => '', 'position' => '', 'is_team_leader' => false,
+                            ]]);
+                        @endphp
+                        <div class="mt-5 border-t border-slate-200 pt-4">
+                            <div class="flex items-center justify-between gap-3">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-slate-800">สมาชิกทีม</h3>
+                                    <p class="mt-1 text-xs text-slate-500">กรอกชื่อสมาชิกอย่างน้อย 1 คน</p>
+                                </div>
+                                <button id="add-team-member" type="button" class="h-9 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700">เพิ่มสมาชิก</button>
+                            </div>
+                            <div id="team-members" class="mt-4 space-y-3">
+                                @foreach ($oldMembers as $index => $member)
+                                    <div data-team-member class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                                        <div class="grid gap-3 sm:grid-cols-2">
+                                            <input name="members[{{ $index }}][fullname]" value="{{ $member['fullname'] ?? '' }}" required maxlength="150" placeholder="ชื่อ-นามสกุล *" class="{{ $inputClass }} h-10 px-3 text-sm">
+                                            <input type="email" name="members[{{ $index }}][email]" value="{{ $member['email'] ?? '' }}" maxlength="150" placeholder="อีเมล" class="{{ $inputClass }} h-10 px-3 text-sm">
+                                            <input type="tel" name="members[{{ $index }}][phone]" value="{{ $member['phone'] ?? '' }}" maxlength="20" placeholder="เบอร์โทร" class="{{ $inputClass }} h-10 px-3 text-sm">
+                                            <input name="members[{{ $index }}][organization]" value="{{ $member['organization'] ?? '' }}" maxlength="255" placeholder="หน่วยงาน" class="{{ $inputClass }} h-10 px-3 text-sm">
+                                            <input name="members[{{ $index }}][position]" value="{{ $member['position'] ?? '' }}" maxlength="150" placeholder="ตำแหน่ง/บทบาท" class="{{ $inputClass }} h-10 px-3 text-sm">
+                                            <label class="flex items-center gap-2 text-xs font-medium text-slate-600">
+                                                <input type="hidden" name="members[{{ $index }}][is_team_leader]" value="0">
+                                                <input type="checkbox" name="members[{{ $index }}][is_team_leader]" value="1" @checked((bool) ($member['is_team_leader'] ?? false))>
+                                                หัวหน้าทีม
+                                            </label>
+                                        </div>
+                                        <button type="button" data-remove-team-member class="mt-3 text-xs font-semibold text-red-600 hover:text-red-700">ลบสมาชิก</button>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @error('members')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                            @error('members.*.fullname')<p class="mt-2 text-sm text-red-600">{{ $message }}</p>@enderror
+                        </div>
                     </section>
                 @endif
 
@@ -399,6 +436,23 @@
                             <p class="mt-2 text-sm text-red-600">
                                 {{ $message }}
                             </p>
+                        @enderror
+                    </div>
+
+                    <div class="mt-4">
+                        <label for="project_description" class="block text-sm font-semibold text-slate-700">
+                            รายละเอียดผลงาน
+                        </label>
+                        <textarea
+                            id="project_description"
+                            name="project_description"
+                            rows="5"
+                            maxlength="10000"
+                            placeholder="อธิบายแนวคิด วัตถุประสงค์ และจุดเด่นของผลงาน"
+                            class="{{ $inputClass }} mt-1 min-h-28 px-3 py-2 text-sm"
+                        >{{ old('project_description') }}</textarea>
+                        @error('project_description')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -850,6 +904,41 @@
                     image.src = '';
                 }
             });
+        });
+
+        const membersContainer = document.getElementById('team-members');
+        const addMemberButton = document.getElementById('add-team-member');
+        let nextMemberIndex = membersContainer?.querySelectorAll('[data-team-member]').length ?? 0;
+
+        const bindMemberRemoval = (container) => {
+            container.querySelector('[data-remove-team-member]')?.addEventListener('click', () => {
+                if (membersContainer.querySelectorAll('[data-team-member]').length > 1) {
+                    container.remove();
+                }
+            });
+        };
+
+        membersContainer?.querySelectorAll('[data-team-member]').forEach(bindMemberRemoval);
+        addMemberButton?.addEventListener('click', () => {
+            const index = nextMemberIndex++;
+            const wrapper = document.createElement('div');
+            wrapper.dataset.teamMember = '';
+            wrapper.className = 'rounded-xl border border-slate-200 bg-slate-50 p-3';
+            wrapper.innerHTML = `
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <input name="members[${index}][fullname]" required maxlength="150" placeholder="ชื่อ-นามสกุล *" class="w-full rounded-lg border border-slate-300 bg-white h-10 px-3 text-sm">
+                    <input type="email" name="members[${index}][email]" maxlength="150" placeholder="อีเมล" class="w-full rounded-lg border border-slate-300 bg-white h-10 px-3 text-sm">
+                    <input type="tel" name="members[${index}][phone]" maxlength="20" placeholder="เบอร์โทร" class="w-full rounded-lg border border-slate-300 bg-white h-10 px-3 text-sm">
+                    <input name="members[${index}][organization]" maxlength="255" placeholder="หน่วยงาน" class="w-full rounded-lg border border-slate-300 bg-white h-10 px-3 text-sm">
+                    <input name="members[${index}][position]" maxlength="150" placeholder="ตำแหน่ง/บทบาท" class="w-full rounded-lg border border-slate-300 bg-white h-10 px-3 text-sm">
+                    <label class="flex items-center gap-2 text-xs font-medium text-slate-600">
+                        <input type="hidden" name="members[${index}][is_team_leader]" value="0">
+                        <input type="checkbox" name="members[${index}][is_team_leader]" value="1"> หัวหน้าทีม
+                    </label>
+                </div>
+                <button type="button" data-remove-team-member class="mt-3 text-xs font-semibold text-red-600 hover:text-red-700">ลบสมาชิก</button>`;
+            membersContainer.appendChild(wrapper);
+            bindMemberRemoval(wrapper);
         });
     </script>
 </body>

@@ -201,6 +201,68 @@
                     </div>
                 </div>
 
+
+                {{-- Search Judge --}}
+                @if ($judges->isNotEmpty())
+                    <div class="border-b border-slate-100 bg-slate-50/50 p-3 sm:p-4">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                            <div class="relative min-w-0 flex-1">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                                    <svg
+                                        class="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        aria-hidden="true"
+                                    >
+                                        <circle cx="11" cy="11" r="7"/>
+                                        <path stroke-linecap="round" d="m20 20-3.5-3.5"/>
+                                    </svg>
+                                </div>
+
+                                <input
+                                    id="judge-search"
+                                    type="search"
+                                    placeholder="ค้นหาชื่อ Username อีเมล ตำแหน่ง หรือหน่วยงาน..."
+                                    autocomplete="off"
+                                    class="h-11 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-11 text-sm font-medium text-slate-700 shadow-sm outline-none transition placeholder:font-normal placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                                >
+
+                                <button
+                                    id="judge-search-clear"
+                                    type="button"
+                                    title="ล้างการค้นหา"
+                                    aria-label="ล้างการค้นหา"
+                                    class="absolute inset-y-0 right-0 hidden items-center justify-center px-4 text-slate-400 transition hover:text-slate-700"
+                                >
+                                    <svg
+                                        class="h-4 w-4"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        aria-hidden="true"
+                                    >
+                                        <path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="flex h-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-600 shadow-sm">
+                                <span id="judge-search-count">
+                                    {{ number_format($availableJudgeCount) }}
+                                </span>
+                                <span class="ml-1">คน</span>
+                            </div>
+                        </div>
+
+                        <p class="mt-2 text-[11px] text-slate-500">
+                            ค้นหาแบบทันทีโดยไม่ต้องโหลดหน้าใหม่
+                        </p>
+                    </div>
+                @endif
+
                 @if ($judges->isEmpty())
                     {{-- Empty state --}}
                     <div class="flex flex-col items-center justify-center px-4 py-12 text-center sm:py-14">
@@ -233,7 +295,7 @@
                     </div>
                 @else
                     {{-- Judge cards --}}
-                    <div class="grid gap-3 p-4 sm:p-5 md:grid-cols-2 2xl:grid-cols-3">
+                    <div id="judge-grid" class="grid gap-3 p-4 sm:p-5 md:grid-cols-2 2xl:grid-cols-3">
                         @foreach ($judges as $judge)
                             @php
                                 $profile = $judge->adminProfile;
@@ -263,6 +325,8 @@
                             @endphp
 
                             <label
+                                data-judge-card
+                                data-judge-search="{{ $displayName }} {{ $judge->username }} {{ $judge->email }} {{ $profile?->position }} {{ $profile?->organization }}"
                                 class="group relative flex min-h-[132px] flex-col rounded-xl border p-4 transition
                                     {{ $judgesLocked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer' }}
                                     {{ $isSelected
@@ -351,6 +415,33 @@
                                 </div>
                             </label>
                         @endforeach
+
+                        <div
+                            id="judge-search-empty"
+                            class="hidden py-12 text-center md:col-span-2 2xl:col-span-3"
+                        >
+                            <div class="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+                                <svg
+                                    class="h-5 w-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    aria-hidden="true"
+                                >
+                                    <circle cx="11" cy="11" r="7"/>
+                                    <path stroke-linecap="round" d="m20 20-3.5-3.5"/>
+                                </svg>
+                            </div>
+
+                            <p class="mt-3 text-sm font-semibold text-slate-700">
+                                ไม่พบกรรมการ
+                            </p>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                ลองค้นหาด้วยชื่อ Username อีเมล ตำแหน่ง หรือหน่วยงาน
+                            </p>
+                        </div>
                     </div>
 
                     {{-- Action footer --}}
@@ -399,4 +490,81 @@
             </section>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('judge-search');
+            const clearButton = document.getElementById('judge-search-clear');
+            const countElement = document.getElementById('judge-search-count');
+            const emptyElement = document.getElementById('judge-search-empty');
+
+            if (!searchInput) {
+                return;
+            }
+
+            const cards = Array.from(
+                document.querySelectorAll('[data-judge-card]')
+            );
+
+            const normalize = (value) => {
+                return (value || '')
+                    .toString()
+                    .toLocaleLowerCase('th')
+                    .trim();
+            };
+
+            const filterJudges = () => {
+                const keyword = normalize(searchInput.value);
+                let visibleCount = 0;
+
+                cards.forEach((card) => {
+                    const searchableText = normalize(
+                        card.dataset.judgeSearch || card.textContent
+                    );
+
+                    const isVisible =
+                        keyword === '' ||
+                        searchableText.includes(keyword);
+
+                    card.classList.toggle('hidden', !isVisible);
+
+                    if (isVisible) {
+                        visibleCount++;
+                    }
+                });
+
+                if (countElement) {
+                    countElement.textContent =
+                        visibleCount.toLocaleString('th-TH');
+                }
+
+                if (emptyElement) {
+                    emptyElement.classList.toggle(
+                        'hidden',
+                        visibleCount !== 0
+                    );
+                }
+
+                if (clearButton) {
+                    clearButton.classList.toggle(
+                        'hidden',
+                        keyword === ''
+                    );
+
+                    clearButton.classList.toggle(
+                        'flex',
+                        keyword !== ''
+                    );
+                }
+            };
+
+            searchInput.addEventListener('input', filterJudges);
+
+            clearButton?.addEventListener('click', () => {
+                searchInput.value = '';
+                filterJudges();
+                searchInput.focus();
+            });
+        });
+    </script>
 @endsection

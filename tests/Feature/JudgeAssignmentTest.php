@@ -31,9 +31,11 @@ class JudgeAssignmentTest extends TestCase
         $assignment = JudgeAssignment::sole();
         $this->assertSame($competition->id, $assignment->competition_id);
         $this->assertSame($judge->id, $assignment->judge_id);
-        $this->assertSame('accepted', $assignment->assignment_status);
+        $this->assertSame('pending', $assignment->assignment_status);
         $this->assertNotNull($assignment->assigned_at);
-        $this->assertNotNull($assignment->accepted_at);
+        $this->assertNull($assignment->accepted_at);
+        $this->assertNull($assignment->declined_at);
+        $this->assertNull($assignment->submitted_at);
         $this->assertSame($judge->id, $assignment->judge->id);
     }
 
@@ -72,6 +74,44 @@ class JudgeAssignmentTest extends TestCase
         }
 
         $this->assertDatabaseCount('judge_assignments', 1);
+    }
+
+    public function test_sync_preserves_existing_accepted_and_pending_statuses(): void
+    {
+        [$superAdmin, , $competition] = $this->context();
+        $acceptedJudge = $this->user('accepted', 'Judge');
+        $pendingJudge = $this->user('pending', 'Judge');
+        $accepted = $this->assignment($competition, $acceptedJudge, 'accepted');
+        $pending = $this->assignment($competition, $pendingJudge, 'pending');
+
+        $this->actingAs($superAdmin)->put(
+            route('superadmin.competitions.judges.sync', $competition),
+            ['judge_ids' => [$acceptedJudge->id, $pendingJudge->id]]
+        )->assertSessionHasNoErrors();
+
+        $this->assertSame('accepted', $accepted->fresh()->assignment_status);
+        $this->assertNotNull($accepted->fresh()->accepted_at);
+        $this->assertSame('pending', $pending->fresh()->assignment_status);
+        $this->assertNull($pending->fresh()->accepted_at);
+    }
+
+    public function test_judge_can_accept_newly_assigned_pending_assignment(): void
+    {
+        [$superAdmin, , $competition] = $this->context();
+        $judge = $this->user('new-judge', 'Judge');
+
+        $this->actingAs($superAdmin)->put(
+            route('superadmin.competitions.judges.sync', $competition),
+            ['judge_ids' => [$judge->id]]
+        );
+
+        $assignment = JudgeAssignment::sole();
+        $this->flushSession();
+        $this->actingAs($judge->fresh())->post(
+            route('judge.assignments.accept', $assignment)
+        )->assertRedirect()->assertSessionHas('success');
+
+        $this->assertSame('accepted', $assignment->fresh()->assignment_status);
     }
 
     public function test_competition_admin_cannot_sync_or_remove_assignments(): void
@@ -123,6 +163,64 @@ class JudgeAssignmentTest extends TestCase
         $this->assertSame('declined', $assignment->assignment_status);
         $this->assertNull($assignment->accepted_at);
         $this->assertNotNull($assignment->declined_at);
+    }
+
+    public function test_judge_cannot_accept_or_decline_after_judging_is_locked(): void
+    {
+        foreach (['live', 'paused', 'ended', 'closed'] as $status) {
+            [, $owner, $competition] = $this->context();
+            $judge = $this->user("locked-{$status}", 'Judge');
+            $pending = $this->assignment($competition, $judge, 'pending');
+            JudgingSession::create([
+                'competition_id' => $competition->id,
+                'controller_user_id' => $owner->id,
+                'status' => $status,
+                'started_at' => now(),
+                'ended_at' => in_array($status, ['ended', 'closed'], true) ? now() : null,
+            ]);
+
+            $this->flushSession();
+            $this->actingAs($judge)->post(
+                route('judge.assignments.accept', $pending)
+            )->assertSessionHasErrors('assignment');
+            $this->assertSame('pending', $pending->fresh()->assignment_status);
+            $this->assertNull($pending->fresh()->accepted_at);
+
+            $accepted = $this->assignment(
+                $competition,
+                $this->user("decline-{$status}", 'Judge'),
+                'accepted'
+            );
+            $acceptedAt = $accepted->accepted_at;
+
+            $this->flushSession();
+            $this->actingAs($accepted->judge->fresh())->post(
+                route('judge.assignments.decline', $accepted)
+            )->assertRedirect()->assertSessionHasErrors('assignment');
+            $accepted->refresh();
+            $this->assertSame('accepted', $accepted->assignment_status);
+            $this->assertTrue($acceptedAt->equalTo($accepted->accepted_at));
+            $this->assertNull($accepted->declined_at);
+        }
+    }
+
+    public function test_started_at_locks_assignment_even_when_status_is_waiting(): void
+    {
+        [, $owner, $competition] = $this->context();
+        $judge = $this->user('started-waiting', 'Judge');
+        $assignment = $this->assignment($competition, $judge, 'pending');
+        JudgingSession::create([
+            'competition_id' => $competition->id,
+            'controller_user_id' => $owner->id,
+            'status' => 'waiting',
+            'started_at' => now(),
+        ]);
+
+        $this->actingAs($judge)->post(
+            route('judge.assignments.accept', $assignment)
+        )->assertSessionHasErrors('assignment');
+
+        $this->assertSame('pending', $assignment->fresh()->assignment_status);
     }
 
     public function test_unlocked_unscored_judge_can_be_removed(): void
@@ -207,6 +305,37 @@ class JudgeAssignmentTest extends TestCase
         $this->assertFalse($competitionB->judgeAssignments()->whereKey($assignmentA->id)->exists());
         $this->assertTrue($competitionA->judges()->whereKey($judge->id)->exists());
         $this->assertFalse($competitionB->judges()->whereKey($judge->id)->exists());
+    }
+
+    public function test_judge_dashboard_lists_only_own_assignments_and_actions(): void
+    {
+        [, $owner, $competition] = $this->context();
+        $judge = $this->user('dashboard-judge', 'Judge');
+        $otherJudge = $this->user('other-dashboard-judge', 'Judge');
+        $pending = $this->assignment($competition, $judge, 'pending');
+        $other = $this->assignment($competition, $otherJudge, 'pending');
+
+        $response = $this->actingAs($judge)->get(route('judge.dashboard'));
+        $response->assertOk()
+            ->assertSee('data-assignment-id="'.$pending->id.'"', false)
+            ->assertDontSee('data-assignment-id="'.$other->id.'"', false)
+            ->assertSee(route('judge.assignments.accept', $pending))
+            ->assertSee(route('judge.assignments.decline', $pending));
+
+        $pending->update([
+            'assignment_status' => 'accepted',
+            'accepted_at' => now(),
+        ]);
+        $session = JudgingSession::create([
+            'competition_id' => $competition->id,
+            'controller_user_id' => $owner->id,
+            'status' => 'live',
+            'started_at' => now(),
+        ]);
+
+        $this->get(route('judge.dashboard'))
+            ->assertOk()
+            ->assertSee(route('judge.judging-rooms.show', $session));
     }
 
     private function context(): array

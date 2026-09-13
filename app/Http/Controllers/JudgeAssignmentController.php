@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\JudgeAssignment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class JudgeAssignmentController extends Controller
 {
@@ -15,6 +16,7 @@ class JudgeAssignmentController extends Controller
         JudgeAssignment $assignment
     ): RedirectResponse {
         $this->authorizeAssignment($assignment);
+        $this->ensureAssignmentIsEditable($assignment);
 
         if ($assignment->submitted_at) {
             return back()->with(
@@ -49,6 +51,7 @@ class JudgeAssignmentController extends Controller
         JudgeAssignment $assignment
     ): RedirectResponse {
         $this->authorizeAssignment($assignment);
+        $this->ensureAssignmentIsEditable($assignment);
 
         if ($assignment->submitted_at) {
             return back()->with(
@@ -95,5 +98,30 @@ class JudgeAssignmentController extends Controller
             403,
             'คุณไม่มีสิทธิ์จัดการงานตัดสินนี้'
         );
+    }
+
+    private function ensureAssignmentIsEditable(
+        JudgeAssignment $assignment
+    ): void {
+        $session = $assignment->competition
+            ?->judgingSession()
+            ->first();
+
+        if (
+            $session
+            && (
+                $session->started_at !== null
+                || in_array(
+                    $session->status,
+                    ['live', 'paused', 'ended', 'closed'],
+                    true
+                )
+            )
+        ) {
+            throw ValidationException::withMessages([
+                'assignment' =>
+                    'เริ่มการตัดสินแล้ว ไม่สามารถเปลี่ยนสถานะงานตัดสินได้',
+            ]);
+        }
     }
 }

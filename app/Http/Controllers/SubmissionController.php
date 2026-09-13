@@ -183,7 +183,7 @@ class SubmissionController extends Controller
                 'competition_id' => $competition->id,
                 'submission_code' => $submissionCode,
                 'project_title' => $validated['project_title'],
-                'project_description' => null,
+                'project_description' => $validated['project_description'] ?? null,
                 'team_name' => $competition->competition_type === 'team'
                     ? ($validated['team_name'] ?? null)
                     : null,
@@ -194,6 +194,19 @@ class SubmissionController extends Controller
                 'status' => 'submitted',
                 'submitted_at' => now(),
             ]);
+
+            if ($competition->competition_type === 'team') {
+                foreach ($validated['members'] as $member) {
+                    $submission->members()->create([
+                        'fullname' => $member['fullname'],
+                        'email' => $member['email'] ?? null,
+                        'phone' => $member['phone'] ?? null,
+                        'organization' => $member['organization'] ?? null,
+                        'position' => $member['position'] ?? null,
+                        'is_team_leader' => (bool) ($member['is_team_leader'] ?? false),
+                    ]);
+                }
+            }
 
             $isPrimaryFile = true;
 
@@ -403,6 +416,11 @@ class SubmissionController extends Controller
                 'string',
                 'max:255',
             ],
+            'project_description' => [
+                'nullable',
+                'string',
+                'max:10000',
+            ],
             'contact_name' => [
                 'required',
                 'string',
@@ -428,16 +446,38 @@ class SubmissionController extends Controller
                 'string',
                 'max:255',
             ],
+            'members' => [
+                Rule::requiredIf($competition->competition_type === 'team'),
+                'nullable',
+                'array',
+                ...($competition->competition_type === 'team' ? ['min:1'] : []),
+            ],
+            'members.*.fullname' => ['required', 'string', 'max:150'],
+            'members.*.email' => ['nullable', 'email', 'max:150'],
+            'members.*.phone' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9+\-\s()]{8,20}$/',
+            ],
+            'members.*.organization' => ['nullable', 'string', 'max:255'],
+            'members.*.position' => ['nullable', 'string', 'max:150'],
+            'members.*.is_team_leader' => ['nullable', 'boolean'],
             'terms' => ['accepted'],
         ];
 
         $attributes = [
         'project_title' => 'ชื่อผลงาน',
+        'project_description' => 'รายละเอียดผลงาน',
         'contact_name' => 'ชื่อ-นามสกุลผู้ส่ง',
         'contact_email' => 'อีเมล',
         'contact_phone' => 'เบอร์โทรศัพท์',
         'access_code' => 'รหัสเข้าร่วม',
         'team_name' => 'ชื่อทีม',
+        'members' => 'สมาชิกทีม',
+        'members.*.fullname' => 'ชื่อสมาชิกทีม',
+        'members.*.email' => 'อีเมลสมาชิกทีม',
+        'members.*.phone' => 'เบอร์โทรสมาชิกทีม',
         'terms' => 'การยืนยันข้อมูล',
         ];
 

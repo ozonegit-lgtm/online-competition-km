@@ -181,20 +181,17 @@ class CompetitionJudgeController extends Controller
             }
 
             foreach ($validJudgeIds as $judgeId) {
-                JudgeAssignment::updateOrCreate(
+                JudgeAssignment::firstOrCreate(
                     [
                         'competition_id' => $competition->id,
                         'judge_id' => $judgeId,
                     ],
                     [
-                        /*
-                         * Super Admin เป็นผู้กำหนดสิทธิ์โดยตรง
-                         * จึงอนุมัติ Assignment ทันที
-                         */
                         'assigned_at' => now(),
-                        'assignment_status' => 'accepted',
-                        'accepted_at' => now(),
+                        'assignment_status' => 'pending',
+                        'accepted_at' => null,
                         'declined_at' => null,
+                        'submitted_at' => null,
                     ]
                 );
             }

@@ -214,6 +214,9 @@ Route::prefix('competition-admin')
         Route::put('/competitions/{competition}/judging-room/submission', [JudgingSessionController::class, 'selectSubmission'])
             ->name('competitions.judging-room.submission');
 
+        Route::put('/competitions/{competition}/judging-room/state', [JudgingSessionController::class, 'updatePresentationState'])
+            ->name('competitions.judging-room.state');
+
         Route::post('/competitions/{competition}/judging-room/end', [JudgingSessionController::class, 'end'])
             ->name('competitions.judging-room.end');
 

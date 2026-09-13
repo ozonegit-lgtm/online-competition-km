@@ -29,7 +29,12 @@ class KnowledgeItemAjaxTest extends TestCase
             ->assertSee('data-ajax-target="#km-detail"', false)
             ->assertSee('data-ajax-redirect="'.$index.'"', false);
         $this->from($show)->delete(route('competition-admin.km.unpublish', $item), [], ['X-Requested-With' => 'XMLHttpRequest'])->assertRedirect($show);
-        $this->get($show)->assertSee('draft')->assertSee(route('competition-admin.km.publish', $item));
+        $this->assertDatabaseHas('knowledge_items', [
+            'id' => $item->id,
+            'status' => 'draft',
+            'published_at' => null,
+        ]);
+        $this->get($show)->assertSee('ฉบับร่าง')->assertSee(route('competition-admin.km.publish', $item));
         $filteredIndex = $index.'?search=AJAX&status=draft';
         $this->from($filteredIndex)->delete(route('competition-admin.km.destroy', $item), [], ['X-Requested-With' => 'XMLHttpRequest'])->assertRedirect($filteredIndex);
         $this->get($index)->assertDontSee('AJAX item')->assertSee('id="km-list"', false);
