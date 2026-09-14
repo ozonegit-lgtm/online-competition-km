@@ -21,12 +21,19 @@ use App\Http\Controllers\CompetitionAdmin\JudgingSessionController;
 use App\Http\Controllers\JudgeAssignmentController;
 use App\Http\Controllers\KnowledgeManagementController;
 use App\Http\Controllers\KnowledgeItemFileController;
+use App\Http\Controllers\KnowledgePageAssetController;
+use App\Http\Controllers\ContactMessageController as PublicContactMessageController;
 use App\Http\Controllers\SubmissionFileController;
 use App\Http\Controllers\CompetitionAdmin\ResultController;
 use App\Http\Controllers\CompetitionAdmin\KmSubmissionController;
 use App\Http\Controllers\CompetitionAdmin\KnowledgeItemController;
 use App\Http\Controllers\SuperAdmin\KnowledgeItemController as SuperAdminKnowledgeItemController;
 use App\Http\Controllers\SuperAdmin\KmSubmissionController as SuperAdminKmSubmissionController;
+use App\Http\Controllers\SuperAdmin\EbookController;
+use App\Http\Controllers\SuperAdmin\KnowledgePageSettingController;
+use App\Http\Controllers\SuperAdmin\KnowledgePageNavItemController;
+use App\Http\Controllers\SuperAdmin\KnowledgeCategoryController;
+use App\Http\Controllers\SuperAdmin\ContactMessageController as SuperAdminContactMessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,10 +41,22 @@ use App\Http\Controllers\SuperAdmin\KmSubmissionController as SuperAdminKmSubmis
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', [KnowledgeManagementController::class, 'index'])->name('home');
+Route::get('/', [KnowledgeManagementController::class, 'home'])->name('home');
+
+Route::get('/knowledge', [KnowledgeManagementController::class, 'index'])
+    ->name('knowledge.index');
 
 Route::get('/knowledge/{knowledgeItem}', [KnowledgeManagementController::class, 'show'])
+    ->whereNumber('knowledgeItem')
     ->name('knowledge.show');
+
+Route::post('/knowledge/contact', [PublicContactMessageController::class, 'store'])
+    ->middleware('throttle:public-contact')
+    ->name('knowledge.contact.store');
+
+Route::get('/knowledge/assets/{asset}', [KnowledgePageAssetController::class, 'show'])
+    ->whereIn('asset', ['logo', 'hero', 'about', 'footer-logo'])
+    ->name('knowledge.assets.show');
 
 Route::get('/submission-files/{submissionFile}', [SubmissionFileController::class, 'show'])
     ->name('submission-files.show');
@@ -50,6 +69,9 @@ Route::get('/knowledge-items/{knowledgeItem}/cover', [KnowledgeItemFileControlle
 
 Route::get('/knowledge-items/{knowledgeItem}/attachment', [KnowledgeItemFileController::class, 'attachment'])
     ->name('knowledge-items.attachment');
+
+Route::get('/knowledge-items/{knowledgeItem}/attachment/inline', [KnowledgeItemFileController::class, 'inline'])
+    ->name('knowledge-items.attachment.inline');
 
 /*
 |--------------------------------------------------------------------------
@@ -174,6 +196,58 @@ Route::prefix('superadmin')
 
         Route::delete('/submissions/{submission}/km/publish', [SuperAdminKmSubmissionController::class, 'unpublish'])
             ->name('submissions.km.unpublish');
+
+        Route::get('/knowledge-page', [KnowledgePageSettingController::class, 'edit'])
+            ->name('knowledge-page.settings.edit');
+        Route::put('/knowledge-page', [KnowledgePageSettingController::class, 'update'])
+            ->name('knowledge-page.settings.update');
+
+        Route::get('/knowledge-page/nav-items', [KnowledgePageNavItemController::class, 'index'])
+            ->name('knowledge-page.nav-items.index');
+        Route::post('/knowledge-page/nav-items', [KnowledgePageNavItemController::class, 'store'])
+            ->name('knowledge-page.nav-items.store');
+        Route::put('/knowledge-page/nav-items/reorder', [KnowledgePageNavItemController::class, 'reorder'])
+            ->name('knowledge-page.nav-items.reorder');
+        Route::put('/knowledge-page/nav-items/{navItem}', [KnowledgePageNavItemController::class, 'update'])
+            ->name('knowledge-page.nav-items.update');
+        Route::patch('/knowledge-page/nav-items/{navItem}/visibility', [KnowledgePageNavItemController::class, 'visibility'])
+            ->name('knowledge-page.nav-items.visibility');
+        Route::delete('/knowledge-page/nav-items/{navItem}', [KnowledgePageNavItemController::class, 'destroy'])
+            ->name('knowledge-page.nav-items.destroy');
+
+        Route::put('/knowledge-page/books/reorder', [EbookController::class, 'reorder'])
+            ->name('knowledge-page.books.reorder');
+        Route::post('/knowledge-page/books/{ebook}/publish', [EbookController::class, 'publish'])
+            ->whereNumber('ebook')->name('knowledge-page.books.publish');
+        Route::delete('/knowledge-page/books/{ebook}/publish', [EbookController::class, 'hide'])
+            ->whereNumber('ebook')->name('knowledge-page.books.hide');
+        Route::resource('/knowledge-page/books', EbookController::class)
+            ->parameters(['books' => 'ebook'])
+            ->names([
+                'index' => 'knowledge-page.books.index',
+                'create' => 'knowledge-page.books.create',
+                'store' => 'knowledge-page.books.store',
+                'show' => 'knowledge-page.books.show',
+                'edit' => 'knowledge-page.books.edit',
+                'update' => 'knowledge-page.books.update',
+                'destroy' => 'knowledge-page.books.destroy',
+            ]);
+
+        Route::get('/knowledge-page/categories', [KnowledgeCategoryController::class, 'index'])
+            ->name('knowledge-page.categories.index');
+        Route::post('/knowledge-page/categories', [KnowledgeCategoryController::class, 'store'])
+            ->name('knowledge-page.categories.store');
+        Route::put('/knowledge-page/categories/{knowledgeCategory}', [KnowledgeCategoryController::class, 'update'])
+            ->name('knowledge-page.categories.update');
+        Route::delete('/knowledge-page/categories/{knowledgeCategory}', [KnowledgeCategoryController::class, 'destroy'])
+            ->name('knowledge-page.categories.destroy');
+
+        Route::get('/contact-messages', [SuperAdminContactMessageController::class, 'index'])
+            ->name('contact-messages.index');
+        Route::get('/contact-messages/{contactMessage}', [SuperAdminContactMessageController::class, 'show'])
+            ->name('contact-messages.show');
+        Route::patch('/contact-messages/{contactMessage}/status', [SuperAdminContactMessageController::class, 'status'])
+            ->name('contact-messages.status');
     });
 
 /*

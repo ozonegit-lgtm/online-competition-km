@@ -51,6 +51,10 @@ class KnowledgeItemPolicy
         User $user,
         KnowledgeItem $knowledgeItem
     ): bool {
+        if ($knowledgeItem->is_ebook) {
+            return $user->is_active && $this->isSuperAdmin($user);
+        }
+
         if ($this->isSuperAdmin($user)) {
             return true;
         }

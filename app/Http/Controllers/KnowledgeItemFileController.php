@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\KnowledgeItem;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class KnowledgeItemFileController extends Controller
 {
@@ -58,12 +60,27 @@ class KnowledgeItemFileController extends Controller
         );
     }
 
+    public function inline(KnowledgeItem $knowledgeItem): StreamedResponse
+    {
+        abort_unless($knowledgeItem->is_ebook, 404);
+
+        return $this->serve(
+            $knowledgeItem,
+            $knowledgeItem->attachment_path,
+            'knowledge-items/attachments/',
+            $knowledgeItem->attachment_original_name ?: 'ebook.pdf',
+            'inline',
+            'application/pdf'
+        );
+    }
+
     private function serve(
         KnowledgeItem $knowledgeItem,
         ?string $path,
         string $directory,
         ?string $name,
-        string $disposition
+        string $disposition,
+        ?string $requiredMime = null
     ): StreamedResponse {
         $this->authorizeAccess($knowledgeItem);
         $normalized = $this->managedPath($path, $directory);
@@ -73,6 +90,8 @@ class KnowledgeItemFileController extends Controller
 
         $headers = ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff'];
         $mime = $disk->mimeType($normalized);
+        abort_if($requiredMime && $mime !== $requiredMime, 404);
+        abort_if($requiredMime === 'application/pdf' && ! $this->hasPdfSignature($disk, $normalized), 404);
         if (is_string($mime) && $mime !== '') {
             $headers['Content-Type'] = $mime;
         }
@@ -97,6 +116,27 @@ class KnowledgeItemFileController extends Controller
             Auth::check() && Gate::allows('view', $knowledgeItem),
             404
         );
+    }
+
+    private function hasPdfSignature(FilesystemAdapter $disk, string $path): bool
+    {
+        try {
+            $stream = $disk->readStream($path);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return false;
+        }
+
+        if (! is_resource($stream)) {
+            return false;
+        }
+
+        try {
+            return fread($stream, 5) === '%PDF-';
+        } finally {
+            fclose($stream);
+        }
     }
 
     private function managedPath(?string $path, string $directory): ?string

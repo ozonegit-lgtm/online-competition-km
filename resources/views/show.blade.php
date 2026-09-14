@@ -40,10 +40,13 @@
         'video' => 'วิดีโอ',
         'link' => 'ลิงก์',
         'other' => 'อื่น ๆ',
+        'ebook' => 'E-Book',
     ];
 
     $knowledgeType = $knowledgeItem->knowledge_type ?? 'article';
     $knowledgeTypeLabel = $typeLabels[$knowledgeType] ?? $knowledgeType;
+    $isEbook = $knowledgeType === 'ebook';
+    $libraryRoute = $isEbook ? 'knowledge.index' : 'home';
 
     $publishedAt = $knowledgeItem->published_at?->format('d/m/Y H:i');
     $updatedAt = $knowledgeItem->updated_at?->format('d/m/Y H:i');
@@ -101,7 +104,7 @@
     <header class="border-b border-slate-200 bg-white">
         <div class="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-4 px-4">
             <a
-                href="{{ route('home') }}"
+                href="{{ route($libraryRoute) }}"
                 class="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
             >
                 <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
@@ -119,7 +122,7 @@
 
             <div class="flex shrink-0 items-center gap-1">
                 <a
-                    href="{{ route('home') }}"
+                    href="{{ route($libraryRoute) }}"
                     class="inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                 >
                     หน้าแรก
@@ -137,10 +140,10 @@
                     </summary>
 
                     <div class="absolute right-0 top-11 z-30 w-[min(22rem,calc(100vw-2rem))] rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-                        <form method="GET" action="{{ route('home') }}" class="flex gap-2">
+                        <form method="GET" action="{{ route($libraryRoute) }}" class="flex gap-2">
                             <input
                                 type="search"
-                                name="search"
+                                name="{{ $isEbook ? 'q' : 'search' }}"
                                 placeholder="ค้นหาผลงาน หรือชื่อการแข่งขัน..."
                                 class="h-10 min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
                             >
@@ -168,21 +171,21 @@
                 {{-- Breadcrumb --}}
                 <nav class="mb-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400" aria-label="Breadcrumb">
                     <div class="flex min-w-0 items-center gap-2">
-                        <a href="{{ route('home') }}" class="font-medium transition hover:text-emerald-700">
-                            หน้าแรก
+                        <a href="{{ route($libraryRoute) }}" class="font-medium transition hover:text-emerald-700">
+                            {{ $isEbook ? 'คลัง E-Book' : 'หน้าแรก' }}
                         </a>
                         <span>/</span>
-                        <span class="truncate text-slate-500">รายละเอียดผลงาน</span>
+                        <span class="truncate text-slate-500">{{ $isEbook ? 'รายละเอียด E-Book' : 'รายละเอียดผลงาน' }}</span>
                     </div>
 
                     <a
-                        href="{{ route('home') }}"
+                        href="{{ route($libraryRoute) }}"
                         class="inline-flex items-center gap-1.5 font-medium text-slate-500 transition hover:text-emerald-700"
                     >
                         <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="m15 18-6-6 6-6"/>
                         </svg>
-                        กลับไปคลังผลงาน
+                        {{ $isEbook ? 'กลับคลัง E-Book' : 'กลับไปคลังผลงาน' }}
                     </a>
                 </nav>
 
@@ -213,7 +216,7 @@
                                             <path d="M12 20h9"/>
                                             <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/>
                                         </svg>
-                                        <span>Manual KM</span>
+                                        <span>{{ $isEbook ? 'E-Book KM' : 'Manual KM' }}</span>
                                     </span>
                                 @endif
 
@@ -341,6 +344,14 @@
                                     </p>
                                 @endif
                             @else
+                                @if ($isEbook)
+                                    <dl class="mb-5 grid gap-4 rounded-xl bg-slate-50 p-4 sm:grid-cols-2 lg:grid-cols-4">
+                                        <div><dt class="text-xs font-medium text-slate-400">หมวดหมู่</dt><dd class="mt-1 text-sm font-semibold text-slate-700">{{ $knowledgeItem->knowledgeCategory?->name ?: '-' }}</dd></div>
+                                        <div><dt class="text-xs font-medium text-slate-400">ปีเผยแพร่</dt><dd class="mt-1 text-sm font-semibold text-slate-700">{{ $knowledgeItem->publication_year ?: '-' }}</dd></div>
+                                        <div><dt class="text-xs font-medium text-slate-400">เล่ม</dt><dd class="mt-1 text-sm font-semibold text-slate-700">{{ $knowledgeItem->volume ?: '-' }}</dd></div>
+                                        <div><dt class="text-xs font-medium text-slate-400">ฉบับ</dt><dd class="mt-1 text-sm font-semibold text-slate-700">{{ $knowledgeItem->issue ?: '-' }}</dd></div>
+                                    </dl>
+                                @endif
                                 @if ($knowledgeItem->content)
                                     <div class="whitespace-pre-line text-sm leading-7 text-slate-600">
                                         {{ $knowledgeItem->content }}
@@ -566,14 +577,14 @@
                                                         <p class="mt-0.5 text-xs text-slate-400">ไฟล์แนบองค์ความรู้</p>
                                                     </div>
 
-                                                    <a
-                                                        href="{{ route('knowledge-items.attachment', $knowledgeItem) }}"
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        class="inline-flex h-9 shrink-0 items-center justify-center self-end rounded-xl bg-emerald-600 px-3 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 sm:self-center"
-                                                    >
-                                                        เปิดไฟล์
-                                                    </a>
+                                                    <div class="flex shrink-0 flex-wrap gap-2 self-end sm:self-center">
+                                                        @if ($isEbook)
+                                                            <a href="{{ route('knowledge-items.attachment.inline', $knowledgeItem) }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-9 items-center justify-center rounded-xl bg-blue-600 px-3 text-xs font-bold text-white shadow-sm hover:bg-blue-700">อ่าน PDF</a>
+                                                            <a href="{{ route('knowledge-items.attachment', $knowledgeItem) }}" class="inline-flex h-9 items-center justify-center rounded-xl border border-blue-200 bg-white px-3 text-xs font-bold text-blue-700 hover:bg-blue-50">ดาวน์โหลด PDF</a>
+                                                        @else
+                                                            <a href="{{ route('knowledge-items.attachment', $knowledgeItem) }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-9 items-center justify-center rounded-xl bg-emerald-600 px-3 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700">เปิดไฟล์</a>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             @endif
 
@@ -590,7 +601,7 @@
                                                         rel="noopener noreferrer"
                                                         class="inline-flex h-9 shrink-0 items-center justify-center self-end rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-600 transition hover:border-emerald-300 hover:text-emerald-700 sm:self-center"
                                                     >
-                                                        เปิดลิงก์
+                                                        {{ $isEbook ? 'อ่านออนไลน์' : 'เปิดลิงก์' }}
                                                     </a>
                                                 </div>
                                             @endif
@@ -604,13 +615,13 @@
 
                         <footer class="mt-6 flex items-center justify-center border-t border-slate-100 pt-4">
                             <a
-                                href="{{ route('home') }}"
+                                href="{{ route($libraryRoute) }}"
                                 class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-slate-600 transition hover:border-emerald-300 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                             >
                                 <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path d="m15 18-6-6 6-6"/>
                                 </svg>
-                                กลับไปคลังผลงานทั้งหมด
+                                {{ $isEbook ? 'กลับคลัง E-Book' : 'กลับไปคลังผลงานทั้งหมด' }}
                             </a>
                         </footer>
                     </div>

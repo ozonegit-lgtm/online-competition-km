@@ -25,6 +25,7 @@ class DashboardController extends Controller
             'submissions' => Submission::query()->count(),
             // Keep the same eligibility as the public KM listing.
             'published_km' => KnowledgeItem::query()
+                ->legacy()
                 ->where('status', 'published')
                 ->where(function (Builder $query) {
                     $query->whereNull('submission_id')
@@ -47,7 +48,7 @@ class DashboardController extends Controller
                     ->whereIn('status', [JudgingSession::STATUS_LIVE, JudgingSession::STATUS_PAUSED]))
                 ->count(),
             'published_results' => $this->publishedResultsCount(),
-            'draft_km' => KnowledgeItem::query()->where('status', 'draft')->count(),
+            'draft_km' => KnowledgeItem::query()->legacy()->where('status', 'draft')->count(),
         ];
 
         $roleCounts = Role::query()

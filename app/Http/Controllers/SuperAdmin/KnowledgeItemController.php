@@ -32,6 +32,7 @@ class KnowledgeItemController extends Controller
          * ผลงานจากการแข่งขันจะใช้ Submission query ด้านล่าง
          */
         $knowledgeQuery = KnowledgeItem::query()
+            ->legacy()
             ->whereNull('submission_id')
             ->with([
                 'creator:id,username',
@@ -153,6 +154,7 @@ class KnowledgeItemController extends Controller
          * รวมเจ้าของ Manual KM และเจ้าของ Competition
          */
         $ownerIds = KnowledgeItem::query()
+            ->legacy()
             ->whereNull('submission_id')
             ->whereNotNull('created_by')
             ->pluck('created_by')
@@ -238,6 +240,7 @@ class KnowledgeItemController extends Controller
 
     public function show(KnowledgeItem $knowledgeItem): View
     {
+        abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('view', $knowledgeItem);
 
         $knowledgeItem->load([
@@ -252,6 +255,7 @@ class KnowledgeItemController extends Controller
 
     public function edit(KnowledgeItem $knowledgeItem): View
     {
+        abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('update', $knowledgeItem);
 
         $knowledgeItem->load([
@@ -268,6 +272,7 @@ class KnowledgeItemController extends Controller
 
     public function update(KnowledgeItemRequest $request, KnowledgeItem $knowledgeItem): RedirectResponse
     {
+        abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('update', $knowledgeItem);
         app(LegacyKnowledgeAttachments::class)->ensureMigrated($knowledgeItem->id);
 
@@ -345,6 +350,7 @@ class KnowledgeItemController extends Controller
 
     public function destroy(KnowledgeItem $knowledgeItem): RedirectResponse
     {
+        abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('delete', $knowledgeItem);
         app(LegacyKnowledgeAttachments::class)->ensureMigrated($knowledgeItem->id);
 
@@ -364,6 +370,7 @@ class KnowledgeItemController extends Controller
 
     public function publish(KnowledgeItem $knowledgeItem): RedirectResponse
     {
+        abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('publish', $knowledgeItem);
 
         $knowledgeItem->update([
@@ -376,6 +383,7 @@ class KnowledgeItemController extends Controller
 
     public function unpublish(KnowledgeItem $knowledgeItem): RedirectResponse
     {
+        abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('unpublish', $knowledgeItem);
 
         $knowledgeItem->update([
@@ -388,6 +396,7 @@ class KnowledgeItemController extends Controller
 
     public function feature(KnowledgeItem $knowledgeItem): RedirectResponse
     {
+        abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('feature', $knowledgeItem);
 
         $knowledgeItem->update([
@@ -399,6 +408,7 @@ class KnowledgeItemController extends Controller
 
     public function unfeature(KnowledgeItem $knowledgeItem): RedirectResponse
     {
+        abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('feature', $knowledgeItem);
 
         $knowledgeItem->update([

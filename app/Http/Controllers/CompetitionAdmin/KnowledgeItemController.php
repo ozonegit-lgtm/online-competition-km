@@ -27,6 +27,7 @@ class KnowledgeItemController extends Controller
 
         // องค์ความรู้ที่เพิ่มเองเท่านั้น
         $knowledgeQuery = KnowledgeItem::query()
+            ->legacy()
             ->where('created_by', Auth::id())
             ->whereNull('submission_id')
             ->with([

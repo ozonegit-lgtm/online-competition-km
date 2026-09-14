@@ -10,6 +10,7 @@
     };
 
     $roleDisplayName = $currentUser?->role?->display_name ?? 'ไม่พบข้อมูลสิทธิ์';
+    $ebookCmsActive = request()->routeIs('superadmin.knowledge-page.*', 'superadmin.contact-messages.*');
 @endphp
 
 <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 flex w-60 shrink-0 -translate-x-full flex-col border-r border-slate-800 bg-slate-950 text-white shadow-sm transition-[width,transform] duration-200 ease-in-out lg:static lg:z-auto lg:translate-x-0 lg:shadow-none">
@@ -60,7 +61,56 @@
                         <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z"/></svg>
                         <span class="sidebar-menu-text">จัดการองค์ความรู้</span>
                     </a>
+                    {{-- E-Book KM --}}
+                    <details class="sidebar-dropdown" @if ($ebookCmsActive) open @endif>
+                        <summary class="sidebar-menu-link flex h-9 w-full cursor-pointer select-none list-none items-center gap-3 rounded-xl px-3 text-sm font-medium transition {{ $ebookCmsActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                            <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z"/>
+                            </svg>
 
+                            <span class="sidebar-menu-text flex-1">E-Book KM</span>
+
+                            <svg class="ebook-chevron h-4 w-4 shrink-0 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </summary>
+
+                        <div class="sidebar-submenu ml-6 mt-1 space-y-1 border-l border-slate-700 pl-3">
+
+                            <a href="{{ route('superadmin.knowledge-page.settings.edit') }}"
+                                class="block rounded-lg px-3 py-2 text-sm transition {{ request()->routeIs('superadmin.knowledge-page.settings.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                จัดการหน้า E-Book KM
+                            </a>
+
+                            <a href="{{ route('superadmin.knowledge-page.nav-items.index') }}"
+                                class="block rounded-lg px-3 py-2 text-sm transition {{ request()->routeIs('superadmin.knowledge-page.nav-items.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                จัดการเมนูเว็บไซต์
+                            </a>
+
+                            <a href="{{ route('superadmin.knowledge-page.books.index') }}"
+                                class="block rounded-lg px-3 py-2 text-sm transition {{ request()->routeIs('superadmin.knowledge-page.books.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                จัดการ E-Book
+                            </a>
+
+                            <a href="{{ route('superadmin.knowledge-page.categories.index') }}"
+                                class="block rounded-lg px-3 py-2 text-sm transition {{ request()->routeIs('superadmin.knowledge-page.categories.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                หมวดหมู่ E-Book
+                            </a>
+
+                            <a href="{{ route('superadmin.contact-messages.index') }}"
+                                class="block rounded-lg px-3 py-2 text-sm transition {{ request()->routeIs('superadmin.contact-messages.*') ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                ข้อความติดต่อ
+                            </a>
+
+                            <a href="{{ route('knowledge.index') }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="block rounded-lg px-3 py-2 text-sm text-emerald-400 transition hover:bg-slate-800 hover:text-emerald-300">
+                                เปิดหน้า E-Book KM ↗
+                            </a>
+
+                        </div>
+                    </details>
                     <a href="{{ route('superadmin.createUser') }}" data-sidebar-tooltip="จัดการผู้ใช้งาน" class="sidebar-menu-link flex h-9 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition {{ request()->routeIs('superadmin.createUser') ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                         <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.12a7.5 7.5 0 0115 0A17.93 17.93 0 0112 21.75c-2.68 0-5.22-.59-7.5-1.63zM19.5 8.25v4.5M21.75 10.5h-4.5"/></svg>
                         <span class="sidebar-menu-text">จัดการผู้ใช้งาน</span>
@@ -220,6 +270,35 @@
         html.sidebar-collapsed #app-sidebar .sidebar-user {
             justify-content: center;
             padding: 8px;
+        }
+    }
+    .sidebar-dropdown summary {
+        list-style: none;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    .sidebar-dropdown summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .sidebar-dropdown[open] .ebook-chevron {
+        transform: rotate(180deg);
+    }
+
+    .sidebar-dropdown summary:focus {
+        outline: none;
+    }
+
+    .sidebar-dropdown summary:focus-visible {
+        outline: 2px solid rgb(59 130 246);
+        outline-offset: 2px;
+    }
+
+    @media (min-width: 1024px) {
+        html.sidebar-collapsed #app-sidebar .sidebar-submenu,
+        html.sidebar-collapsed #app-sidebar .ebook-chevron {
+            display: none;
         }
     }
 </style>

@@ -47,5 +47,17 @@ class AppServiceProvider extends ServiceProvider
                     ->response($response),
             ];
         });
+
+        RateLimiter::for('public-contact', function (Request $request) {
+            $sessionKey = hash('sha256', $request->session()->getId());
+            $ipKey = hash('sha256', (string) $request->ip());
+
+            return [
+                Limit::perMinute(config('knowledge_page.contact_rate_limits.session_per_minute'))
+                    ->by("contact:session:{$sessionKey}"),
+                Limit::perHour(config('knowledge_page.contact_rate_limits.ip_per_hour'))
+                    ->by("contact:ip:{$ipKey}"),
+            ];
+        });
     }
 }

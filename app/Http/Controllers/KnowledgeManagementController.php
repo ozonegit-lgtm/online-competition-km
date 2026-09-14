@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\CompetitionCategory;
 use App\Models\Competition;
 use App\Models\KnowledgeItem;
+use App\Models\KnowledgeCategory;
+use App\Models\KnowledgePageNavItem;
+use App\Models\KnowledgePageSetting;
 use App\Models\Submission;
 use Illuminate\Http\Request;
 
@@ -67,13 +70,13 @@ class KnowledgeManagementController extends Controller
                 }
             }
         } else {
-            $knowledgeItem->load('creator');
+            $knowledgeItem->load(['creator', 'knowledgeCategory']);
         }
 
         return view('show', compact('knowledgeItem'));
     }
 
-    public function index(Request $request)
+    public function home(Request $request)
     {
         /*
         |--------------------------------------------------------------------------
@@ -85,6 +88,7 @@ class KnowledgeManagementController extends Controller
         |
         */
         $query = KnowledgeItem::query()
+            ->legacy()
             ->with([
                 'category',
                 'submission.competition.category',
@@ -198,6 +202,7 @@ class KnowledgeManagementController extends Controller
         |
         */
         $featuredItems = KnowledgeItem::query()
+            ->legacy()
             ->with([
                 'category',
                 'submission.competition.category',
@@ -334,5 +339,59 @@ class KnowledgeManagementController extends Controller
             'featuredItems' => $featuredItems,
             'categories' => $categories,
         ]);
+    }
+
+    public function index(Request $request)
+    {
+        $query = KnowledgeItem::query()
+            ->ebooks()
+            ->where('status', 'published')
+            ->with('knowledgeCategory');
+
+        if ($request->filled('q')) {
+            $search = $request->string('q')->toString();
+            $query->where(function ($query) use ($search): void {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('summary', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category')) {
+            $categoryId = filter_var($request->input('category'), FILTER_VALIDATE_INT);
+            if ($categoryId !== false) {
+                $query->where('knowledge_category_id', $categoryId);
+            }
+        }
+
+        if ($request->filled('year')) {
+            $year = filter_var($request->input('year'), FILTER_VALIDATE_INT);
+            if ($year !== false) {
+                $query->where('publication_year', $year);
+            }
+        }
+
+        $knowledgeItems = $query
+            ->orderBy('sort_order')
+            ->orderByDesc('published_at')
+            ->orderByDesc('id')
+            ->paginate(12)
+            ->withQueryString();
+        $settings = KnowledgePageSetting::current();
+        $links = KnowledgePageNavItem::query()
+            ->where('is_visible', true)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->groupBy('placement');
+        $categories = KnowledgeCategory::query()
+            ->where('is_active', true)
+            ->whereHas('knowledgeItems', fn ($query) => $query->ebooks()->where('status', 'published'))
+            ->orderBy('name')
+            ->get();
+
+        return view('knowledge.index', compact(
+            'knowledgeItems', 'settings', 'links', 'categories'
+        ));
     }
 }

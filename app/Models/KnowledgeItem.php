@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -39,6 +40,14 @@ class KnowledgeItem extends Model
         'is_featured',
         'status',
         'published_at',
+        'knowledge_type',
+        'knowledge_category_id',
+        'external_url',
+        'archived_at',
+        'sort_order',
+        'publication_year',
+        'volume',
+        'issue',
     ];
 
     /**
@@ -47,6 +56,9 @@ class KnowledgeItem extends Model
     protected $casts = [
         'is_featured' => 'boolean',
         'published_at' => 'datetime',
+        'archived_at' => 'datetime',
+        'sort_order' => 'integer',
+        'publication_year' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -70,6 +82,29 @@ class KnowledgeItem extends Model
             CompetitionCategory::class,
             'category_id'
         );
+    }
+
+    public function knowledgeCategory(): BelongsTo
+    {
+        return $this->belongsTo(KnowledgeCategory::class, 'knowledge_category_id');
+    }
+
+    public function scopeEbooks(Builder $query): Builder
+    {
+        return $query->where('knowledge_type', 'ebook');
+    }
+
+    public function scopeLegacy(Builder $query): Builder
+    {
+        return $query->where(function (Builder $query): void {
+            $query->whereNull('knowledge_type')
+                ->orWhere('knowledge_type', '!=', 'ebook');
+        });
+    }
+
+    public function getIsEbookAttribute(): bool
+    {
+        return $this->knowledge_type === 'ebook';
     }
 
     /**

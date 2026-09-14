@@ -127,6 +127,7 @@ class DashboardController extends Controller
         */
 
         $knowledgeBase = KnowledgeItem::query()
+            ->legacy()
             ->where(function ($query) use ($userId) {
                 $query
                     ->where(function ($manual) use ($userId) {
