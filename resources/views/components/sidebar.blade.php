@@ -58,14 +58,23 @@
 
                 <div class="space-y-1">
                     <a href="{{ route('superadmin.km.index') }}" data-sidebar-tooltip="จัดการองค์ความรู้" class="sidebar-menu-link flex h-9 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition {{ request()->routeIs('superadmin.km.*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                        <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z"/></svg>
+                        <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z"/>
+                        </svg>
                         <span class="sidebar-menu-text">จัดการองค์ความรู้</span>
                     </a>
                     {{-- E-Book KM --}}
                     <details class="sidebar-dropdown" @if ($ebookCmsActive) open @endif>
                         <summary class="sidebar-menu-link flex h-9 w-full cursor-pointer select-none list-none items-center gap-3 rounded-xl px-3 text-sm font-medium transition {{ $ebookCmsActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                            <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z"/>
+                            <svg class="h-5 w-5 shrink-0"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M7 3.5h7l4 4V20a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 20V5a1.5 1.5 0 0 1 1-1.5Z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M14 3.5V8h4M9 12h6M9 15.5h6M9 19h4"/>
                             </svg>
 
                             <span class="sidebar-menu-text flex-1">E-Book KM</span>
