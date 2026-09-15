@@ -98,6 +98,54 @@ class KnowledgePageFrontendTest extends TestCase
             ->assertDontSee('name="email"', false);
     }
 
+    public function test_section_order_settings_use_four_position_selects(): void
+    {
+        KnowledgePageSetting::create();
+        $super = $this->user('section-order-ui', 'Super Admin');
+
+        $response = $this->actingAs($super)
+            ->get(route('superadmin.knowledge-page.settings.edit'))
+            ->assertOk()
+            ->assertSee('ลำดับการแสดง')
+            ->assertDontSee('ลำดับ Section')
+            ->assertSee('1 จะแสดงก่อน และ 4 จะแสดงท้ายสุด');
+
+        $html = $response->getContent();
+
+        $this->assertSame(4, preg_match_all(
+            '/<select name="(?:hero|about|books|contact)_sort_order"/',
+            $html
+        ));
+        $this->assertSame(16, preg_match_all('/<option value="[1-4]"/', $html));
+        $this->assertDoesNotMatchRegularExpression(
+            '/<input[^>]+name="(?:hero|about|books|contact)_sort_order"/s',
+            $html
+        );
+    }
+
+    public function test_public_sections_follow_the_selected_order(): void
+    {
+        KnowledgePageSetting::create([
+            'hero_title' => 'Section Hero First',
+            'hero_sort_order' => 1,
+            'about_title' => 'Section About Third',
+            'about_sort_order' => 3,
+            'books_title' => 'Section Books Second',
+            'books_sort_order' => 2,
+            'contact_title' => 'Section Contact Fourth',
+            'contact_sort_order' => 4,
+        ]);
+
+        $this->get(route('knowledge.index'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Section Hero First',
+                'Section Books Second',
+                'Section About Third',
+                'Section Contact Fourth',
+            ]);
+    }
+
     public function test_ebook_detail_renders_metadata_pdf_online_actions_and_library_back_link(): void
     {
         $category = $this->knowledgeCategory();

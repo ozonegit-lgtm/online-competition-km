@@ -138,6 +138,100 @@ class KnowledgePageCmsBackendTest extends TestCase
         $this->get('/knowledge/assets/not-allowed')->assertNotFound();
     }
 
+    public function test_section_sort_orders_accept_unique_positions_and_reject_duplicates_or_legacy_values(): void
+    {
+        $super = $this->user('section-order', 'Super Admin');
+        $route = route('superadmin.knowledge-page.settings.update');
+
+        $this->actingAs($super)->put($route, [
+            'hero_sort_order' => 1,
+            'about_sort_order' => 2,
+            'books_sort_order' => 3,
+            'contact_sort_order' => 4,
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('knowledge_page_settings', [
+            'hero_sort_order' => 1,
+            'about_sort_order' => 2,
+            'books_sort_order' => 3,
+            'contact_sort_order' => 4,
+        ]);
+
+        $this->put($route, [
+            'hero_sort_order' => 1,
+            'about_sort_order' => 3,
+            'books_sort_order' => 2,
+            'contact_sort_order' => 4,
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('knowledge_page_settings', [
+            'hero_sort_order' => 1,
+            'about_sort_order' => 3,
+            'books_sort_order' => 2,
+            'contact_sort_order' => 4,
+        ]);
+
+        $this->put($route, [
+            'hero_sort_order' => 1,
+            'about_sort_order' => 1,
+            'books_sort_order' => 2,
+            'contact_sort_order' => 3,
+        ])->assertSessionHasErrors(['hero_sort_order', 'about_sort_order']);
+
+        $this->put($route, [
+            'hero_sort_order' => 3,
+        ])->assertSessionHasErrors([
+            'about_sort_order',
+            'books_sort_order',
+            'contact_sort_order',
+        ]);
+
+        $this->assertDatabaseHas('knowledge_page_settings', [
+            'hero_sort_order' => 1,
+            'about_sort_order' => 3,
+            'books_sort_order' => 2,
+            'contact_sort_order' => 4,
+        ]);
+
+        $this->put($route, [
+            'hero_sort_order' => 10,
+            'about_sort_order' => 20,
+            'books_sort_order' => 30,
+            'contact_sort_order' => 40,
+        ])->assertSessionHasErrors([
+            'hero_sort_order',
+            'about_sort_order',
+            'books_sort_order',
+            'contact_sort_order',
+        ]);
+    }
+
+    public function test_legacy_section_sort_orders_can_be_normalized_safely(): void
+    {
+        $settings = KnowledgePageSetting::create([
+            'site_name' => 'Legacy section order',
+            'hero_sort_order' => 10,
+            'about_sort_order' => 20,
+            'books_sort_order' => 30,
+            'contact_sort_order' => 40,
+        ]);
+        $super = $this->user('section-normalize', 'Super Admin');
+
+        $this->actingAs($super)->put(route('superadmin.knowledge-page.settings.update'), [
+            'hero_sort_order' => 1,
+            'about_sort_order' => 2,
+            'books_sort_order' => 3,
+            'contact_sort_order' => 4,
+        ])->assertRedirect();
+
+        $this->assertSame([1, 2, 3, 4], [
+            $settings->fresh()->hero_sort_order,
+            $settings->fresh()->about_sort_order,
+            $settings->fresh()->books_sort_order,
+            $settings->fresh()->contact_sort_order,
+        ]);
+    }
+
     public function test_hidden_section_asset_and_unmanaged_paths_are_not_public(): void
     {
         $heroPath = 'knowledge-page/assets/hero/hero.png';

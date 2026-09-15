@@ -20,18 +20,18 @@ return new class extends Migration
             $table->boolean('hero_button_enabled')->default(false);
             $table->string('hero_button_label', 150)->nullable();
             $table->string('hero_button_url', 2048)->nullable();
-            $table->unsignedInteger('hero_sort_order')->default(10);
+            $table->unsignedInteger('hero_sort_order')->default(1);
 
             $table->boolean('about_enabled')->default(true);
             $table->string('about_title')->default('เกี่ยวกับเรา');
             $table->text('about_content')->nullable();
             $table->string('about_image_path', 500)->nullable();
-            $table->unsignedInteger('about_sort_order')->default(20);
+            $table->unsignedInteger('about_sort_order')->default(2);
 
             $table->boolean('books_enabled')->default(true);
             $table->string('books_title')->default('E-Book KM');
             $table->text('books_description')->nullable();
-            $table->unsignedInteger('books_sort_order')->default(30);
+            $table->unsignedInteger('books_sort_order')->default(3);
 
             $table->boolean('contact_enabled')->default(true);
             $table->string('contact_title')->default('ติดต่อเรา');
@@ -41,7 +41,7 @@ return new class extends Migration
             $table->string('phone', 30)->nullable();
             $table->string('email', 254)->nullable();
             $table->string('map_embed_url', 2048)->nullable();
-            $table->unsignedInteger('contact_sort_order')->default(40);
+            $table->unsignedInteger('contact_sort_order')->default(4);
 
             $table->boolean('contact_form_enabled')->default(true);
             $contactLabels = ['name' => 'ชื่อ', 'phone' => 'โทรศัพท์', 'email' => 'อีเมล', 'message' => 'ข้อความ'];

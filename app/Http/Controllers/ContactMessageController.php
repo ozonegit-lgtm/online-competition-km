@@ -26,6 +26,8 @@ class ContactMessageController extends Controller
             return response()->json(['message' => 'ส่งข้อความเรียบร้อยแล้ว'], 201);
         }
 
-        return back()->with('success', 'ส่งข้อความเรียบร้อยแล้ว');
+        return redirect()
+            ->to(route('knowledge.index').'#contact')
+            ->with('success', 'ส่งข้อความเรียบร้อยแล้ว');
     }
 }

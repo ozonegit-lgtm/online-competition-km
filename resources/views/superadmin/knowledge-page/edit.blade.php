@@ -29,6 +29,7 @@
     $fileClass = 'mt-2 block w-full rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-slate-700 hover:file:bg-slate-200';
     $labelClass = 'text-sm font-medium text-slate-700';
     $helpClass = 'mt-1 text-xs leading-5 text-slate-500';
+    $sectionOrderOptions = range(1, 4);
 @endphp
 
 <div class="mx-auto w-full max-w-6xl">
@@ -145,14 +146,18 @@
                 </label>
 
                 <label>
-                    <span class="{{ $labelClass }}">ลำดับ Section</span>
-                    <input
-                        type="number"
-                        min="0"
-                        name="hero_sort_order"
-                        value="{{ old('hero_sort_order', $settings->hero_sort_order) }}"
-                        class="{{ $inputClass }}"
-                    >
+                    <span class="{{ $labelClass }}">ลำดับการแสดง</span>
+                    <select name="hero_sort_order" required class="{{ $inputClass }}">
+                        @foreach ($sectionOrderOptions as $order)
+                            <option value="{{ $order }}" @selected((int) old('hero_sort_order', $settings->hero_sort_order) === $order)>
+                                ลำดับที่ {{ $order }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="{{ $helpClass }}">1 จะแสดงก่อน และ 4 จะแสดงท้ายสุด</p>
+                    @error('hero_sort_order')
+                        <span class="mt-1 block text-xs text-red-600">{{ $message }}</span>
+                    @enderror
                 </label>
 
                 <label class="md:col-span-2">
@@ -270,14 +275,18 @@
                 </label>
 
                 <label>
-                    <span class="{{ $labelClass }}">ลำดับ Section</span>
-                    <input
-                        type="number"
-                        min="0"
-                        name="about_sort_order"
-                        value="{{ old('about_sort_order', $settings->about_sort_order) }}"
-                        class="{{ $inputClass }}"
-                    >
+                    <span class="{{ $labelClass }}">ลำดับการแสดง</span>
+                    <select name="about_sort_order" required class="{{ $inputClass }}">
+                        @foreach ($sectionOrderOptions as $order)
+                            <option value="{{ $order }}" @selected((int) old('about_sort_order', $settings->about_sort_order) === $order)>
+                                ลำดับที่ {{ $order }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="{{ $helpClass }}">1 จะแสดงก่อน และ 4 จะแสดงท้ายสุด</p>
+                    @error('about_sort_order')
+                        <span class="mt-1 block text-xs text-red-600">{{ $message }}</span>
+                    @enderror
                 </label>
 
                 <label class="md:col-span-2">
@@ -356,14 +365,18 @@
                 </label>
 
                 <label>
-                    <span class="{{ $labelClass }}">ลำดับ Section</span>
-                    <input
-                        type="number"
-                        min="0"
-                        name="books_sort_order"
-                        value="{{ old('books_sort_order', $settings->books_sort_order) }}"
-                        class="{{ $inputClass }}"
-                    >
+                    <span class="{{ $labelClass }}">ลำดับการแสดง</span>
+                    <select name="books_sort_order" required class="{{ $inputClass }}">
+                        @foreach ($sectionOrderOptions as $order)
+                            <option value="{{ $order }}" @selected((int) old('books_sort_order', $settings->books_sort_order) === $order)>
+                                ลำดับที่ {{ $order }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="{{ $helpClass }}">1 จะแสดงก่อน และ 4 จะแสดงท้ายสุด</p>
+                    @error('books_sort_order')
+                        <span class="mt-1 block text-xs text-red-600">{{ $message }}</span>
+                    @enderror
                 </label>
 
                 <label class="md:col-span-2">
@@ -410,14 +423,18 @@
                 </label>
 
                 <label>
-                    <span class="{{ $labelClass }}">ลำดับ Section</span>
-                    <input
-                        type="number"
-                        min="0"
-                        name="contact_sort_order"
-                        value="{{ old('contact_sort_order', $settings->contact_sort_order) }}"
-                        class="{{ $inputClass }}"
-                    >
+                    <span class="{{ $labelClass }}">ลำดับการแสดง</span>
+                    <select name="contact_sort_order" required class="{{ $inputClass }}">
+                        @foreach ($sectionOrderOptions as $order)
+                            <option value="{{ $order }}" @selected((int) old('contact_sort_order', $settings->contact_sort_order) === $order)>
+                                ลำดับที่ {{ $order }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="{{ $helpClass }}">1 จะแสดงก่อน และ 4 จะแสดงท้ายสุด</p>
+                    @error('contact_sort_order')
+                        <span class="mt-1 block text-xs text-red-600">{{ $message }}</span>
+                    @enderror
                 </label>
 
                 <label class="md:col-span-2">

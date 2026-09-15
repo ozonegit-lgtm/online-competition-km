@@ -186,6 +186,24 @@
                         >
                             @csrf
 
+                            @if ($errors->any())
+                                <div
+                                    class="mb-5 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                                    role="alert"
+                                    aria-labelledby="contact-error-title"
+                                >
+                                    <p id="contact-error-title" class="font-semibold">
+                                        ไม่สามารถส่งข้อความได้ กรุณาตรวจสอบข้อมูล
+                                    </p>
+
+                                    <ul class="mt-2 list-disc space-y-1 pl-5">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
                             {{-- Honeypot --}}
                             <input
                                 type="text"

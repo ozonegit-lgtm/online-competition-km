@@ -6,9 +6,17 @@ use App\Rules\GoogleMapsEmbedUrl;
 use App\Rules\KnowledgeItemFilePolicy;
 use App\Rules\SafePageUrl;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class KnowledgePageSettingRequest extends FormRequest
 {
+    private const SECTION_SORT_FIELDS = [
+        'hero_sort_order',
+        'about_sort_order',
+        'books_sort_order',
+        'contact_sort_order',
+    ];
+
     public function authorize(): bool
     {
         return $this->user()?->is_active === true
@@ -45,7 +53,15 @@ class KnowledgePageSettingRequest extends FormRequest
 
         foreach (['hero', 'about', 'books', 'contact'] as $section) {
             $rules["{$section}_enabled"] = ['sometimes', 'boolean'];
-            $rules["{$section}_sort_order"] = ['sometimes', 'integer', 'min:0', 'max:4294967295'];
+            $field = "{$section}_sort_order";
+            $otherFields = array_values(array_diff(self::SECTION_SORT_FIELDS, [$field]));
+            $rules[$field] = [
+                'bail',
+                'required_with:'.implode(',', $otherFields),
+                'integer',
+                Rule::in([1, 2, 3, 4]),
+                'different:'.implode(',', $otherFields),
+            ];
         }
         foreach (['hero_button', 'contact_form'] as $field) {
             $rules["{$field}_enabled"] = ['sometimes', 'boolean'];
@@ -64,5 +80,19 @@ class KnowledgePageSettingRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function messages(): array
+    {
+        $messages = [];
+
+        foreach (self::SECTION_SORT_FIELDS as $field) {
+            $messages["{$field}.required_with"] = 'กรุณาเลือกลำดับการแสดงให้ครบทั้ง 4 Section';
+            $messages["{$field}.integer"] = 'ลำดับการแสดงต้องเป็นตัวเลข 1 ถึง 4';
+            $messages["{$field}.in"] = 'ลำดับการแสดงต้องเป็นตัวเลข 1 ถึง 4';
+            $messages["{$field}.different"] = 'ลำดับการแสดงของแต่ละ Section ต้องไม่ซ้ำกัน';
+        }
+
+        return $messages;
     }
 }
