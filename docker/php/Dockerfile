@@ -41,6 +41,7 @@ RUN apt-get update && apt-get install -y \
         intl \
         gd \
         zip \
+        opcache \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -65,6 +66,8 @@ FROM runtime AS production
 ENV APP_ENV=production \
     APP_DEBUG=false \
     COMPOSER_ALLOW_SUPERUSER=1
+
+COPY docker/php/production.ini /usr/local/etc/php/conf.d/zz-production.ini
 
 COPY --chown=www-data:www-data composer.json composer.lock artisan ./
 COPY --chown=www-data:www-data app ./app

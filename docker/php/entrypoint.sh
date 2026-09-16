@@ -2,25 +2,36 @@
 
 set -eu
 
-private_root=/var/www/html/storage/app/private
+storage_root=/var/www/html/storage
+app_storage_root="$storage_root/app"
+private_root="$app_storage_root/private"
+public_root="$app_storage_root/public"
 
-# Private uploads must be owned by the same user as PHP-FPM. Never follow
-# symlinks while repairing an existing tree.
-if [ -L /var/www/html/storage ] || [ -L /var/www/html/storage/app ] || [ -L "$private_root" ]; then
-    echo 'Private storage must not be a symbolic link.' >&2
+# Uploaded files must be owned by the PHP-FPM user. Never follow symlinks
+# while repairing a persistent volume.
+for path in "$storage_root" "$app_storage_root" "$private_root" "$public_root"; do
+    if [ -L "$path" ]; then
+        echo "Upload storage path must not be a symbolic link: $path" >&2
+        exit 1
+    fi
+done
+
+mkdir -p "$private_root" "$public_root"
+
+if [ -n "$(find "$private_root" "$public_root" -type l -print -quit)" ]; then
+    echo 'Upload storage contains a symbolic link; refusing permission repair.' >&2
     exit 1
 fi
-mkdir -p "$private_root"
-if [ -n "$(find "$private_root" -type l -print -quit)" ]; then
-    echo 'Private storage contains a symbolic link; refusing permission repair.' >&2
-    exit 1
-fi
+
 mkdir -p "$private_root/submissions" "$private_root/knowledge-items/covers" "$private_root/knowledge-items/attachments"
 if [ "$(id -u)" -eq 0 ]; then
-    chown -R www-data:www-data "$private_root"
+    chown -R www-data:www-data "$private_root" "$public_root"
 fi
+
 find "$private_root" -type d -exec chmod 0700 {} +
 find "$private_root" -type f -exec chmod 0600 {} +
+find "$public_root" -type d -exec chmod 0755 {} +
+find "$public_root" -type f -exec chmod 0644 {} +
 
 runtime_directories='
 /var/www/html/storage/framework/sessions
