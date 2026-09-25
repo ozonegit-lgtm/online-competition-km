@@ -148,10 +148,9 @@ docker compose --env-file .env.production -f docker-compose.prod.yml ps
 ```bash
 docker compose --env-file .env.production -f docker-compose.prod.yml exec app php artisan submissions:secure-files
 docker compose --env-file .env.production -f docker-compose.prod.yml exec app php artisan knowledge-items:secure-files
-docker compose --env-file .env.production -f docker-compose.prod.yml exec app php artisan knowledge-items:import-legacy-attachments
 ```
 
-ตรวจรายงานและข้อมูลจริงก่อนเติม `--execute` การ import legacy attachment ต้องหยุดการเขียน KM ชั่วคราวตามข้อความเตือนของ command ห้ามเปลี่ยน `FILESYSTEM_DISK` เพื่อใช้แทนขั้นตอน migration นี้
+ระบบ legacy attachment ถูกยกเลิกหลังตรวจยืนยันว่าไม่มีข้อมูลค้างแล้ว ไฟล์ KM ปัจจุบันยังคงอ้างอิงผ่าน `knowledge_items.attachment_path`
 
 ## 7. ขั้นตอนหลังระบบ HTTP ทำงาน
 

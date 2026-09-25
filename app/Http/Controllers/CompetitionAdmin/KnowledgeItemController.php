@@ -8,7 +8,6 @@ use App\Models\CompetitionCategory;
 use App\Models\KnowledgeItem;
 use App\Models\Submission;
 use App\Services\KnowledgeFileCleanup;
-use App\Services\LegacyKnowledgeAttachments;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -207,8 +206,6 @@ class KnowledgeItemController extends Controller
     public function update(KnowledgeItemRequest $request, KnowledgeItem $knowledgeItem): RedirectResponse
     {
         Gate::authorize('update', $knowledgeItem);
-        app(LegacyKnowledgeAttachments::class)->ensureMigrated($knowledgeItem->id);
-
         $validated = $request->validated();
         $oldCover = $knowledgeItem->cover_image;
         $oldAttachment = $knowledgeItem->attachment_path;
@@ -284,8 +281,6 @@ class KnowledgeItemController extends Controller
     public function destroy(Request $request, KnowledgeItem $knowledgeItem): RedirectResponse
     {
         Gate::authorize('delete', $knowledgeItem);
-        app(LegacyKnowledgeAttachments::class)->ensureMigrated($knowledgeItem->id);
-
         $cover = $knowledgeItem->cover_image;
         $attachment = $knowledgeItem->attachment_path;
 

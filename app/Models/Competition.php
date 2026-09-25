@@ -135,13 +135,6 @@ class Competition extends Model
         return $this->hasMany(Submission::class);
     }
 
-    /**
-     * รางวัล
-     */
-    public function awards(): HasMany
-    {
-        return $this->hasMany(Award::class);
-    }
     public function judgingSession(): HasOne
     {
         return $this->hasOne(JudgingSession::class);

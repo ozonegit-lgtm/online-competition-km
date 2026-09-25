@@ -199,7 +199,6 @@ class CompetitionController extends Controller
             'rubrics',
             'judgeAssignments',
             'submissions',
-            'awards',
         ]);
 
         return view('competition-admin.competitions.show',compact('competition'));
@@ -359,11 +358,10 @@ class CompetitionController extends Controller
             $competition->submissions()->exists()
             || $competition->judgeAssignments()->exists()
             || $competition->judgingSession()->exists()
-            || $competition->awards()->exists()
         ) {
             return redirect()
                 ->route('competition-admin.competitions.index')
-                ->with('error', 'ไม่สามารถลบการแข่งขันนี้ได้ เนื่องจากมีข้อมูลผลงาน การตัดสิน หรือรางวัลที่เกี่ยวข้อง');
+                ->with('error', 'ไม่สามารถลบการแข่งขันนี้ได้ เนื่องจากมีข้อมูลผลงานหรือการตัดสินที่เกี่ยวข้อง');
         }
 
         $coverImage = $competition->cover_image;

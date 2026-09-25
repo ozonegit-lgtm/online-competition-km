@@ -294,13 +294,6 @@
                 </p>
             </div>
 
-            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                <p class="font-medium text-slate-500 text-xs">รางวัล</p>
-                <p class="mt-1 text-xl font-bold text-slate-900">
-                    {{ number_format($competition->awards_count ?? 0) }}
-                </p>
-            </div>
-
         </section>
 
         <div class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">

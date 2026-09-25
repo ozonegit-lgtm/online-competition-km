@@ -89,17 +89,6 @@ namespace App\Models;
             return $this->hasMany(Score::class);
         }
 
-        /**
-         * รายการเชื่อมรางวัล
-         *
-         * คืนค่า SubmissionAward
-         */
-        public function awards(): HasMany
-        {
-            return $this->hasMany(SubmissionAward::class);
-        }
-
-
         public function knowledgeItem(): HasOne
         {
             return $this->hasOne(KnowledgeItem::class);

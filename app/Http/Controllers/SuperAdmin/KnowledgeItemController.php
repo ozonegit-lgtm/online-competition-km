@@ -10,7 +10,6 @@ use App\Models\KnowledgeItem;
 use App\Models\Submission;
 use App\Models\User;
 use App\Services\KnowledgeFileCleanup;
-use App\Services\LegacyKnowledgeAttachments;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -274,8 +273,6 @@ class KnowledgeItemController extends Controller
     {
         abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('update', $knowledgeItem);
-        app(LegacyKnowledgeAttachments::class)->ensureMigrated($knowledgeItem->id);
-
         $validated = $request->validated();
         $oldCover = $knowledgeItem->cover_image;
         $oldAttachment = $knowledgeItem->attachment_path;
@@ -352,8 +349,6 @@ class KnowledgeItemController extends Controller
     {
         abort_if($knowledgeItem->is_ebook, 404);
         Gate::authorize('delete', $knowledgeItem);
-        app(LegacyKnowledgeAttachments::class)->ensureMigrated($knowledgeItem->id);
-
         $paths = [
             $knowledgeItem->cover_image,
             $knowledgeItem->attachment_path,

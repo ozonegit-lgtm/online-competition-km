@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
@@ -105,19 +104,6 @@ class KnowledgeItem extends Model
     public function getIsEbookAttribute(): bool
     {
         return $this->knowledge_type === 'ebook';
-    }
-
-    /**
-     * แท็ก
-     */
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            KnowledgeTag::class,
-            'knowledge_item_tags',
-            'knowledge_item_id',
-            'knowledge_tag_id'
-        );
     }
 
     /**
