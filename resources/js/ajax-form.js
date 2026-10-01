@@ -46,62 +46,70 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-function extractErrorMessage(responseText, contentType) {
-    if (contentType.includes('application/json')) {
-        try {
-            const payload = JSON.parse(responseText);
+    function extractErrorMessage(responseText, contentType) {
+        if (contentType.includes('application/json')) {
+            try {
+                const payload = JSON.parse(responseText);
 
-            if (payload.message) {
-                return payload.message;
+                if (payload.message) {
+                    return payload.message;
+                }
+
+                const firstError = Object.values(payload.errors ?? {})
+                    .flat()
+                    .find(Boolean);
+
+                if (firstError) {
+                    return firstError;
+                }
+            } catch (_) {
+                // ใช้ข้อความสำรองด้านล่าง
             }
-
-            const firstError = Object.values(payload.errors ?? {})
-                .flat()
-                .find(Boolean);
-
-            if (firstError) {
-                return firstError;
-            }
-        } catch (_) {
-            // ใช้ข้อความสำรองด้านล่าง
         }
+
+        if (contentType.includes('text/html')) {
+            const responseDocument = new DOMParser().parseFromString(
+                responseText,
+                'text/html'
+            );
+            const alert = responseDocument.querySelector(
+                '[role="alert"], [data-error-message]'
+            );
+
+            if (alert?.textContent.trim()) {
+                return alert.textContent.trim();
+            }
+        }
+
+        return 'ไม่สามารถดำเนินการได้ กรุณาลองใหม่';
     }
 
-    if (contentType.includes('text/html')) {
+    function replaceTarget(responseText, targetSelector) {
+        if (!targetSelector) {
+            return;
+        }
+
+        
+
         const responseDocument = new DOMParser().parseFromString(
             responseText,
             'text/html'
         );
-        const alert = responseDocument.querySelector(
-            '[role="alert"], [data-error-message]'
-        );
 
-        if (alert?.textContent.trim()) {
-            return alert.textContent.trim();
+        const currentTargets = [...document.querySelectorAll(targetSelector)];
+        const nextTargets = [...responseDocument.querySelectorAll(targetSelector)];
+
+        if (
+            !currentTargets.length ||
+            currentTargets.length !== nextTargets.length
+        ) {
+            throw new Error('บันทึกสำเร็จ แต่ไม่พบส่วนข้อมูลที่ต้องอัปเดต');
         }
+
+        currentTargets.forEach((target, index) => {
+            target.replaceWith(nextTargets[index]);
+        });
     }
-
-    return 'ไม่สามารถดำเนินการได้ กรุณาลองใหม่';
-}
-
-function replaceTarget(responseText, targetSelector) {
-    if (!targetSelector) {
-        return;
-    }
-
-    const responseDocument = new DOMParser().parseFromString(
-        responseText,
-        'text/html'
-    );
-    const currentTargets = [...document.querySelectorAll(targetSelector)];
-    const nextTargets = [...responseDocument.querySelectorAll(targetSelector)];
-
-    if (!currentTargets.length || currentTargets.length !== nextTargets.length) {
-        throw new Error('บันทึกสำเร็จ แต่ไม่พบส่วนข้อมูลที่ต้องอัปเดต');
-    }
-
-    currentTargets.forEach((target, index) => target.replaceWith(nextTargets[index]));
-}
 
 document.addEventListener('submit', async (event) => {
     const form = event.target.closest(AJAX_FORM_SELECTOR);
@@ -165,10 +173,16 @@ document.addEventListener('submit', async (event) => {
             return;
         }
 
-        replaceTarget(responseText, form.dataset.ajaxTarget);
         showToast(
-            form.dataset.ajaxSuccess || 'บันทึกข้อมูลเรียบร้อยแล้ว'
-        );
+    form.dataset.ajaxSuccess || 'บันทึกข้อมูลเรียบร้อยแล้ว'
+);
+
+if (response.redirected) {
+    window.location.assign(response.url);
+    return;
+}
+
+replaceTarget(responseText, form.dataset.ajaxTarget);
 
         document.dispatchEvent(
             new CustomEvent('ajax-form:success', {
