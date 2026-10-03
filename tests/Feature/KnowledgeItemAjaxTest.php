@@ -21,14 +21,16 @@ class KnowledgeItemAjaxTest extends TestCase
         $show = route('competition-admin.km.show', $item);
         $this->actingAs($owner)->get($index)->assertOk()
             ->assertSee('id="km-list"', false)->assertSee('id="km-total"', false)
-            ->assertSee('data-ajax-target="#km-list, #km-total"', false)
+            ->assertSee('data-ajax-target="#km-list"', false)
             ->assertSee(route('competition-admin.km.publish', $item));
         $this->from($index)->post(route('competition-admin.km.publish', $item), [], ['X-Requested-With' => 'XMLHttpRequest'])->assertRedirect($index);
-        $this->get($index)->assertSee('published')->assertSee(route('competition-admin.km.unpublish', $item));
+        $this->get($index)->assertSee('published')
+            ->assertSee('data-ajax-target="#km-list"', false)
+            ->assertSee(route('competition-admin.km.unpublish', $item));
         $this->get($show)->assertOk()->assertSee('id="km-detail"', false)
             ->assertSee('data-ajax-target="#km-detail"', false)
             ->assertSee('data-ajax-redirect="'.$index.'"', false);
-        $this->from($show)->delete(route('competition-admin.km.unpublish', $item), [], ['X-Requested-With' => 'XMLHttpRequest'])->assertRedirect($show);
+        $this->from($show)->post(route('competition-admin.km.unpublish', $item), ['_method' => 'DELETE'], ['X-Requested-With' => 'XMLHttpRequest'])->assertRedirect($show);
         $this->assertDatabaseHas('knowledge_items', [
             'id' => $item->id,
             'status' => 'draft',

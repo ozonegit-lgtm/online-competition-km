@@ -493,7 +493,7 @@
                         @if($item->status === 'published')
                             @can('unpublish', $item)
                                 <x-ajax-form
-                                    target="#km-list, #km-total"
+                                    target="#km-list"
                                     :action="route('competition-admin.km.unpublish', $item)"
                                     method="DELETE"
                                     confirm="ยืนยันถอนเผยแพร่รายการนี้?"
@@ -516,7 +516,7 @@
                         @else
                             @can('publish', $item)
                                 <x-ajax-form
-                                    target="#km-list, #km-total"
+                                    target="#km-list"
                                     :action="route('competition-admin.km.publish', $item)"
                                     method="POST"
                                     confirm="ยืนยันเผยแพร่รายการนี้?"
@@ -740,7 +740,7 @@
 
                         @if($isPublished)
                             <x-ajax-form
-                                target="#km-list, #km-total"
+                                target="#km-list"
                                 :action="route('competition-admin.submissions.km.unpublish', $submission)"
                                 method="DELETE"
                                 confirm="ยืนยันถอนผลงานนี้ออกจาก KM หรือไม่?"
@@ -761,7 +761,7 @@
                             </x-ajax-form>
                         @else
                             <x-ajax-form
-                                target="#km-list, #km-total"
+                                target="#km-list"
                                 :action="route('competition-admin.submissions.km.publish', $submission)"
                                 method="POST"
                                 confirm="ยืนยันเผยแพร่ผลงานนี้เข้าสู่ KM หรือไม่?"
