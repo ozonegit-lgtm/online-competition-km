@@ -9,9 +9,7 @@
 
     {{-- Logo --}}
     <div class="text-center mb-4">
-        <img src="{{ asset('images/logo.png') }}"
-             alt="Logo"
-             class="w-14 h-14 mx-auto mb-3">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-14 h-14 mx-auto mb-3">
 
         <h1 class="text-gray-800 text-xl font-bold">
             Online Competition
